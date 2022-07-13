@@ -3,13 +3,11 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-typedef unsigned char byte;
-
 struct RGBA {
-    byte R;
-    byte G;
-    byte B;
-    byte A;
+    GLbyte R;
+    GLbyte G;
+    GLbyte B;
+    GLbyte A;
 };
 
 struct GLRGBA {

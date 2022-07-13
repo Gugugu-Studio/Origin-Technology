@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.0.0)
 
-set (PROJECT_NAME UnknownGame)
+set (PROJECT_NAME OriginTechnology)
 
 set (COMPILER vc2019)
 
@@ -18,15 +18,16 @@ include_directories(
 set (SOURCES
 ./src/Main.cpp
 ./src/Window.cpp
+./src/Shader.cpp
 ./src/lib/glad.c
 )
 
-set (SHOW_CONSOLE false)
+# set (SHOW_CONSOLE false)
 
 if (${COMPILER} MATCHES vc2019)
     set (LIBRARIES glfw3.lib)
-    set (COMPILE_OPTIONS /MT)
-    set (LK_OPTIONS  )
+    set (COMPILE_OPTIONS /MT /EHsc)
+    set (LK_OPTIONS)
     if (${SHOW_CONSOLE} MATCHES false)
         set (LK_OPTIONS ${LK_OPTIONS} /SUBSYSTEM:WINDOWS /entry:mainCRTStartup)
     endif()
@@ -35,10 +36,14 @@ endif()
 add_link_options(${LK_OPTIONS})
 add_compile_options(${COMPILER_OPTIONS})
 
+message ("SRC PATH " ${CMAKE_CURRENT_SOURCE_DIR})
+message ("BIN PATH " ${CMAKE_CURRENT_BINARY_DIR})
 message ("COMPILER "  ${COMPILER})
 message ("LIBRARIES " ${LIBRARIES})
 message ("COMPILER OPTIONS " ${COMPILE_OPTIONS})
 message ("LINKER OPTIONS " ${LK_OPTIONS})
+
+file (COPY ${CMAKE_CURRENT_SOURCE_DIR}/resource/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/resource/)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
