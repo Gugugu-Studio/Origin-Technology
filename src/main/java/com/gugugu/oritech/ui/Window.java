@@ -11,6 +11,7 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 
 /**
  * @author theflysong
+ * @author squid233
  * @since 1.0
  */
 public abstract class Window implements IKeyListener, ISizeListener {

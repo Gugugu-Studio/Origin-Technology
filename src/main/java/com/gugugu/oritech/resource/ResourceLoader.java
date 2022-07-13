@@ -21,9 +21,9 @@ public class ResourceLoader {
     }
 
     public static String loadText(ResLocation location) {
-        var sb = new StringBuilder();
-        var file = loadFile(location);
-        try (var br = new BufferedReader(new InputStreamReader(file, StandardCharsets.UTF_8))) {
+        StringBuilder sb = new StringBuilder();
+        InputStream file = loadFile(location);
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(file, StandardCharsets.UTF_8))) {
             String line = br.readLine();
             if (line != null) {
                 sb.append(line);
