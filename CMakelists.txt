@@ -22,9 +22,16 @@ set (SOURCES
 ./src/lib/glad.c
 )
 
-# set (SHOW_CONSOLE false)
+set (SHOW_CONSOLE false)
 
 if (${COMPILER} MATCHES vc2019)
+    set (LIBRARIES glfw3.lib)
+    set (COMPILE_OPTIONS /MT /EHsc)
+    set (LK_OPTIONS)
+    if (${SHOW_CONSOLE} MATCHES false)
+        set (LK_OPTIONS ${LK_OPTIONS} /SUBSYSTEM:WINDOWS /entry:mainCRTStartup)
+    endif()
+elseif (${COMPILER} MATCHES vc2013)
     set (LIBRARIES glfw3.lib)
     set (COMPILE_OPTIONS /MT /EHsc)
     set (LK_OPTIONS)
