@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 3.0.0)
 set (PROJECT_NAME OriginTechnology)
 
 #set (COMPILER compiler)
-#compiler list: vc2019 vc2013
+#compiler list: vc2019
 include (compiler.cmake)
 
 project (${PROJECT_NAME})
@@ -27,13 +27,6 @@ set (SOURCES
 set (SHOW_CONSOLE false)
 
 if (${COMPILER} MATCHES vc2019)
-    set (LIBRARIES glfw3.lib)
-    set (COMPILE_OPTIONS /MT /EHsc)
-    set (LK_OPTIONS)
-    if (${SHOW_CONSOLE} MATCHES false)
-        set (LK_OPTIONS ${LK_OPTIONS} /SUBSYSTEM:WINDOWS /entry:mainCRTStartup)
-    endif()
-elseif (${COMPILER} MATCHES vc2013)
     set (LIBRARIES glfw3.lib)
     set (COMPILE_OPTIONS /MT /EHsc)
     set (LK_OPTIONS)
