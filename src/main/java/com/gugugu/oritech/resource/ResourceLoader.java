@@ -6,9 +6,18 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * @author theflysong
+ * @author squid233
+ * @since 1.0
+ */
 public class ResourceLoader {
+    public static InputStream loadFile(String name) {
+        return ResourceLoader.class.getClassLoader().getResourceAsStream(name);
+    }
+
     public static InputStream loadFile(ResLocation location) {
-        return ResourceLoader.class.getClassLoader().getResourceAsStream(location.toPath());
+        return loadFile(location.toPath());
     }
 
     public static String loadText(ResLocation location) {

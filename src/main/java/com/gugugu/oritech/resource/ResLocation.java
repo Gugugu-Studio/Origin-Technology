@@ -1,19 +1,36 @@
 package com.gugugu.oritech.resource;
 
+import java.util.Objects;
+
+/**
+ * @author squid233
+ * @author theflysong
+ * @since 1.0
+ */
 public class ResLocation {
     public static final String DEFAULT_NAMESPACE = "origin_technology";
 
-    public enum ResType {
-        ASSETS("assets"),
-        DATA("data"),
-        CORE("core"),
-        BEHAVIOR("behavior");
+    private ResType resType;
+    private String namespace;
+    private String path;
 
-        public String pathPrefix;
-
-        ResType(String prefix) {
-            this.pathPrefix = prefix;
+    private ResLocation(ResType type, String[] location) {
+        resType = type;
+        if (location.length > 1) {
+            namespace = location[0];
+            path = location[1];
+        } else {
+            namespace = DEFAULT_NAMESPACE;
+            path = location[0];
         }
+    }
+
+    public ResLocation(ResType type, String namespace, String path) {
+        this(type, new String[]{namespace, path});
+    }
+
+    public ResLocation(ResType type, String location) {
+        this(type, location.split(":", 2));
     }
 
     public ResType getResType() {
@@ -40,20 +57,6 @@ public class ResLocation {
         this.path = path;
     }
 
-    private ResType resType;
-    private String namespace;
-    private String path;
-
-    public ResLocation(ResType resType, String namespace, String path) {
-        this.resType = resType;
-        this.namespace = namespace;
-        this.path = path;
-    }
-
-    public ResLocation(ResType resType, String path) {
-        this(resType, DEFAULT_NAMESPACE, path);
-    }
-
     @Override
     public String toString() {
         return resType.pathPrefix + "@" + namespace + ":" + path;
@@ -61,5 +64,20 @@ public class ResLocation {
 
     public String toPath() {
         return resType.pathPrefix + "/" + namespace + "/" + path;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ResLocation that = (ResLocation) o;
+        return resType == that.resType &&
+               Objects.equals(namespace, that.namespace) &&
+               Objects.equals(path, that.path);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(resType, namespace, path);
     }
 }
