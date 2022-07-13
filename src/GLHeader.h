@@ -23,4 +23,5 @@ inline GLRGBA TurnGLRGBA(RGBA color) {
     glColor.G = color.G / 255.0f;
     glColor.B = color.B / 255.0f;
     glColor.A = color.A / 255.0f;
+    return glColor;
 }
