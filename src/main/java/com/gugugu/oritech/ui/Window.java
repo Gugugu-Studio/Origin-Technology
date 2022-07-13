@@ -1,17 +1,20 @@
 package com.gugugu.oritech.ui;
 
 import org.lwjgl.glfw.GLFWErrorCallback;
-import org.lwjgl.glfw.GLFWKeyCallbackI;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11C.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
-public abstract class Window implements IKeyListener {
-    private long handle;
+/**
+ * @author theflysong
+ * @since 1.0
+ */
+public abstract class Window implements IKeyListener, ISizeListener {
+    private final long handle;
 
     public static void initGLFW() throws IllegalStateException {
         GLFWErrorCallback.createPrint(System.err).set();
@@ -20,12 +23,15 @@ public abstract class Window implements IKeyListener {
         }
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
     }
 
     public static void terminateGLFW() {
         glfwTerminate();
-        glfwSetErrorCallback(null).free();
+        var cb = glfwSetErrorCallback(null);
+        if (cb != null) {
+            cb.free();
+        }
     }
 
     public Window(String title, int width, int height) throws IllegalStateException {
@@ -35,6 +41,7 @@ public abstract class Window implements IKeyListener {
         }
 
         glfwSetKeyCallback(handle, this::onKey);
+        glfwSetFramebufferSizeCallback(handle, this::onResize);
 
         int[] pWidth = {0};
         int[] pHeight = {0};
@@ -44,9 +51,9 @@ public abstract class Window implements IKeyListener {
 
         if (videoMode != null) {
             glfwSetWindowPos(
-                    handle,
-                    (videoMode.width() - pWidth[0]) / 2,
-                    (videoMode.height() - pHeight[0]) / 2
+                handle,
+                (videoMode.width() - pWidth[0]) / 2,
+                (videoMode.height() - pHeight[0]) / 2
             );
         }
 
@@ -58,6 +65,7 @@ public abstract class Window implements IKeyListener {
     }
 
     public abstract void init();
+
     public abstract void update();
 
     public void mainLoop() {
