@@ -2,7 +2,9 @@ cmake_minimum_required (VERSION 3.0.0)
 
 set (PROJECT_NAME OriginTechnology)
 
-set (COMPILER vc2019)
+#set (COMPILER compiler)
+#compiler list: vc2019 vc2013
+include (compiler.cmake)
 
 project (${PROJECT_NAME})
 
