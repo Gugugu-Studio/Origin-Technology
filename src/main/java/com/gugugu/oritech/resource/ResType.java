@@ -6,13 +6,16 @@ package com.gugugu.oritech.resource;
  * @since 1.0
  */
 public enum ResType {
+    /**
+     * Textures, models and so on
+     */
     ASSETS("assets"),
     /**
      * Data and values
      */
     DATA("data"),
     /**
-     * Resources that can't be modified
+     * Core Resources.Shouldn't be modified
      */
     CORE("core"),
     /**
