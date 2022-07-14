@@ -2,8 +2,7 @@ package com.gugugu.oritech;
 
 import com.gugugu.oritech.ui.Window;
 
-import static org.lwjgl.opengl.GL11C.glClearColor;
-import static org.lwjgl.opengl.GL11C.glViewport;
+import static org.lwjgl.opengl.GL11C.*;
 
 /**
  * @author theflysong
@@ -13,9 +12,9 @@ import static org.lwjgl.opengl.GL11C.glViewport;
 public class Main extends Window {
     public static void main(String[] args) {
         Window.initGLFW();
-        var main = new Main("Origin Technology", 854, 480);
-        main.mainLoop();
-        main.closeWindow();
+        try (var main = new Main("Origin Technology", 854, 480)) {
+            main.mainLoop();
+        }
         Window.terminateGLFW();
     }
 
@@ -26,10 +25,19 @@ public class Main extends Window {
     @Override
     public void init() {
         glClearColor(0.3f, 0.4f, 1.0f, 1.0f);
+        // Initialize resources here
     }
 
     @Override
     public void update() {
+        // Render
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
+    @Override
+    public void close() {
+        // Free resources here
+        super.close();
     }
 
     @Override

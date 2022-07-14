@@ -4,9 +4,8 @@ import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 
-import static org.lwjgl.glfw.Callbacks.*;
+import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11C.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 /**
@@ -14,7 +13,7 @@ import static org.lwjgl.system.MemoryUtil.NULL;
  * @author squid233
  * @since 1.0
  */
-public abstract class Window implements IKeyListener, ISizeListener {
+public abstract class Window implements IKeyListener, ISizeListener, AutoCloseable {
     private final long handle;
 
     public static void initGLFW() throws IllegalStateException {
@@ -73,8 +72,6 @@ public abstract class Window implements IKeyListener, ISizeListener {
         init();
 
         while (!glfwWindowShouldClose(handle)) {
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
             update();
 
             glfwSwapBuffers(handle);
@@ -82,7 +79,8 @@ public abstract class Window implements IKeyListener, ISizeListener {
         }
     }
 
-    public void closeWindow() {
+    @Override
+    public void close() {
         glfwFreeCallbacks(handle);
         glfwDestroyWindow(handle);
     }
