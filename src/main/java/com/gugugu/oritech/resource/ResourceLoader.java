@@ -1,5 +1,7 @@
 package com.gugugu.oritech.resource;
 
+import com.gugugu.oritech.renderer.Shader;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,5 +37,12 @@ public class ResourceLoader {
             e.printStackTrace();
         }
         return sb.toString();
+    }
+
+    public static Shader loadShader(ResLocation vertexLocation, ResLocation fragmentLocation) {
+        String vertexShader = loadText(vertexLocation);
+        String fragmentShader = loadText(fragmentLocation);
+
+        return new Shader(vertexShader, fragmentShader);
     }
 }

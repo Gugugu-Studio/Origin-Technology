@@ -28,7 +28,7 @@ public abstract class Window implements IKeyListener, ISizeListener, AutoCloseab
 
     public static void terminateGLFW() {
         glfwTerminate();
-        var cb = glfwSetErrorCallback(null);
+        GLFWErrorCallback cb = glfwSetErrorCallback(null);
         if (cb != null) {
             cb.free();
         }
