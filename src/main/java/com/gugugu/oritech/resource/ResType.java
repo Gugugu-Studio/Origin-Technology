@@ -15,7 +15,7 @@ public enum ResType {
      */
     DATA("data"),
     /**
-     * Core Resources.Shouldn't be modified
+     * Core resources. Shouldn't be modified
      */
     CORE("core"),
     /**
