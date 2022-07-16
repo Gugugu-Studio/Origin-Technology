@@ -1,5 +1,11 @@
 package com.gugugu.oritech.renderer;
 
+import org.joml.Matrix4f;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 import static org.lwjgl.opengl.GL20C.*;
 
 /**
@@ -9,6 +15,7 @@ import static org.lwjgl.opengl.GL20C.*;
  */
 public class Shader implements AutoCloseable {
     private final int programId;
+    private final Map<CharSequence, GLUniform> uniformMap = new HashMap<>();
 
     public Shader(CharSequence vertexShader, CharSequence fragmentShader) {
         programId = glCreateProgram();
@@ -27,6 +34,13 @@ public class Shader implements AutoCloseable {
         glDetachShader(programId, fsh);
         glDeleteShader(vsh);
         glDeleteShader(fsh);
+
+        // Initialize uniforms
+        final Matrix4f identity = new Matrix4f();
+        createUniform("Projection", UniformType.MAT_F4).ifPresent(uniform -> uniform.set(identity));
+        createUniform("View", UniformType.MAT_F4).ifPresent(uniform -> uniform.set(identity));
+        createUniform("Model", UniformType.MAT_F4).ifPresent(uniform -> uniform.set(identity));
+        createUniform("ColorModulator", UniformType.F4).ifPresent(uniform -> uniform.set(1.0f, 1.0f, 1.0f, 1.0f));
     }
 
     private static int compileShader(int type, String typeStr, CharSequence src) {
@@ -40,6 +54,30 @@ public class Shader implements AutoCloseable {
                                             glGetShaderInfoLog(shader));
         }
         return shader;
+    }
+
+    public Optional<GLUniform> createUniform(CharSequence name,
+                                             UniformType type) {
+        if (uniformMap.containsKey(name)) {
+            return Optional.of(uniformMap.get(name));
+        }
+        int loc = glGetUniformLocation(programId, name);
+        if (loc != -1) {
+            GLUniform uniform = new GLUniform(loc, type);
+            uniformMap.put(name, uniform);
+            return Optional.of(uniform);
+        }
+        return Optional.empty();
+    }
+
+    public Optional<GLUniform> getUniform(CharSequence name) {
+        return Optional.ofNullable(uniformMap.get(name));
+    }
+
+    public void uploadUniforms() {
+        for (GLUniform uniform : uniformMap.values()) {
+            uniform.upload();
+        }
     }
 
     public void bind() {
@@ -56,6 +94,9 @@ public class Shader implements AutoCloseable {
 
     @Override
     public void close() {
+        for (GLUniform uniform : uniformMap.values()) {
+            uniform.close();
+        }
         delete();
     }
 }

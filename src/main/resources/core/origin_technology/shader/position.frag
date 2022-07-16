@@ -2,6 +2,8 @@
 
 out vec4 FragColor;
 
+uniform vec4 ColorModulator;
+
 void main() {
-    FragColor = vec4(1.0);
+    FragColor = ColorModulator;
 }
