@@ -1,5 +1,7 @@
 package com.gugugu.oritech.resource;
 
+import com.gugugu.oritech.util.Identifier;
+
 import java.util.Objects;
 
 /**
@@ -8,8 +10,6 @@ import java.util.Objects;
  * @since 1.0
  */
 public class ResLocation {
-    public static final String DEFAULT_NAMESPACE = "origin_technology";
-
     private ResType resType;
     private String namespace;
     private String path;
@@ -20,7 +20,7 @@ public class ResLocation {
             namespace = location[0];
             path = location[1];
         } else {
-            namespace = DEFAULT_NAMESPACE;
+            namespace = Identifier.DEFAULT_NAMESPACE;
             path = location[0];
         }
     }

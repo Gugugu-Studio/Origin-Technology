@@ -24,6 +24,9 @@ public abstract class Window implements IKeyListener, ISizeListener, AutoCloseab
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     }
 
     public static void terminateGLFW() {
@@ -58,7 +61,7 @@ public abstract class Window implements IKeyListener, ISizeListener, AutoCloseab
         }
 
         glfwMakeContextCurrent(handle);
-        GL.createCapabilities();
+        GL.createCapabilities(true);
         glfwSwapInterval(1);
 
         glfwShowWindow(handle);
