@@ -17,12 +17,14 @@ jobs:
           17
         ]
         os: [ ubuntu-latest, windows-latest, macos-latest ]
-        arch: [ x64, arm64 ]
+        arch: [ x64, aarch64 ]
         include:
           - os: ubuntu-latest
-            arch: arm32
+            arch: arm
+            java: 17
           - os: windows-latest
-            arch: x86
+            arch: x32
+            java: 17
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -62,7 +64,7 @@ jobs:
           name: windows-x86-dist
           path: build/distributions/
       - name: capture windows-arm64 dist
-        if: ${{ runner.os == 'Windows' && matrix.arch == 'arm64' && matrix.java == '17' }}
+        if: ${{ runner.os == 'Windows' && matrix.arch == 'aarch64' && matrix.java == '17' }}
         uses: actions/upload-artifact@v2
         with:
           name: windows-arm64-dist
@@ -74,13 +76,13 @@ jobs:
           name: linux-x64-dist
           path: build/distributions/
       - name: capture linux-arm64 dist
-        if: ${{ runner.os == 'Linux' && matrix.arch == 'arm64' && matrix.java == '17' }}
+        if: ${{ runner.os == 'Linux' && matrix.arch == 'aarch64' && matrix.java == '17' }}
         uses: actions/upload-artifact@v2
         with:
           name: linux-arm64-dist
           path: build/distributions/
       - name: capture linux-arm32 dist
-        if: ${{ runner.os == 'Linux' && matrix.arch == 'arm32' && matrix.java == '17' }}
+        if: ${{ runner.os == 'Linux' && matrix.arch == 'arm' && matrix.java == '17' }}
         uses: actions/upload-artifact@v2
         with:
           name: linux-arm32-dist
@@ -92,7 +94,7 @@ jobs:
           name: macos-x64-dist
           path: build/distributions/
       - name: capture macos-arm64 dist
-        if: ${{ runner.os == 'macOS' && matrix.arch == 'arm64' && matrix.java == '17' }}
+        if: ${{ runner.os == 'macOS' && matrix.arch == 'aarch64' && matrix.java == '17' }}
         uses: actions/upload-artifact@v2
         with:
           name: macOS-arm64-dist
