@@ -1,6 +1,9 @@
 package com.gugugu.oritech.util.math;
 
-import static org.joml.Math.toRadians;
+import org.joml.Quaternionf;
+import org.joml.Vector3fc;
+
+import static org.joml.Math.*;
 
 /**
  * @author Overrun Organization
@@ -12,6 +15,10 @@ public class Numbers {
      * The angles in radians for 90°.
      */
     public static final float RAD90F = toRadians(90.0f);
+    /**
+     * The angles in radians for 180°.
+     */
+    public static final float RAD180F = toRadians(180.0f);
     /**
      * The angles in radians for 360°.
      */
@@ -162,7 +169,6 @@ public class Numbers {
      *
      * @param a the number
      * @return the result
-     * @since 0.2.0
      */
     public static int toPoT(int a) {
         --a;
@@ -180,7 +186,6 @@ public class Numbers {
      * @param a a
      * @param n n
      * @return <code>ln(n) / ln(a)</code>
-     * @since 0.2.0
      */
     public static double log(double a, double n) {
         return Math.log(n) / Math.log(a);
@@ -191,9 +196,23 @@ public class Numbers {
      *
      * @param a a
      * @return <code>ln(a) / ln2</code>
-     * @since 0.2.0
      */
     public static double log2(double a) {
         return Math.log(a) / LN2;
+    }
+
+    public static Quaternionf quatFromEulerAngle(Vector3fc eulerAngle,
+                                                 Quaternionf dst) {
+        float sx = sin(eulerAngle.x() * 0.5f),
+            sy = sin(eulerAngle.y() * 0.5f),
+            sz = sin(eulerAngle.z() * 0.5f),
+            cx = cosFromSin(sx, eulerAngle.x() * 0.5f),
+            cy = cosFromSin(sy, eulerAngle.y() * 0.5f),
+            cz = cosFromSin(sz, eulerAngle.z() * 0.5f);
+        dst.x = sx * cy * cz - cx * sy * sz;
+        dst.y = cx * sy * cz + sx * cy * sz;
+        dst.z = cx * cy * sz - sx * sy * cz;
+        dst.w = cx * cy * cz + sx * sy * sz;
+        return dst;
     }
 }

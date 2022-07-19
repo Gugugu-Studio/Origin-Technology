@@ -22,10 +22,23 @@ public final class GLUniform implements AutoCloseable {
         this.location = loc;
         buffer = MemoryUtil.memAlloc(type.length);
         this.type = type;
+        if (type == UniformType.MAT_F4) {
+            buffer.putFloat(1).putFloat(0).putFloat(0).putFloat(0)
+                .putFloat(0).putFloat(1).putFloat(0).putFloat(0)
+                .putFloat(0).putFloat(0).putFloat(1).putFloat(0)
+                .putFloat(0).putFloat(0).putFloat(0).putFloat(1)
+                .flip();
+        }
     }
 
     public int getLocation() {
         return location;
+    }
+
+    public void set(int value) {
+        buffer.position(0)
+            .putInt(value);
+        markDirty();
     }
 
     public void set(Matrix4fc value) {
@@ -64,6 +77,7 @@ public final class GLUniform implements AutoCloseable {
             return;
         }
         switch (type) {
+            case I1 -> glUniform1f(location, buffer.getInt(0));
             case F4 -> glUniform4f(location, buffer.getFloat(0),
                 buffer.getFloat(4),
                 buffer.getFloat(8),

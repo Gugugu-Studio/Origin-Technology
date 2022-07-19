@@ -1,5 +1,9 @@
 package com.gugugu.oritech.renderer;
 
+import com.gugugu.oritech.renderer.vertex.Vertex;
+import com.gugugu.oritech.renderer.vertex.VertexFormat;
+import com.gugugu.oritech.renderer.vertex.VertexLayout;
+
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -31,10 +35,10 @@ public class Mesh implements AutoCloseable {
         for (Vertex vert : vertices) {
             for (VertexFormat format : layout) {
                 switch (format) {
-                    case POSITION -> DataType.FLOAT.asWrite(buf, vert.position);
-                    case COLOR -> DataType.UNSIGNED_BYTE.asWrite(buf, vert.color);
-                    case TEX_COORDS -> DataType.FLOAT.asWrite(buf, vert.texCoords);
-                    case NORMAL -> DataType.BYTE.asWrite(buf, vert.normal);
+                    case POSITION -> DataType.FLOAT.asWrite(buf, vert.x(), vert.y(), vert.z());
+                    case COLOR -> DataType.UNSIGNED_BYTE.asWrite(buf, vert.r(), vert.g(), vert.b(), vert.a());
+                    case TEX_COORDS -> DataType.FLOAT.asWrite(buf, vert.s(), vert.t());
+                    case NORMAL -> DataType.BYTE.asWrite(buf, vert.nx(), vert.ny(), vert.nz());
                 }
             }
         }

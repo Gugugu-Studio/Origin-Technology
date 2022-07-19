@@ -55,21 +55,33 @@ public enum DataType {
         }
     }
 
+    public void asWrite(ByteBuffer buffer, float x, float y) {
+        asWrite(buffer, x);
+        asWrite(buffer, y);
+    }
+
     public void asWrite(ByteBuffer buffer, Vector2fc values) {
-        asWrite(buffer, values.x());
-        asWrite(buffer, values.y());
+        asWrite(buffer, values.x(), values.y());
+    }
+
+    public void asWrite(ByteBuffer buffer, float x, float y, float z) {
+        asWrite(buffer, x);
+        asWrite(buffer, y);
+        asWrite(buffer, z);
     }
 
     public void asWrite(ByteBuffer buffer, Vector3fc values) {
-        asWrite(buffer, values.x());
-        asWrite(buffer, values.y());
-        asWrite(buffer, values.z());
+        asWrite(buffer, values.x(), values.y(), values.z());
+    }
+
+    public void asWrite(ByteBuffer buffer, float x, float y, float z, float w) {
+        asWrite(buffer, x);
+        asWrite(buffer, y);
+        asWrite(buffer, z);
+        asWrite(buffer, w);
     }
 
     public void asWrite(ByteBuffer buffer, Vector4fc values) {
-        asWrite(buffer, values.x());
-        asWrite(buffer, values.y());
-        asWrite(buffer, values.z());
-        asWrite(buffer, values.w());
+        asWrite(buffer, values.x(), values.y(), values.z(), values.w());
     }
 }

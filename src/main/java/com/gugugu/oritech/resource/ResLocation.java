@@ -33,6 +33,22 @@ public class ResLocation {
         this(type, location.split(":", 2));
     }
 
+    public static ResLocation ofAssets(String location) {
+        return new ResLocation(ResType.ASSETS, location);
+    }
+
+    public static ResLocation ofBehavior(String location) {
+        return new ResLocation(ResType.BEHAVIOR, location);
+    }
+
+    public static ResLocation ofCore(String location) {
+        return new ResLocation(ResType.CORE, location);
+    }
+
+    public static ResLocation ofData(String location) {
+        return new ResLocation(ResType.DATA, location);
+    }
+
     public ResType getResType() {
         return resType;
     }

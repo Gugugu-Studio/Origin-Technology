@@ -1,9 +1,7 @@
 package com.gugugu.oritech.renderer;
 
 import com.gugugu.oritech.util.math.Direction;
-import com.gugugu.oritech.util.math.Numbers;
 import org.joml.Matrix4f;
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import static org.joml.Math.*;
@@ -14,119 +12,124 @@ import static org.joml.Math.*;
  * @since 1.0
  */
 public class Camera {
-    private final Vector3f position = new Vector3f();
-    private final Vector3f front = new Vector3f(0, 0, -1);
-    private final Vector3f up = new Vector3f(0, 1, 0);
-    private final Vector3f eulerAngle = new Vector3f();
-    private final Vector3f resultPosition = new Vector3f();
-    private final Quaternionf orientation = new Quaternionf();
+    public static final float YAW = -90.0f;
+    public static final float PITCH = 0.0f;
 
+    public final Vector3f prevPosition = new Vector3f();
+    public final Vector3f position = new Vector3f();
+    public final Vector3f lerpPosition = new Vector3f();
+    public final Vector3f resultPosition = new Vector3f();
+    public final Vector3f front;
+    public final Vector3f up;
+    public final Vector3f right = new Vector3f();
+    public final Vector3f worldUp;
+    /**
+     * Euler angles
+     */
+    public float yaw, pitch;
+    public float smoothStep = -1.0f;
 
     public Camera() {
+        front = new Vector3f(0.0f, 0.0f, -1.0f);
+        up = new Vector3f(0.0f, 1.0f, 0.0f);
+        worldUp = new Vector3f(0.0f, 1.0f, 0.0f);
+        yaw = YAW;
+        pitch = PITCH;
+        updateCameraVec();
     }
 
-    public void move(float dt, Direction direction) {
+    public void moveRelative(Direction direction, float speed) {
         switch (direction) {
-            case WEST -> position.x -= dt;
-            case EAST -> position.x += dt;
-            case DOWN -> position.y -= dt;
-            case UP -> position.y += dt;
-            case NORTH -> position.z -= dt;
-            case SOUTH -> position.z += dt;
-        }
-    }
-
-    public void moveRelative(float dt, Direction direction) {
-        switch (direction) {
-            case WEST -> {
-                // Cross product
-                float cx = front.y * up.z - front.z * up.y;
-                float cz = front.x * up.y - front.y * up.x;
-                // Normalize
-                float length = invsqrt(fma(cx, cx, cz * cz));
-                cx *= length;
-                cz *= length;
-                position.x -= cx * dt;
-                position.z -= cz * dt;
-            }
-            case EAST -> {
-                // Cross product
-                float cx = front.y * up.z - front.z * up.y;
-                float cz = front.x * up.y - front.y * up.x;
-                // Normalize
-                float length = invsqrt(fma(cx, cx, cz * cz));
-                cx *= length;
-                cz *= length;
-                position.x += cx * dt;
-                position.z += cz * dt;
-            }
-            case DOWN -> position.y -= dt;
-            case UP -> position.y += dt;
             case NORTH -> {
-                // Normalize
-                float length = invsqrt(fma(front.x, front.x, front.z * front.z));
-                float fx = front.x * length;
-                float fz = front.z * length;
-                position.x += dt * fx;
-                position.z += dt * fz;
+                float scalar = invsqrt(fma(front.x(), front.x(), front.z() * front.z())) * speed;
+                position.add(front.x() * scalar,
+                    0.0f,
+                    front.z() * scalar);
             }
             case SOUTH -> {
-                // Normalize
-                float length = invsqrt(fma(front.x, front.x, front.z * front.z));
-                float fx = front.x * length;
-                float fz = front.z * length;
-                position.x -= dt * fx;
-                position.z -= dt * fz;
+                float scalar = invsqrt(fma(front.x(), front.x(), front.z() * front.z())) * speed;
+                position.sub(front.x() * scalar,
+                    0.0f,
+                    front.z() * scalar);
+            }
+            case WEST -> {
+                float scalar = invsqrt(fma(right.x(), right.x(), right.z() * right.z())) * speed;
+                position.sub(right.x() * scalar,
+                    0.0f,
+                    right.z() * scalar);
+            }
+            case EAST -> {
+                float scalar = invsqrt(fma(right.x(), right.x(), right.z() * right.z())) * speed;
+                position.add(right.x() * scalar,
+                    0.0f,
+                    right.z() * scalar);
+            }
+            case UP -> position.y += speed;
+            case DOWN -> position.y -= speed;
+        }
+    }
+
+    public void moveRelative(float xa, float ya, float za) {
+        moveRelative(Direction.EAST, xa);
+        moveRelative(Direction.UP, ya);
+        moveRelative(Direction.SOUTH, za);
+    }
+
+    public void moveRelative(float xa, float ya, float za, float speed) {
+        moveRelative(xa * speed, ya * speed, za * speed);
+    }
+
+    public void rotate(float xo, float yo, boolean constrainPitch) {
+        yaw += xo;
+        pitch += yo;
+        // make sure that when pitch is out of bounds, screen doesn't get flipped
+        if (constrainPitch) {
+            if (pitch > 89.0f) {
+                pitch = 89.0f;
+            }
+            if (pitch < -89.0f) {
+                pitch = -89.0f;
             }
         }
+        // update front, right and up vectors using the updated euler angles
+        updateCameraVec();
     }
 
-    public void moveRelative(float dx, float dy, float dz) {
-        if (Numbers.isNonZero(dz)) {
-            // Normalize
-            float length = invsqrt(fma(front.x, front.x, front.z * front.z));
-            float fx = front.x * length;
-            float fz = front.z * length;
-            position.x -= dz * fx;
-            position.z -= dz * fz;
-        }
-
-        if (Numbers.isNonZero(dx)) {
-            // Cross product
-            float cx = front.y * up.z - front.z * up.y;
-            float cz = front.x * up.y - front.y * up.x;
-            // Normalize
-            float length = invsqrt(fma(cx, cx, cz * cz));
-            cx *= length;
-            cz *= length;
-            position.x += cx * dx;
-            position.z += cz * dx;
-        }
-
-        position.y += dy;
+    public void rotate(float xo, float yo) {
+        rotate(xo, yo, true);
     }
 
-    public void moveRelative(float dx, float dy, float dz, float speed) {
-        moveRelative(dx * speed, dy * speed, dz * speed);
+    public void resetYawPitch() {
+        yaw = YAW;
+        pitch = PITCH;
     }
 
-    public Vector3f getFrontVec() {
-        orientation.getEulerAnglesXYZ(eulerAngle);
-        float pitch = eulerAngle.x;
-        float sinPitch = sin(pitch);
-        float cosPitch = cosFromSin(sinPitch, pitch);
-        float yaw = eulerAngle.y;
-        float sinYaw = sin(yaw);
-        float cosYaw = cosFromSin(sinYaw, yaw);
-        front.x = cosPitch * cosYaw;
-        front.y = sinPitch;
-        front.z = cosPitch * sinYaw;
-        return front.normalize();
+    public void update() {
+        prevPosition.set(position);
+    }
+
+    private void updateCameraVec() {
+        // calculate the new front vector
+        final float yawRad = toRadians(yaw);
+        final float pitchRad = toRadians(pitch);
+        final float yawSin = sin(yawRad), yawCos = cosFromSin(yawSin, yawRad);
+        final float pitchSin = sin(pitchRad), pitchCos = cosFromSin(pitchSin, pitchRad);
+        front.x = yawCos * pitchCos;
+        front.y = pitchSin;
+        front.z = yawSin * pitchCos;
+        front.normalize();
+        // also re-calculate the right and up vector
+        // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
+        front.cross(worldUp, right).normalize();
+        right.cross(front, up).normalize();
     }
 
     public Matrix4f apply(Matrix4f matrix) {
-        return matrix.lookAt(position,
-            position.add(getFrontVec(), resultPosition),
+        Vector3f pos = smoothStep >= 0.0f ?
+            prevPosition.lerp(position, smoothStep, lerpPosition) :
+            position;
+        return matrix.lookAt(pos,
+            pos.add(front, resultPosition),
             up);
     }
 }

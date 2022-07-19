@@ -1,7 +1,5 @@
 package com.gugugu.oritech.renderer;
 
-import org.joml.Matrix4f;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -36,11 +34,11 @@ public class Shader implements AutoCloseable {
         glDeleteShader(fsh);
 
         // Initialize uniforms
-        final Matrix4f identity = new Matrix4f();
-        createUniform("Projection", UniformType.MAT_F4).ifPresent(uniform -> uniform.set(identity));
-        createUniform("View", UniformType.MAT_F4).ifPresent(uniform -> uniform.set(identity));
-        createUniform("Model", UniformType.MAT_F4).ifPresent(uniform -> uniform.set(identity));
+        createUniform("Projection", UniformType.MAT_F4);
+        createUniform("View", UniformType.MAT_F4);
+        createUniform("Model", UniformType.MAT_F4);
         createUniform("ColorModulator", UniformType.F4).ifPresent(uniform -> uniform.set(1.0f, 1.0f, 1.0f, 1.0f));
+        createUniform("Sampler0", UniformType.I1).ifPresent(uniform -> uniform.set(0));
     }
 
     private static int compileShader(int type, String typeStr, CharSequence src) {

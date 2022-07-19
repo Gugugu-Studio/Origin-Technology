@@ -1,4 +1,4 @@
-package com.gugugu.oritech.renderer;
+package com.gugugu.oritech.renderer.vertex;
 
 /**
  * @author squid233
@@ -7,4 +7,5 @@ package com.gugugu.oritech.renderer;
 public final class VertexLayouts {
     public static final VertexLayout POSITION = new VertexLayout(VertexFormat.POSITION);
     public static final VertexLayout POSITION_COLOR = new VertexLayout(VertexFormat.POSITION, VertexFormat.COLOR);
+    public static final VertexLayout POSITION_COLOR_TEX = new VertexLayout(VertexFormat.POSITION, VertexFormat.COLOR, VertexFormat.TEX_COORDS);
 }

@@ -5,6 +5,7 @@ package com.gugugu.oritech.renderer;
  * @since 1.0
  */
 public enum UniformType {
+    I1(4),
     F4(16),
     MAT_F4(64);
 
