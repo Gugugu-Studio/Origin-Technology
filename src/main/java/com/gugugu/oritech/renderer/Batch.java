@@ -55,12 +55,8 @@ public class Batch {
     }
 
     public Batch indices(int... indices) {
-        int max = 0;
         for (int i : indices) {
             this.indices.add(i + vertexCount);
-            if (i > max) {
-                max = i;
-            }
         }
         return this;
     }

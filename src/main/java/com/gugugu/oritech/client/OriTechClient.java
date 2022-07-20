@@ -1,15 +1,25 @@
 package com.gugugu.oritech.client;
 
 import com.gugugu.oritech.renderer.GameRenderer;
+import com.gugugu.oritech.resource.ResLocation;
+import com.gugugu.oritech.resource.tex.SpriteInfo;
+import com.gugugu.oritech.resource.tex.TextureAtlas;
 import com.gugugu.oritech.ui.IKeyListener;
 import com.gugugu.oritech.ui.ISizeListener;
 import com.gugugu.oritech.ui.Keyboard;
 import com.gugugu.oritech.ui.Mouse;
+import com.gugugu.oritech.util.Identifier;
 import com.gugugu.oritech.util.Timer;
 import com.gugugu.oritech.util.math.Numbers;
+import com.gugugu.oritech.util.registry.Registry;
 import com.gugugu.oritech.world.ClientWorld;
+import com.gugugu.oritech.world.block.Block;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11C.*;
 
 /**
  * Client.
@@ -26,14 +36,32 @@ public class OriTechClient
     public Keyboard keyboard;
     public Mouse mouse;
     public int width, height;
-    private ClientWorld world;
+    public TextureAtlas blockAtlas;
+    public ClientWorld world;
 
     public OriTechClient(int width, int height) {
         this.width = width;
         this.height = height;
+
+        glEnable(GL_CULL_FACE);
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LEQUAL);
+
         this.gameRenderer = new GameRenderer();
         gameRenderer.init();
         world = new ClientWorld(32, 32, 32);
+        blockAtlas = new TextureAtlas();
+        List<SpriteInfo> list = new ArrayList<>();
+        for (Block block : Registry.BLOCK) {
+            if (block.isAir()) {
+                continue;
+            }
+            Identifier id = Registry.BLOCK.getId(block);
+            list.add(new SpriteInfo(ResLocation.ofTexture(id.namespace(), "block/" + id.path()),
+                32,
+                32));
+        }
+        blockAtlas.load(list);
 
         instance = this;
     }
@@ -71,16 +99,16 @@ public class OriTechClient
             --ya;
         }
         gameRenderer.camera.update();
-        gameRenderer.camera.moveRelative(xa, ya, za, 0.1f);
+        gameRenderer.camera.moveRelative(xa, ya, za, 0.5f);
     }
 
     public void render() {
-        gameRenderer.useShader(gameRenderer.positionColor(),
+        gameRenderer.useShader(gameRenderer.positionColorTex(),
             shader -> {
                 shader.getUniform("Projection").ifPresent(uniform -> uniform.set(gameRenderer.projection
                     .setPerspective(Numbers.RAD90F,
                         (float) width / (float) height,
-                        0.01f,
+                        0.05f,
                         1000.0f)));
                 gameRenderer.camera.smoothStep = (float) timer.partialTick;
                 shader.getUniform("View").ifPresent(uniform -> uniform.set(gameRenderer.camera.apply(
@@ -89,15 +117,10 @@ public class OriTechClient
                 gameRenderer.view.popMatrix();
                 shader.uploadUniforms();
                 world.chunk.rebuild();
+
+                blockAtlas.bind();
                 world.chunk.render();
-//                tesselator.begin()
-//                    .color(1.0f, 0.0f, 0.0f).vertex(0.0f, 1.0f, 0.0f)
-//                    .color(0.0f, 1.0f, 0.0f).vertex(0.0f, 0.0f, 0.0f)
-//                    .color(0.0f, 0.0f, 1.0f).vertex(1.0f, 0.0f, 0.0f)
-//                    .emit()
-//                    .color(1.0f, 1.0f, 1.0f).vertex(1.0f, 1.0f, 0.0f)
-//                    .color(1.0f, 0.0f, 0.0f).vertex(0.0f, 1.0f, 0.0f)
-//                    .end();
+                glBindTexture(GL_TEXTURE_2D, 0);
             });
     }
 
@@ -126,6 +149,7 @@ public class OriTechClient
 
     @Override
     public void close() {
+        blockAtlas.close();
         world.close();
         gameRenderer.close();
     }

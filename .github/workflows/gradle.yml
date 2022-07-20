@@ -17,18 +17,21 @@ jobs:
           17
         ]
         os: [ ubuntu-latest, windows-latest, macos-latest ]
-        arch: [ x64, aarch64 ]
+        arch: [
+          x64
+#          aarch64
+        ]
         include:
-          - os: ubuntu-latest
-            arch: arm
-            java: 17
+#          - os: ubuntu-latest
+#            arch: arm
+#            java: '17'
           - os: windows-latest
             arch: x32
-            java: 17
-        exclude:
-          - os: windows-latest
-            arch: aarch64
-            java: 17
+            java: '17'
+#        exclude:
+#          - os: windows-latest
+#            arch: aarch64
+#            java: '17'
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3

@@ -1,5 +1,8 @@
 package com.gugugu.oritech.util;
 
+import com.gugugu.oritech.resource.ResLocation;
+import com.gugugu.oritech.resource.ResType;
+
 import java.util.Objects;
 
 /**
@@ -27,6 +30,10 @@ public class Identifier {
 
     public Identifier(String namespace, String path) {
         this(new String[]{namespace, path});
+    }
+
+    public ResLocation toResLocation(ResType type) {
+        return new ResLocation(type, namespace, path);
     }
 
     public String namespace() {

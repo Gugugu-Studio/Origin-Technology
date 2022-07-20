@@ -53,9 +53,10 @@ public class ResourceLoader {
 
     public static ByteBuffer loadToByteBuffer(ResLocation location, int bufferSize)
         throws IOException {
-        URL url = Thread.currentThread().getContextClassLoader().getResource(location.toPath());
+        final String path = location.toPath();
+        final URL url = Thread.currentThread().getContextClassLoader().getResource(path);
         if (url == null) {
-            throw new IOException("Classpath resource not found: " + location);
+            throw new IOException("Classpath resource not found: " + path);
         }
         File file = new File(url.getFile());
         if (file.isFile()) {
@@ -67,7 +68,7 @@ public class ResourceLoader {
         ByteBuffer buffer = BufferUtils.createByteBuffer(bufferSize);
         InputStream source = url.openStream();
         if (source == null) {
-            throw new FileNotFoundException(location.toPath());
+            throw new FileNotFoundException(path);
         }
         try (source) {
             byte[] buf = new byte[8192];

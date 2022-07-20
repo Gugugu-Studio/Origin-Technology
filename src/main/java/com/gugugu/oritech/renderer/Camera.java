@@ -20,7 +20,7 @@ public class Camera {
     public final Vector3f lerpPosition = new Vector3f();
     public final Vector3f resultPosition = new Vector3f();
     public final Vector3f front;
-    public final Vector3f up;
+    public final Vector3f up = new Vector3f();
     public final Vector3f right = new Vector3f();
     public final Vector3f worldUp;
     /**
@@ -31,7 +31,6 @@ public class Camera {
 
     public Camera() {
         front = new Vector3f(0.0f, 0.0f, -1.0f);
-        up = new Vector3f(0.0f, 1.0f, 0.0f);
         worldUp = new Vector3f(0.0f, 1.0f, 0.0f);
         yaw = YAW;
         pitch = PITCH;

@@ -49,6 +49,14 @@ public class ResLocation {
         return new ResLocation(ResType.DATA, location);
     }
 
+    public static ResLocation ofTexture(String namespace, String path) {
+        return new ResLocation(ResType.ASSETS, namespace + ":textures/" + path + ".png");
+    }
+
+    public Identifier toIdentifier() {
+        return new Identifier(namespace, path);
+    }
+
     public ResType getResType() {
         return resType;
     }

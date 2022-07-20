@@ -1,7 +1,12 @@
 package com.gugugu.oritech.world.block;
 
+import com.gugugu.oritech.client.OriTechClient;
 import com.gugugu.oritech.renderer.Batch;
+import com.gugugu.oritech.resource.ResLocation;
+import com.gugugu.oritech.resource.tex.TextureAtlas;
+import com.gugugu.oritech.util.Identifier;
 import com.gugugu.oritech.util.math.Direction;
+import com.gugugu.oritech.util.registry.Registry;
 import com.gugugu.oritech.world.World;
 
 /**
@@ -28,38 +33,47 @@ public class Block {
         float x1 = x0 + 1.0f;
         float y1 = y0 + 1.0f;
         float z1 = z0 + 1.0f;
+
+        TextureAtlas atlas = OriTechClient.getClient().blockAtlas;
+        Identifier id = Registry.BLOCK.getId(this);
+        String texName = ResLocation.ofTexture(id.namespace(), "block/" + id.path()).toString();
+        float u0 = atlas.getU0n(texName);
+        float v0 = atlas.getV0n(texName);
+        float u1 = atlas.getU1n(texName);
+        float v1 = atlas.getV1n(texName);
+
         batch.color(1.0f, 1.0f, 1.0f);
         switch (face) {
             case WEST -> batch.quadIndices()
-                .vertex(x0, y1, z1)
-                .vertex(x0, y0, z1)
-                .vertex(x0, y0, z0)
-                .vertex(x0, y1, z0);
+                .texCoords(u0, v0).vertex(x0, y1, z0)
+                .texCoords(u0, v1).vertex(x0, y0, z0)
+                .texCoords(u1, v1).vertex(x0, y0, z1)
+                .texCoords(u1, v0).vertex(x0, y1, z1);
             case EAST -> batch.quadIndices()
-                .vertex(x1, y1, z0)
-                .vertex(x1, y0, z0)
-                .vertex(x1, y0, z1)
-                .vertex(x1, y1, z1);
+                .texCoords(u0, v0).vertex(x1, y1, z1)
+                .texCoords(u0, v1).vertex(x1, y0, z1)
+                .texCoords(u1, v1).vertex(x1, y0, z0)
+                .texCoords(u1, v0).vertex(x1, y1, z0);
             case DOWN -> batch.quadIndices()
-                .vertex(x0, y0, z1)
-                .vertex(x0, y0, z0)
-                .vertex(x1, y0, z0)
-                .vertex(x1, y0, z1);
+                .texCoords(u0, v0).vertex(x0, y0, z1)
+                .texCoords(u0, v1).vertex(x0, y0, z0)
+                .texCoords(u1, v1).vertex(x1, y0, z0)
+                .texCoords(u1, v0).vertex(x1, y0, z1);
             case UP -> batch.quadIndices()
-                .vertex(x0, y1, z0)
-                .vertex(x0, y1, z1)
-                .vertex(x1, y1, z1)
-                .vertex(x1, y1, z0);
+                .texCoords(u0, v0).vertex(x0, y1, z0)
+                .texCoords(u0, v1).vertex(x0, y1, z1)
+                .texCoords(u1, v1).vertex(x1, y1, z1)
+                .texCoords(u1, v0).vertex(x1, y1, z0);
             case NORTH -> batch.quadIndices()
-                .vertex(x1, y1, z0)
-                .vertex(x1, y0, z0)
-                .vertex(x0, y0, z0)
-                .vertex(x0, y1, z0);
+                .texCoords(u0, v0).vertex(x1, y1, z0)
+                .texCoords(u0, v1).vertex(x1, y0, z0)
+                .texCoords(u1, v1).vertex(x0, y0, z0)
+                .texCoords(u1, v0).vertex(x0, y1, z0);
             case SOUTH -> batch.quadIndices()
-                .vertex(x0, y1, z1)
-                .vertex(x0, y0, z1)
-                .vertex(x1, y0, z1)
-                .vertex(x1, y1, z1);
+                .texCoords(u0, v0).vertex(x0, y1, z1)
+                .texCoords(u0, v1).vertex(x0, y0, z1)
+                .texCoords(u1, v1).vertex(x1, y0, z1)
+                .texCoords(u1, v0).vertex(x1, y1, z1);
         }
     }
 
