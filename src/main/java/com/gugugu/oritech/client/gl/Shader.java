@@ -1,4 +1,4 @@
-package com.gugugu.oritech.renderer;
+package com.gugugu.oritech.client.gl;
 
 import java.util.HashMap;
 import java.util.Map;

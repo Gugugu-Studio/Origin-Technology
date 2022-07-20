@@ -1,4 +1,4 @@
-package com.gugugu.oritech.renderer;
+package com.gugugu.oritech.client.gl;
 
 import com.gugugu.oritech.util.FloatByteUtil;
 import org.joml.Vector2fc;

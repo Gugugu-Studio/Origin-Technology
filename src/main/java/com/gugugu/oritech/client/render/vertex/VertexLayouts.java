@@ -1,4 +1,4 @@
-package com.gugugu.oritech.renderer.vertex;
+package com.gugugu.oritech.client.render.vertex;
 
 /**
  * @author squid233

@@ -1,4 +1,4 @@
-package com.gugugu.oritech.renderer;
+package com.gugugu.oritech.client.gl;
 
 /**
  * @author squid233

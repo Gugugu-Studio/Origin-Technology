@@ -1,6 +1,6 @@
 package com.gugugu.oritech.resource;
 
-import com.gugugu.oritech.renderer.Shader;
+import com.gugugu.oritech.client.gl.Shader;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.BufferUtils;
 

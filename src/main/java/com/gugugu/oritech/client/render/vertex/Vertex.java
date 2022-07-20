@@ -1,4 +1,4 @@
-package com.gugugu.oritech.renderer.vertex;
+package com.gugugu.oritech.client.render.vertex;
 
 import org.joml.Vector2fc;
 import org.joml.Vector3fc;

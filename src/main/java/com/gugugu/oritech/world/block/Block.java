@@ -1,7 +1,8 @@
 package com.gugugu.oritech.world.block;
 
 import com.gugugu.oritech.client.OriTechClient;
-import com.gugugu.oritech.renderer.Batch;
+import com.gugugu.oritech.client.render.Batch;
+import com.gugugu.oritech.phys.AABBox;
 import com.gugugu.oritech.resource.ResLocation;
 import com.gugugu.oritech.resource.tex.TextureAtlas;
 import com.gugugu.oritech.util.Identifier;
@@ -20,6 +21,19 @@ public class Block {
 
     public boolean hasSideTransparency() {
         return false;
+    }
+
+    public AABBox getOutline(int x, int y, int z) {
+        return new AABBox(x, y, z,
+            x + 1.0f, y + 1.0f, z + 1.0f);
+    }
+
+    public AABBox getRayCast(int x, int y, int z) {
+        return getOutline(x, y, z);
+    }
+
+    public AABBox getCollision(int x, int y, int z) {
+        return getOutline(x, y, z);
     }
 
     public boolean shouldRenderFace(World world, int x, int y, int z) {

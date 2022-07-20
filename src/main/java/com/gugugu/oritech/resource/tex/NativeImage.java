@@ -88,7 +88,7 @@ public class NativeImage implements AutoCloseable {
             cp,
             STBI_rgb_alpha);
         if (ret == null) {
-            // TODO: 2022/7/20 Replace with logger
+            // TODO: 2022/7/20 Replace System.err with logger
             System.err.println("Failed to load image '" +
                                name +
                                "'! Reason: " +

@@ -32,6 +32,7 @@ public class Main extends Window {
         client = new OriTechClient(width, height);
         client.keyboard = keyboard;
         client.mouse = mouse;
+        client.lazyInit();
     }
 
     @Override

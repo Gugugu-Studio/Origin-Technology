@@ -1,4 +1,4 @@
-package com.gugugu.oritech.renderer;
+package com.gugugu.oritech.client.render;
 
 import com.gugugu.oritech.util.math.Direction;
 import org.joml.Matrix4f;
@@ -78,20 +78,32 @@ public class Camera {
         moveRelative(xa * speed, ya * speed, za * speed);
     }
 
-    public void rotate(float xo, float yo, boolean constrainPitch) {
-        yaw += xo;
-        pitch += yo;
+    public void setPosition(float x, float y, float z) {
+        position.set(x, y, z);
+    }
+
+    public void setRotation(float xo, float yo, boolean constrainPitch) {
+        yaw = xo;
+        pitch = yo;
         // make sure that when pitch is out of bounds, screen doesn't get flipped
         if (constrainPitch) {
-            if (pitch > 89.0f) {
-                pitch = 89.0f;
+            if (pitch > 89.5f) {
+                pitch = 89.5f;
             }
-            if (pitch < -89.0f) {
-                pitch = -89.0f;
+            if (pitch < -89.5f) {
+                pitch = -89.5f;
             }
         }
         // update front, right and up vectors using the updated euler angles
         updateCameraVec();
+    }
+
+    public void setRotation(float xo, float yo) {
+        setRotation(xo, yo, true);
+    }
+
+    public void rotate(float xo, float yo, boolean constrainPitch) {
+        setRotation(yaw + xo, pitch + yo, constrainPitch);
     }
 
     public void rotate(float xo, float yo) {

@@ -25,9 +25,9 @@ jobs:
 #          - os: ubuntu-latest
 #            arch: arm
 #            java: '17'
+          - java: '17'
           - os: windows-latest
             arch: x32
-            java: '17'
 #        exclude:
 #          - os: windows-latest
 #            arch: aarch64
@@ -65,7 +65,7 @@ jobs:
           name: windows-x64-dist
           path: build/distributions/
       - name: capture windows-x86 dist
-        if: ${{ runner.os == 'Windows' && matrix.arch == 'x86' && matrix.java == '17' }}
+        if: ${{ runner.os == 'Windows' && matrix.arch == 'x32' && matrix.java == '17' }}
         uses: actions/upload-artifact@v2
         with:
           name: windows-x86-dist

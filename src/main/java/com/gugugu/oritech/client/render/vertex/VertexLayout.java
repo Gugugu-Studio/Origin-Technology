@@ -1,4 +1,4 @@
-package com.gugugu.oritech.renderer.vertex;
+package com.gugugu.oritech.client.render.vertex;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;

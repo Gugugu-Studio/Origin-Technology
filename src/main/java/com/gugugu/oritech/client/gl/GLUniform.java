@@ -1,4 +1,4 @@
-package com.gugugu.oritech.renderer;
+package com.gugugu.oritech.client.gl;
 
 import org.joml.Matrix4fc;
 import org.joml.Vector4fc;

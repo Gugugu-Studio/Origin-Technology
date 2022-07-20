@@ -194,19 +194,19 @@ public class TextureAtlas implements AutoCloseable {
     }
 
     public float getU0n(String spriteName) {
-        return getU0(spriteName) / (float) width();
+        return (float) getU0(spriteName) / (float) width();
     }
 
     public float getV0n(String spriteName) {
-        return getV0(spriteName) / (float) height();
+        return (float) getV0(spriteName) / (float) height();
     }
 
     public float getU1n(String spriteName) {
-        return getU1(spriteName) / (float) width();
+        return (float) getU1(spriteName) / (float) width();
     }
 
     public float getV1n(String spriteName) {
-        return getV1(spriteName) / (float) height();
+        return (float) getV1(spriteName) / (float) height();
     }
 
     public int maxMipmapLevel() {

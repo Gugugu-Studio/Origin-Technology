@@ -1,8 +1,9 @@
-package com.gugugu.oritech.renderer;
+package com.gugugu.oritech.client.render;
 
-import com.gugugu.oritech.renderer.vertex.Vertex;
-import com.gugugu.oritech.renderer.vertex.VertexFormat;
-import com.gugugu.oritech.renderer.vertex.VertexLayout;
+import com.gugugu.oritech.client.gl.DataType;
+import com.gugugu.oritech.client.render.vertex.Vertex;
+import com.gugugu.oritech.client.render.vertex.VertexFormat;
+import com.gugugu.oritech.client.render.vertex.VertexLayout;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;

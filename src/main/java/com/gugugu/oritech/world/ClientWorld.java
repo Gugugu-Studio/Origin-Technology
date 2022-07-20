@@ -1,8 +1,12 @@
 package com.gugugu.oritech.world;
 
+import com.gugugu.oritech.phys.AABBox;
 import com.gugugu.oritech.world.block.Block;
 import com.gugugu.oritech.world.block.Blocks;
 import com.gugugu.oritech.world.chunk.RenderChunk;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.gugugu.oritech.world.chunk.Chunk.CHUNK_SIZE;
 
@@ -12,7 +16,7 @@ import static com.gugugu.oritech.world.chunk.Chunk.CHUNK_SIZE;
  */
 public class ClientWorld extends World implements AutoCloseable {
     private final Block[][][] blocks;
-    public final RenderChunk chunk;
+    public final RenderChunk[][][] chunks;
     public final int width, height, depth;
 
     public ClientWorld(int width, int height, int depth) {
@@ -20,17 +24,49 @@ public class ClientWorld extends World implements AutoCloseable {
         this.height = height;
         this.depth = depth;
         blocks = new Block[height][width][depth];
-        for (int x = 0; x < CHUNK_SIZE; x++) {
-            for (int z = 0; z < CHUNK_SIZE; z++) {
-                for (int y = 0; y < 16; y++) {
+        for (int x = 0; x < width; x++) {
+            for (int z = 0; z < depth; z++) {
+                for (int y = 0; y < 11; y++) {
                     blocks[y][x][z] = Blocks.STONE;
                 }
-                for (int y = 16; y < CHUNK_SIZE; y++) {
+                for (int y = 11; y < 15; y++) {
+                    blocks[y][x][z] = Blocks.DIRT;
+                }
+                blocks[15][x][z] = Blocks.GRASS_BLOCK;
+                for (int y = 16; y < height; y++) {
                     blocks[y][x][z] = Blocks.AIR;
                 }
             }
         }
-        chunk = new RenderChunk(this);
+        chunks = new RenderChunk[height / CHUNK_SIZE][width / CHUNK_SIZE][depth / CHUNK_SIZE];
+        for (int y = 0; y < chunks.length; y++) {
+            RenderChunk[][] chunks2 = chunks[y];
+            for (int x = 0; x < chunks2.length; x++) {
+                RenderChunk[] chunks1 = chunks2[x];
+                for (int z = 0; z < chunks1.length; z++) {
+                    int x0 = x * CHUNK_SIZE;
+                    int y0 = y * CHUNK_SIZE;
+                    int z0 = z * CHUNK_SIZE;
+                    int x1 = (x + 1) * CHUNK_SIZE;
+                    int y1 = (y + 1) * CHUNK_SIZE;
+                    int z1 = (z + 1) * CHUNK_SIZE;
+
+                    if (x1 > width) {
+                        x1 = width;
+                    }
+                    if (y1 > height) {
+                        y1 = height;
+                    }
+                    if (z1 > depth) {
+                        z1 = depth;
+                    }
+
+                    chunks1[z] = new RenderChunk(this,
+                        x0, y0, z0,
+                        x1, y1, z1);
+                }
+            }
+        }
     }
 
     public boolean isInBounds(int x, int y, int z) {
@@ -46,12 +82,80 @@ public class ClientWorld extends World implements AutoCloseable {
         return Blocks.AIR;
     }
 
+    @Override
+    public List<AABBox> getCubes(AABBox origin) {
+        List<AABBox> list = new ArrayList<>();
+        int x0 = (int) origin.min.x;
+        int y0 = (int) origin.min.y;
+        int z0 = (int) origin.min.z;
+        int x1 = (int) (origin.max.x + 1.0f);
+        int y1 = (int) (origin.max.y + 1.0f);
+        int z1 = (int) (origin.max.z + 1.0f);
+
+        if (x0 < 0) {
+            x0 = 0;
+        }
+        if (y0 < 0) {
+            y0 = 0;
+        }
+        if (z0 < 0) {
+            z0 = 0;
+        }
+
+        if (x1 > width) {
+            x1 = width;
+        }
+        if (y1 > height) {
+            y1 = height;
+        }
+        if (z1 > depth) {
+            z1 = depth;
+        }
+
+        for (int y = y0; y < y1; y++) {
+            for (int x = x0; x < x1; x++) {
+                for (int z = z0; z < z1; z++) {
+                    var block = getBlock(x, y, z);
+                    if (!block.isAir()) {
+                        AABBox aabb = block.getCollision(x, y, z);
+                        if (aabb != null) {
+                            list.add(aabb);
+                        }
+                    }
+                }
+            }
+        }
+
+        return list;
+    }
+
     public RenderChunk getChunk(int x, int y, int z) {
-        return chunk;
+        return chunks[y][x][z];
+    }
+
+    @Override
+    public int getWidth() {
+        return width;
+    }
+
+    @Override
+    public int getHeight() {
+        return height;
+    }
+
+    @Override
+    public int getDepth() {
+        return depth;
     }
 
     @Override
     public void close() {
-        chunk.close();
+        for (RenderChunk[][] chunks2 : chunks) {
+            for (RenderChunk[] chunks1 : chunks2) {
+                for (RenderChunk chunk : chunks1) {
+                    chunk.close();
+                }
+            }
+        }
     }
 }

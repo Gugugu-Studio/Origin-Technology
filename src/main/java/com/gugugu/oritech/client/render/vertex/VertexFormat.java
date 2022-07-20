@@ -1,6 +1,6 @@
-package com.gugugu.oritech.renderer.vertex;
+package com.gugugu.oritech.client.render.vertex;
 
-import com.gugugu.oritech.renderer.DataType;
+import com.gugugu.oritech.client.gl.DataType;
 
 import static org.lwjgl.opengl.GL20C.*;
 

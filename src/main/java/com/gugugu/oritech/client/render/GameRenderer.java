@@ -1,7 +1,9 @@
-package com.gugugu.oritech.renderer;
+package com.gugugu.oritech.client.render;
 
+import com.gugugu.oritech.client.gl.Shader;
 import com.gugugu.oritech.resource.ResLocation;
 import com.gugugu.oritech.resource.ResourceLoader;
+import com.gugugu.oritech.util.math.Numbers;
 import org.joml.Matrix4fStack;
 
 import java.util.function.Consumer;
@@ -36,6 +38,21 @@ public class GameRenderer implements AutoCloseable {
         shader.bind();
         supplier.accept(shader);
         shader.unbind();
+    }
+
+    private void moveCameraToPlayer(float delta) {
+        camera.smoothStep = delta;
+        camera.apply(view.translate(0.0f, 0.0f, -0.3f));
+    }
+
+    public void setupCamera(float delta, float width, float height) {
+        projection.setPerspective(Numbers.RAD90F,
+            width / height,
+            0.05f,
+            1000.0f);
+        view.identity();
+        moveCameraToPlayer(delta);
+        model.identity();
     }
 
     public Shader position() {
