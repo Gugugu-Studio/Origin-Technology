@@ -56,7 +56,6 @@ public class Block {
         float u1 = atlas.getU1n(texName);
         float v1 = atlas.getV1n(texName);
 
-        batch.color(1.0f, 1.0f, 1.0f);
         switch (face) {
             case WEST -> batch.quadIndices()
                 .texCoords(u0, v0).vertex(x0, y1, z0)
@@ -97,6 +96,16 @@ public class Block {
                 x + face.getOffsetX(),
                 y + face.getOffsetY(),
                 z + face.getOffsetZ())) {
+                final float c1 = 1.0f;
+                final float c2 = 0.8f;
+                final float c3 = 0.6f;
+                if (face.isOnAxisX()) {
+                    batch.color(c1, c1, c1);
+                } else if (face.isOnAxisY()) {
+                    batch.color(c2, c2, c2);
+                } else if (face.isOnAxisZ()) {
+                    batch.color(c3, c3, c3);
+                }
                 renderFace(batch, face, x, y, z);
             }
         }

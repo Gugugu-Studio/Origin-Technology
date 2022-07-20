@@ -1,6 +1,5 @@
 package com.gugugu.oritech.client;
 
-import com.gugugu.oritech.client.render.Frustum;
 import com.gugugu.oritech.client.render.GameRenderer;
 import com.gugugu.oritech.client.render.WorldRenderer;
 import com.gugugu.oritech.resource.ResLocation;
@@ -10,6 +9,7 @@ import com.gugugu.oritech.ui.IKeyListener;
 import com.gugugu.oritech.ui.ISizeListener;
 import com.gugugu.oritech.ui.Keyboard;
 import com.gugugu.oritech.ui.Mouse;
+import com.gugugu.oritech.util.HitResult;
 import com.gugugu.oritech.util.Identifier;
 import com.gugugu.oritech.util.Timer;
 import com.gugugu.oritech.util.registry.Registry;
@@ -22,8 +22,7 @@ import org.joml.Vector3f;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
-import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
+import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL12C.*;
 
 /**
@@ -54,7 +53,7 @@ public class OriTechClient
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
 
-        this.gameRenderer = new GameRenderer();
+        this.gameRenderer = new GameRenderer(this);
         gameRenderer.init();
 
         Blocks.register();
@@ -99,6 +98,16 @@ public class OriTechClient
     }
 
     public void update(float delta) {
+        if (mouse.isBtnDown(GLFW_MOUSE_BUTTON_LEFT)) {
+            destroyBlock();
+        }
+    }
+
+    private void destroyBlock() {
+        final HitResult hitResult = worldRenderer.hitResult;
+        if (hitResult != null) {
+            world.setBlock(Blocks.AIR, hitResult.x(), hitResult.y(), hitResult.z());
+        }
     }
 
     public void tick() {
@@ -109,21 +118,7 @@ public class OriTechClient
     }
 
     public void render() {
-        gameRenderer.setupCamera((float) timer.partialTick, width, height);
-        gameRenderer.useShader(gameRenderer.positionColorTex(),
-            shader -> {
-                shader.getUniform("Projection").ifPresent(uniform -> uniform.set(gameRenderer.projection));
-                shader.getUniform("View").ifPresent(uniform -> uniform.set(gameRenderer.view));
-                shader.getUniform("Model").ifPresent(uniform -> uniform.set(gameRenderer.model));
-                shader.uploadUniforms();
-                Frustum.update(gameRenderer.projection.pushMatrix().mul(gameRenderer.view));
-                gameRenderer.projection.popMatrix();
-                worldRenderer.updateDirtyChunks(player);
-
-                blockAtlas.bind();
-                worldRenderer.render();
-                glBindTexture(GL_TEXTURE_2D, 0);
-            });
+        gameRenderer.render();
     }
 
     @Override

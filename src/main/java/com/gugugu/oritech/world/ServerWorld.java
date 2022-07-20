@@ -16,6 +16,11 @@ public class ServerWorld extends World {
     }
 
     @Override
+    public boolean setBlock(Block block, int x, int y, int z) {
+        return false;
+    }
+
+    @Override
     public List<AABBox> getCubes(AABBox origin) {
         return null;
     }

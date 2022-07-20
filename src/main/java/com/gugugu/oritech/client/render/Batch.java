@@ -41,10 +41,8 @@ public class Batch {
     }
 
     public Batch begin() {
-        if (buffer.position() > 0) {
-            buffer.clear();
-        }
-        if (indexBuffer != null && indexBuffer.position() > 0) {
+        buffer.clear();
+        if (indexBuffer != null) {
             indexBuffer.clear();
         }
         indices.clear();
@@ -120,30 +118,34 @@ public class Batch {
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         if (bufferSize < buffer.remaining()) {
-            bufferSize=buffer.remaining();
+            bufferSize = buffer.remaining();
             glBufferData(GL_ARRAY_BUFFER, buffer, GL_DYNAMIC_DRAW);
         } else {
             glBufferSubData(GL_ARRAY_BUFFER, 0L, buffer);
         }
         boolean reallocated = false;
-        if (indexBuffer == null) {
-            indexBuffer = memAllocInt(indices.size());
-            reallocated = true;
-        } else if (indices.size() > indexBuffer.capacity()) {
-            indexBuffer = memRealloc(indexBuffer, indices.size());
-            reallocated = true;
-        }
-        for (int index : indices) {
-            indexBuffer.put(index);
-        }
-        if (indexBuffer.position() > 0) {
-            indexBuffer.flip();
-        }
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        if (reallocated) {
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL_DYNAMIC_DRAW);
+        if (indices.size() > 0) {
+            if (indexBuffer == null) {
+                indexBuffer = memAllocInt(indices.size());
+                reallocated = true;
+            } else if (indices.size() > indexBuffer.capacity()) {
+                indexBuffer = memRealloc(indexBuffer, indices.size());
+                reallocated = true;
+            }
+            for (int index : indices) {
+                indexBuffer.put(index);
+            }
+            if (indexBuffer.position() > 0) {
+                indexBuffer.flip();
+            }
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+            if (reallocated) {
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL_DYNAMIC_DRAW);
+            } else {
+                glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0L, indexBuffer);
+            }
         } else {
-            glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0L, indexBuffer);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         }
         glVertexAttribPointer(0, 3, GL_FLOAT, false, stride, 0L);
         if (hasColor) {
@@ -159,12 +161,19 @@ public class Batch {
         return this;
     }
 
-    public void render() {
+    public void render(int mode) {
         glBindVertexArray(vao);
-
-        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0L);
-
+        if (indices.size() > 0) {
+            glDrawElements(mode, indices.size(), GL_UNSIGNED_INT, 0L);
+        } else {
+            glDrawArrays(mode, 0, vertexCount);
+        }
         glBindVertexArray(0);
+
+    }
+
+    public void render() {
+        render(GL_TRIANGLES);
     }
 
     public void free() {

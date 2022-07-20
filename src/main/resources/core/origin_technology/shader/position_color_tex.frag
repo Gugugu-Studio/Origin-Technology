@@ -9,5 +9,9 @@ uniform vec4 ColorModulator;
 uniform sampler2D Sampler0;
 
 void main() {
-    FragColor = ColorModulator * texture(Sampler0, texCoord0) * vertexColor;
+    vec4 color = ColorModulator * texture(Sampler0, texCoord0) * vertexColor;
+    if (color.a < 0.1) {
+        discard;
+    }
+    FragColor = color;
 }

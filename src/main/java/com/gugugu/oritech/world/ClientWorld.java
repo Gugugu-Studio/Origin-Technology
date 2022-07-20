@@ -18,11 +18,16 @@ public class ClientWorld extends World implements AutoCloseable {
     private final Block[][][] blocks;
     public final RenderChunk[][][] chunks;
     public final int width, height, depth;
+    public final int xChunks, yChunks, zChunks;
+    private final List<IWorldListener> listeners = new ArrayList<>();
 
     public ClientWorld(int width, int height, int depth) {
         this.width = width;
         this.height = height;
         this.depth = depth;
+        xChunks = width / CHUNK_SIZE;
+        yChunks = height / CHUNK_SIZE;
+        zChunks = depth / CHUNK_SIZE;
         blocks = new Block[height][width][depth];
         for (int x = 0; x < width; x++) {
             for (int z = 0; z < depth; z++) {
@@ -38,7 +43,7 @@ public class ClientWorld extends World implements AutoCloseable {
                 }
             }
         }
-        chunks = new RenderChunk[height / CHUNK_SIZE][width / CHUNK_SIZE][depth / CHUNK_SIZE];
+        chunks = new RenderChunk[yChunks][xChunks][zChunks];
         for (int y = 0; y < chunks.length; y++) {
             RenderChunk[][] chunks2 = chunks[y];
             for (int x = 0; x < chunks2.length; x++) {
@@ -69,17 +74,69 @@ public class ClientWorld extends World implements AutoCloseable {
         }
     }
 
-    public boolean isInBounds(int x, int y, int z) {
-        return x >= 0 && x < width &&
-               y >= 0 && y < height &&
-               z >= 0 && z < depth;
+    public void addListener(IWorldListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeListener(IWorldListener listener) {
+        listeners.remove(listener);
+    }
+
+    public void markDirty(int x0, int y0, int z0,
+                          int x1, int y1, int z1) {
+        x0 /= CHUNK_SIZE;
+        y0 /= CHUNK_SIZE;
+        z0 /= CHUNK_SIZE;
+        x1 /= CHUNK_SIZE;
+        y1 /= CHUNK_SIZE;
+        z1 /= CHUNK_SIZE;
+
+        if (x0 < 0) {
+            x0 = 0;
+        }
+        if (y0 < 0) {
+            y0 = 0;
+        }
+        if (z0 < 0) {
+            z0 = 0;
+        }
+        if (x1 >= xChunks) {
+            x1 = xChunks - 1;
+        }
+        if (y1 >= yChunks) {
+            y1 = yChunks - 1;
+        }
+        if (z1 >= zChunks) {
+            z1 = zChunks - 1;
+        }
+
+        for (int y = y0; y <= y1; y++) {
+            for (int x = x0; x <= x1; x++) {
+                for (int z = z0; z <= z1; z++) {
+                    chunks[y][x][z].markDirty();
+                }
+            }
+        }
     }
 
     @Override
     public Block getBlock(int x, int y, int z) {
-        if (isInBounds(x, y, z))
+        if (isInsideWorld(x, y, z))
             return blocks[y][x][z];
         return Blocks.AIR;
+    }
+
+    @Override
+    public boolean setBlock(Block block, int x, int y, int z) {
+        if (isOutsideWorld(x, y, z) ||
+            getBlock(x, y, z) == block) {
+            return false;
+        }
+        blocks[y][x][z] = block;
+        for (IWorldListener listener : listeners) {
+            listener.onBlockChanged(x, y, z);
+        }
+        return true;
     }
 
     @Override

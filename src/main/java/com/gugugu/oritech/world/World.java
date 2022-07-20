@@ -12,6 +12,8 @@ import java.util.List;
 public abstract class World {
     public abstract Block getBlock(int x, int y, int z);
 
+    public abstract boolean setBlock(Block block, int x, int y, int z);
+
     public abstract List<AABBox> getCubes(AABBox origin);
 
     public abstract int getWidth();
@@ -19,4 +21,14 @@ public abstract class World {
     public abstract int getHeight();
 
     public abstract int getDepth();
+
+    public boolean isInsideWorld(int x, int y, int z) {
+        return x >= 0 && x < getWidth() &&
+               y >= 0 && y < getHeight() &&
+               z >= 0 && z < getDepth();
+    }
+
+    public boolean isOutsideWorld(int x, int y, int z) {
+        return !isInsideWorld(x, y, z);
+    }
 }

@@ -27,7 +27,7 @@ public class Main extends Window {
 
     @Override
     public void init(int width, int height) {
-        glClearColor(0.3f, 0.4f, 1.0f, 1.0f);
+        glClearColor(0.53f, 0.68f, 0.98f, 1.0f);
         // Initialize resources here
         client = new OriTechClient(width, height);
         client.keyboard = keyboard;
