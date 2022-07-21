@@ -14,4 +14,9 @@ public class AirBlock extends Block {
     public boolean hasSideTransparency() {
         return true;
     }
+
+    @Override
+    public boolean isSolid() {
+        return false;
+    }
 }

@@ -23,6 +23,10 @@ public class Block {
         return false;
     }
 
+    public boolean isSolid() {
+        return true;
+    }
+
     public AABBox getOutline(int x, int y, int z) {
         return new AABBox(x, y, z,
             x + 1.0f, y + 1.0f, z + 1.0f);
@@ -40,6 +44,12 @@ public class Block {
         return world.getBlock(x, y, z).hasSideTransparency();
     }
 
+    public boolean canPlaceOn(Block target, World world, int x, int y, int z, Direction face) {
+        return !world.getBlock(x + face.getOffsetX(),
+            y + face.getOffsetY(),
+            z + face.getOffsetZ()).isSolid();
+    }
+
     public void renderFace(Batch batch, Direction face, int x, int y, int z) {
         float x0 = (float) x;
         float y0 = (float) y;
@@ -50,7 +60,7 @@ public class Block {
 
         TextureAtlas atlas = OriTechClient.getClient().blockAtlas;
         Identifier id = Registry.BLOCK.getId(this);
-        String texName = ResLocation.ofTexture(id.namespace(), "block/" + id.path()).toString();
+        String texName = ResLocation.ofAssets(id.namespace(), "textures/block/" + id.path() + ".png").toString();
         float u0 = atlas.getU0n(texName);
         float v0 = atlas.getV0n(texName);
         float u1 = atlas.getU1n(texName);

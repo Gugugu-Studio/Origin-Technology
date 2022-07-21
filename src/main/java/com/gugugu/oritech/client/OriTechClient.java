@@ -1,5 +1,6 @@
 package com.gugugu.oritech.client;
 
+import com.gugugu.oritech.client.gl.GLStateMgr;
 import com.gugugu.oritech.client.render.GameRenderer;
 import com.gugugu.oritech.client.render.WorldRenderer;
 import com.gugugu.oritech.resource.ResLocation;
@@ -12,6 +13,7 @@ import com.gugugu.oritech.ui.Mouse;
 import com.gugugu.oritech.util.HitResult;
 import com.gugugu.oritech.util.Identifier;
 import com.gugugu.oritech.util.Timer;
+import com.gugugu.oritech.util.math.Direction;
 import com.gugugu.oritech.util.registry.Registry;
 import com.gugugu.oritech.world.ClientWorld;
 import com.gugugu.oritech.world.block.Block;
@@ -44,11 +46,15 @@ public class OriTechClient
     public ClientWorld world;
     public WorldRenderer worldRenderer;
     public PlayerEntity player;
+    public int passedTick = 0;
+    private int buildTick = 0;
+    private Block handBlock = Blocks.STONE;
 
     public OriTechClient(int width, int height) {
         this.width = width;
         this.height = height;
 
+        GLStateMgr.initialize();
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
@@ -65,7 +71,7 @@ public class OriTechClient
                 continue;
             }
             Identifier id = Registry.BLOCK.getId(block);
-            list.add(new SpriteInfo(ResLocation.ofTexture(id.namespace(), "block/" + id.path()),
+            list.add(new SpriteInfo(ResLocation.ofAssets(id.namespace(), "textures/block/" + id.path() + ".png"),
                 32,
                 32));
         }
@@ -92,14 +98,22 @@ public class OriTechClient
         timer.update();
         for (int i = 0; i < timer.ticks; i++) {
             tick();
+            ++passedTick;
         }
 
         update((float) timer.deltaFrameTime);
     }
 
     public void update(float delta) {
-        if (mouse.isBtnDown(GLFW_MOUSE_BUTTON_LEFT)) {
-            destroyBlock();
+        if (passedTick - buildTick >= 4) {
+            if (mouse.isBtnDown(GLFW_MOUSE_BUTTON_LEFT)) {
+                destroyBlock();
+                buildTick = passedTick;
+            }
+            if (mouse.isBtnDown(GLFW_MOUSE_BUTTON_RIGHT)) {
+                placeBlock();
+                buildTick = passedTick;
+            }
         }
     }
 
@@ -107,6 +121,29 @@ public class OriTechClient
         final HitResult hitResult = worldRenderer.hitResult;
         if (hitResult != null) {
             world.setBlock(Blocks.AIR, hitResult.x(), hitResult.y(), hitResult.z());
+        }
+    }
+
+    private void placeBlock() {
+        final HitResult hitResult = worldRenderer.hitResult;
+        if (hitResult != null) {
+            final Direction face = hitResult.face();
+            if (face == null) {
+                return;
+            }
+            final int hrx = hitResult.x();
+            final int hry = hitResult.y();
+            final int hrz = hitResult.z();
+            if (world.canBlockPlaceOn(handBlock,
+                hrx,
+                hry,
+                hrz,
+                face)) {
+                final int x = hrx + face.getOffsetX();
+                final int y = hry + face.getOffsetY();
+                final int z = hrz + face.getOffsetZ();
+                world.setBlock(handBlock, x, y, z);
+            }
         }
     }
 
@@ -124,8 +161,11 @@ public class OriTechClient
     @Override
     public void onKey(long window, int key, int scancode, int action, int mods) {
         if (action == GLFW_PRESS) {
-            if (key == GLFW_KEY_ESCAPE) {
-                mouse.setGrabbed(!mouse.isGrabbed());
+            switch (key) {
+                case GLFW_KEY_ESCAPE -> mouse.setGrabbed(!mouse.isGrabbed());
+                case GLFW_KEY_1 -> handBlock = Blocks.STONE;
+                case GLFW_KEY_2 -> handBlock = Blocks.GRASS_BLOCK;
+                case GLFW_KEY_3 -> handBlock = Blocks.DIRT;
             }
         }
     }
@@ -145,11 +185,18 @@ public class OriTechClient
         }
     }
 
+    public void onMouseBtnPress(int btn, int mods) {
+    }
+
+    public void onMouseBtnRelease(int btn, int mods) {
+    }
+
     @Override
     public void close() {
         blockAtlas.close();
         world.close();
         gameRenderer.close();
+        GLStateMgr.close();
     }
 
     public static OriTechClient getClient() {

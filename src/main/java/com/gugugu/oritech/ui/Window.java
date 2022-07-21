@@ -48,6 +48,12 @@ public abstract class Window
 
         glfwSetKeyCallback(handle, this::onKey);
         glfwSetFramebufferSizeCallback(handle, this::onResize);
+        glfwSetMouseButtonCallback(handle, (window, button, action, mods) -> {
+            switch (action) {
+                case GLFW_PRESS -> onMouseBtnPress(button, mods);
+                case GLFW_RELEASE -> onMouseBtnRelease(button, mods);
+            }
+        });
         keyboard = new Keyboard();
         keyboard.setWindow(handle);
         mouse = new Mouse(this);
@@ -76,6 +82,12 @@ public abstract class Window
     public abstract void init(int width, int height);
 
     public abstract void update();
+
+    public void onMouseBtnPress(int btn, int mods) {
+    }
+
+    public void onMouseBtnRelease(int btn, int mods) {
+    }
 
     public void mainLoop() {
         int[] pWidth = {0}, pHeight = {0};

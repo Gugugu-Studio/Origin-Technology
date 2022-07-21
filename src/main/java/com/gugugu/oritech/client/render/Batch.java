@@ -23,12 +23,14 @@ public class Batch {
     private IntBuffer indexBuffer;
     private final List<Integer> indices = new ArrayList<>();
     private final Vertex vertex = new Vertex();
+    private final int drawFreq;
     private boolean hasColor, hasTexture;
     private final int vao, vbo, ebo;
     private int vertexCount;
     private int bufferSize;
 
-    public Batch() {
+    public Batch(int drawFreq) {
+        this.drawFreq = drawFreq;
         buffer = memAlloc(BUFFER_SIZE);
         vao = glGenVertexArrays();
         glBindVertexArray(vao);
@@ -38,6 +40,10 @@ public class Batch {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
         glEnableVertexAttribArray(0);
         glBindVertexArray(0);
+    }
+
+    public Batch() {
+        this(GL_DYNAMIC_DRAW);
     }
 
     public Batch begin() {
@@ -84,6 +90,10 @@ public class Batch {
         return emit();
     }
 
+    public Batch vertex(float x, float y) {
+        return vertex(x, y, 0.0f);
+    }
+
     public Batch emit() {
         buffer.putFloat(vertex.x())
             .putFloat(vertex.y())
@@ -119,7 +129,7 @@ public class Batch {
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         if (bufferSize < buffer.remaining()) {
             bufferSize = buffer.remaining();
-            glBufferData(GL_ARRAY_BUFFER, buffer, GL_DYNAMIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, buffer, drawFreq);
         } else {
             glBufferSubData(GL_ARRAY_BUFFER, 0L, buffer);
         }
@@ -140,7 +150,7 @@ public class Batch {
             }
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
             if (reallocated) {
-                glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL_DYNAMIC_DRAW);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBuffer, drawFreq);
             } else {
                 glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0L, indexBuffer);
             }

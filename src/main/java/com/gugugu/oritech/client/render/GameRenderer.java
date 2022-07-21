@@ -2,6 +2,8 @@ package com.gugugu.oritech.client.render;
 
 import com.gugugu.oritech.client.OriTechClient;
 import com.gugugu.oritech.client.gl.Shader;
+import com.gugugu.oritech.client.gui.DrawableHelper;
+import com.gugugu.oritech.client.gui.Screen;
 import com.gugugu.oritech.resource.ResLocation;
 import com.gugugu.oritech.resource.ResourceLoader;
 import com.gugugu.oritech.util.math.Numbers;
@@ -9,8 +11,8 @@ import org.joml.Matrix4fStack;
 
 import java.util.function.Consumer;
 
-import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11C.glBindTexture;
+import static com.gugugu.oritech.client.gl.GLStateMgr.bindTexture;
+import static org.lwjgl.opengl.GL14C.*;
 
 /**
  * @author squid233
@@ -22,11 +24,11 @@ public class GameRenderer implements AutoCloseable {
     public final Matrix4fStack view = new Matrix4fStack(16);
     public final Matrix4fStack model = new Matrix4fStack(16);
     private final OriTechClient client;
-    public Batch batch;
     public int renderInstance = 5;
     private Shader position;
     private Shader positionColor;
     private Shader positionColorTex;
+    private Shader positionTex;
     private Shader currentShader;
 
     private static Shader loadShader(String name) {
@@ -42,7 +44,9 @@ public class GameRenderer implements AutoCloseable {
         position = loadShader("position");
         positionColor = loadShader("position_color");
         positionColorTex = loadShader("position_color_tex");
-        batch = new Batch();
+        positionTex = loadShader("position_tex");
+
+        Tesselator.getInstance().init();
     }
 
     public void useShader(Shader shader,
@@ -85,11 +89,36 @@ public class GameRenderer implements AutoCloseable {
 
             client.blockAtlas.bind();
             client.worldRenderer.render();
-            glBindTexture(GL_TEXTURE_2D, 0);
+            bindTexture(0);
         });
         useShader(position, shader -> {
             setupShaderMatrix(shader);
-            client.worldRenderer.tryRenderHit(batch);
+            client.worldRenderer.tryRenderHit();
+        });
+
+        drawGui(client.width * 0.5f, client.height * 0.5f);
+    }
+
+    private void drawGui(float width, float height) {
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+        projection.setOrtho2D(0, width, height, 0);
+        view.identity();
+        model.identity();
+
+        useShader(positionTex, shader -> {
+            glEnable(GL_BLEND);
+            glBlendFuncSeparate(GL_ONE_MINUS_DST_COLOR, GL_ONE_MINUS_SRC_COLOR, GL_ONE, GL_ZERO);
+
+            model.pushMatrix().translate(width * 0.5f, height * 0.5f, 0.0f);
+            setupShaderMatrix(shader);
+            model.popMatrix();
+            DrawableHelper.drawSprite(Screen.WIDGETS_TEXTURES,
+                -8.0f, -8.0f,
+                16.0f, 16.0f,
+                240, 0);
+
+            glDisable(GL_BLEND);
         });
     }
 
@@ -123,11 +152,16 @@ public class GameRenderer implements AutoCloseable {
         return positionColorTex;
     }
 
+    public Shader positionTex() {
+        return positionTex;
+    }
+
     @Override
     public void close() {
-        batch.free();
+        Tesselator.getInstance().free();
         position.close();
         positionColor.close();
         positionColorTex.close();
+        positionTex.close();
     }
 }

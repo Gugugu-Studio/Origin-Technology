@@ -70,23 +70,26 @@ public class WorldRenderer implements IWorldListener {
         }
     }
 
-    public void tryRenderHit(Batch batch) {
+    public void tryRenderHit() {
         if (hitResult != null) {
             GameRenderer gameRenderer = OriTechClient.getClient().gameRenderer;
             gameRenderer.setShaderColor(0.0f, 0.0f, 0.0f, 0.4f);
-            glDisable(GL_DEPTH_TEST);
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            batch.begin();
+            glLineWidth(2.0f);
             AABBox outline = hitResult.block().getOutline(hitResult.x(), hitResult.y(), hitResult.z());
-            outline.forEachEdge((dir, minX, minY, minZ, maxX, maxY, maxZ) -> {
-                batch.vertex(minX, minY, minZ)
-                    .vertex(maxX, maxY, maxZ);
-                return true;
+            final float epsilon = 0.001f;
+            Tesselator.getInstance().withBatch(batch -> {
+                batch.begin();
+                outline.forEachEdge((dir, minX, minY, minZ, maxX, maxY, maxZ) -> {
+                    batch.vertex(minX, minY, minZ)
+                        .vertex(maxX + epsilon, maxY + epsilon, maxZ + epsilon);
+                    return true;
+                });
+                batch.end().render(GL_LINES);
             });
-            batch.end().render(GL_LINES);
+            glLineWidth(1.0f);
             glDisable(GL_BLEND);
-            glEnable(GL_DEPTH_TEST);
             gameRenderer.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         }
     }

@@ -35,6 +35,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.IntConsumer;
 
+import static com.gugugu.oritech.client.gl.GLStateMgr.*;
 import static org.lwjgl.opengl.GL13C.*;
 import static org.lwjgl.stb.STBImage.*;
 import static org.lwjgl.system.MemoryUtil.memAlloc;
@@ -219,12 +220,11 @@ public class Texture2D implements AutoCloseable {
     }
 
     private void build(ByteBuffer buffer) {
-        int lastUnit = glGetInteger(GL_ACTIVE_TEXTURE);
-        int lastId = glGetInteger(GL_TEXTURE_2D);
+        int lastUnit = getActiveTexture2d();
+        int lastId = getTexture2dId();
         if (!glIsTexture(id))
             create();
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, id);
+        bindTexture(0, id);
         if (mipmap != null) {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
@@ -243,8 +243,7 @@ public class Texture2D implements AutoCloseable {
         if (mipmap != null) {
             mipmap.accept(GL_TEXTURE_2D);
         }
-        glActiveTexture(GL_TEXTURE0 + lastUnit);
-        glBindTexture(GL_TEXTURE_2D, lastId);
+        bindTexture(lastUnit, lastId);
     }
 
     public void create() {
@@ -252,11 +251,11 @@ public class Texture2D implements AutoCloseable {
     }
 
     public void bind() {
-        glBindTexture(GL_TEXTURE_2D, id);
+        bindTexture(id);
     }
 
     public void unbind() {
-        glBindTexture(GL_TEXTURE_2D, 0);
+        bindTexture(0);
     }
 
     public int getId() {

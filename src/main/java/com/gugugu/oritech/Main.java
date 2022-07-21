@@ -67,4 +67,14 @@ public class Main extends Window {
             client.onResize(window, width, height);
         }
     }
+
+    @Override
+    public void onMouseBtnPress(int btn, int mods) {
+        client.onMouseBtnPress(btn, mods);
+    }
+
+    @Override
+    public void onMouseBtnRelease(int btn, int mods) {
+        client.onMouseBtnRelease(btn, mods);
+    }
 }

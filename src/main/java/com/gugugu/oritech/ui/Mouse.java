@@ -48,10 +48,10 @@ public class Mouse {
     }
 
     /**
-     * The swgl cursor pos callback.
+     * The cursor pos callback.
      *
      * @author squid233
-     * @since 0.1.0
+     * @since 1.0
      */
     @FunctionalInterface
     public interface Callback {

@@ -33,6 +33,10 @@ public class ResLocation {
         this(type, location.split(":", 2));
     }
 
+    public static ResLocation ofAssets(String namespace, String path) {
+        return new ResLocation(ResType.ASSETS, namespace, path);
+    }
+
     public static ResLocation ofAssets(String location) {
         return new ResLocation(ResType.ASSETS, location);
     }
@@ -47,10 +51,6 @@ public class ResLocation {
 
     public static ResLocation ofData(String location) {
         return new ResLocation(ResType.DATA, location);
-    }
-
-    public static ResLocation ofTexture(String namespace, String path) {
-        return new ResLocation(ResType.ASSETS, namespace + ":textures/" + path + ".png");
     }
 
     public Identifier toIdentifier() {
