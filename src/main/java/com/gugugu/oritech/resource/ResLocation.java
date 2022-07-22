@@ -1,5 +1,7 @@
 package com.gugugu.oritech.resource;
 
+import com.gugugu.oritech.util.Identifier;
+
 import java.util.Objects;
 
 /**
@@ -8,8 +10,6 @@ import java.util.Objects;
  * @since 1.0
  */
 public class ResLocation {
-    public static final String DEFAULT_NAMESPACE = "origin_technology";
-
     private ResType resType;
     private String namespace;
     private String path;
@@ -20,7 +20,7 @@ public class ResLocation {
             namespace = location[0];
             path = location[1];
         } else {
-            namespace = DEFAULT_NAMESPACE;
+            namespace = Identifier.DEFAULT_NAMESPACE;
             path = location[0];
         }
     }
@@ -31,6 +31,30 @@ public class ResLocation {
 
     public ResLocation(ResType type, String location) {
         this(type, location.split(":", 2));
+    }
+
+    public static ResLocation ofAssets(String namespace, String path) {
+        return new ResLocation(ResType.ASSETS, namespace, path);
+    }
+
+    public static ResLocation ofAssets(String location) {
+        return new ResLocation(ResType.ASSETS, location);
+    }
+
+    public static ResLocation ofBehavior(String location) {
+        return new ResLocation(ResType.BEHAVIOR, location);
+    }
+
+    public static ResLocation ofCore(String location) {
+        return new ResLocation(ResType.CORE, location);
+    }
+
+    public static ResLocation ofData(String location) {
+        return new ResLocation(ResType.DATA, location);
+    }
+
+    public Identifier toIdentifier() {
+        return new Identifier(namespace, path);
     }
 
     public ResType getResType() {

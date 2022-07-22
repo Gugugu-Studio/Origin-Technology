@@ -1,0 +1,108 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+
+name: Java CI with Gradle
+
+on: [ push, pull_request ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        java: [
+          17
+        ]
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        arch: [
+          x64
+#          aarch64
+        ]
+        include:
+#          - java: '17'
+#            os: ubuntu-latest
+#            arch: arm
+          - java: '17'
+            os: windows-latest
+            arch: x32
+#        exclude:
+#          - java: '17'
+#            os: windows-latest
+#            arch: aarch64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK ${{ matrix.java }}-${{ matrix.arch }}
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'temurin'
+          architecture: ${{ matrix.arch }}
+      - name: Grant execute permission for gradlew
+        if: ${{ runner.os != 'Windows' }}
+        run: chmod +x gradlew
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+        with:
+          arguments: build
+      - name: capture build artifacts
+        if: ${{ runner.os == 'Linux' && matrix.java == '17' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: Artifacts
+          path: build/libs/
+      - name: Make Distribution
+        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+        with:
+          arguments: distZip
+      - name: capture windows-x64 dist
+        if: ${{ runner.os == 'Windows' && matrix.arch == 'x64' && matrix.java == '17' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: windows-x64-dist
+          path: build/distributions/
+      - name: capture windows-x86 dist
+        if: ${{ runner.os == 'Windows' && matrix.arch == 'x32' && matrix.java == '17' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: windows-x86-dist
+          path: build/distributions/
+      - name: capture windows-arm64 dist
+        if: ${{ runner.os == 'Windows' && matrix.arch == 'aarch64' && matrix.java == '17' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: windows-arm64-dist
+          path: build/distributions/
+      - name: capture linux-x64 dist
+        if: ${{ runner.os == 'Linux' && matrix.arch == 'x64' && matrix.java == '17' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux-x64-dist
+          path: build/distributions/
+      - name: capture linux-arm64 dist
+        if: ${{ runner.os == 'Linux' && matrix.arch == 'aarch64' && matrix.java == '17' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux-arm64-dist
+          path: build/distributions/
+      - name: capture linux-arm32 dist
+        if: ${{ runner.os == 'Linux' && matrix.arch == 'arm' && matrix.java == '17' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux-arm32-dist
+          path: build/distributions/
+      - name: capture macos-x64 dist
+        if: ${{ runner.os == 'macOS' && matrix.arch == 'x64' && matrix.java == '17' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: macos-x64-dist
+          path: build/distributions/
+      - name: capture macos-arm64 dist
+        if: ${{ runner.os == 'macOS' && matrix.arch == 'aarch64' && matrix.java == '17' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: macOS-arm64-dist
+          path: build/distributions/
