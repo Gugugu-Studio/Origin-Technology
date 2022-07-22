@@ -32,6 +32,10 @@ public abstract class Chunk {
      */
     public abstract Block getBlock(int x, int y, int z);
 
+    public Block getBlockAbsolute(int x, int y, int z) {
+        return getBlock(getRelativePos(x), getRelativePos(y), getRelativePos(z));
+    }
+
     /**
      * Set block by relative position.
      *
@@ -41,6 +45,10 @@ public abstract class Chunk {
      * @param z     the pos z
      */
     public abstract void setBlock(Block block, int x, int y, int z);
+
+    public void setBlockAbsolute(Block block, int x, int y, int z) {
+        setBlock(block, getRelativePos(x), getRelativePos(y), getRelativePos(z));
+    }
 
     public abstract boolean isDirty();
 

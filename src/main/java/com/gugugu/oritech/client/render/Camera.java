@@ -1,5 +1,7 @@
 package com.gugugu.oritech.client.render;
 
+import com.gugugu.oritech.util.Side;
+import com.gugugu.oritech.util.SideOnly;
 import com.gugugu.oritech.util.math.Direction;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -11,6 +13,7 @@ import static org.joml.Math.*;
  * @author theflysong
  * @since 1.0
  */
+@SideOnly(Side.CLIENT)
 public class Camera {
     public static final float YAW = -90.0f;
     public static final float PITCH = 0.0f;

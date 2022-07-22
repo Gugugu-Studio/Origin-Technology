@@ -1,6 +1,8 @@
 package com.gugugu.oritech.client.gl;
 
 import com.gugugu.oritech.util.FloatByteUtil;
+import com.gugugu.oritech.util.Side;
+import com.gugugu.oritech.util.SideOnly;
 import org.joml.Vector2fc;
 import org.joml.Vector3fc;
 import org.joml.Vector4fc;
@@ -12,6 +14,7 @@ import java.util.Arrays;
  * @author squid233
  * @since 1.0
  */
+@SideOnly(Side.CLIENT)
 public enum DataType {
     BYTE(1) {
         @Override

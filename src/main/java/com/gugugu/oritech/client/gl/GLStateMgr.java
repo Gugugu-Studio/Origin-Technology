@@ -3,6 +3,8 @@ package com.gugugu.oritech.client.gl;
 import com.gugugu.oritech.resource.ResType;
 import com.gugugu.oritech.resource.tex.Texture2D;
 import com.gugugu.oritech.util.Identifier;
+import com.gugugu.oritech.util.Side;
+import com.gugugu.oritech.util.SideOnly;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +15,7 @@ import static org.lwjgl.opengl.GL20C.*;
  * @author squid233
  * @since 1.0
  */
+@SideOnly(Side.CLIENT)
 public class GLStateMgr {
     private static final Map<Identifier, Texture2D> TEXTURE_MAP =
         new HashMap<>();

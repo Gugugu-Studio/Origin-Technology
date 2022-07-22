@@ -6,13 +6,13 @@ import com.gugugu.oritech.client.render.WorldRenderer;
 import com.gugugu.oritech.resource.ResLocation;
 import com.gugugu.oritech.resource.tex.SpriteInfo;
 import com.gugugu.oritech.resource.tex.TextureAtlas;
+import com.gugugu.oritech.server.IntegratedServer;
+import com.gugugu.oritech.server.Server;
 import com.gugugu.oritech.ui.IKeyListener;
 import com.gugugu.oritech.ui.ISizeListener;
 import com.gugugu.oritech.ui.Keyboard;
 import com.gugugu.oritech.ui.Mouse;
-import com.gugugu.oritech.util.HitResult;
-import com.gugugu.oritech.util.Identifier;
-import com.gugugu.oritech.util.Timer;
+import com.gugugu.oritech.util.*;
 import com.gugugu.oritech.util.math.Direction;
 import com.gugugu.oritech.util.registry.Registry;
 import com.gugugu.oritech.world.ClientWorld;
@@ -20,7 +20,6 @@ import com.gugugu.oritech.world.block.Block;
 import com.gugugu.oritech.world.block.Blocks;
 import com.gugugu.oritech.world.entity.PlayerEntity;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Random;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -35,8 +34,10 @@ import static org.lwjgl.opengl.GL12C.*;
  * @author squid233
  * @since 1.0
  */
+@SideOnly(Side.CLIENT)
 public class OriTechClient
-    implements IKeyListener, ISizeListener, Mouse.Callback, AutoCloseable {
+    implements IKeyListener, ISizeListener, Mouse.Callback,
+    Runnable, AutoCloseable {
     public static final float SENSITIVITY = 0.15f;
     private static OriTechClient instance;
     public final GameRenderer gameRenderer;
@@ -54,6 +55,7 @@ public class OriTechClient
     public int passedTick = 0;
     private int buildTick = 0;
     private Block handBlock = Blocks.STONE;
+    private IntegratedServer integratedServer;
 
     public OriTechClient(int width, int height) {
         this.width = width;
@@ -93,10 +95,19 @@ public class OriTechClient
     }
 
     public void lazyInit() {
-        world = new ClientWorld(this, Random.newSeed(), 0, 5, 0);
+        integratedServer = new IntegratedServer(this);
+        integratedServer.start();
+        world = new ClientWorld(this, integratedServer.world.seed, 0, 5, 0);
         worldRenderer = new WorldRenderer(this, world);
         player = new PlayerEntity(world);
         player.keyboard = keyboard;
+    }
+
+    @Override
+    public void run() {
+        updateTime();
+        integratedServer.run();
+        render();
     }
 
     public void updateTime() {
@@ -198,10 +209,19 @@ public class OriTechClient
 
     @Override
     public void close() {
+        integratedServer.close();
         blockAtlas.close();
         world.close();
         gameRenderer.close();
         GLStateMgr.close();
+    }
+
+    public static Server getServer() {
+        return getIntegratedServer();
+    }
+
+    public static IntegratedServer getIntegratedServer() {
+        return getClient().integratedServer;
     }
 
     public static OriTechClient getClient() {

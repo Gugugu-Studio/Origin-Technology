@@ -1,5 +1,8 @@
 package com.gugugu.oritech.client.render.vertex;
 
+import com.gugugu.oritech.util.Side;
+import com.gugugu.oritech.util.SideOnly;
+
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -8,6 +11,7 @@ import java.util.Map;
  * @author squid233
  * @since 1.0
  */
+@SideOnly(Side.CLIENT)
 public class VertexLayout implements Iterable<VertexFormat> {
     private final Map<VertexFormat, Integer> offsets = new LinkedHashMap<>();
     private final int length;
