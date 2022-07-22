@@ -2,6 +2,7 @@ package com.gugugu.oritech.world;
 
 import com.gugugu.oritech.phys.AABBox;
 import com.gugugu.oritech.world.block.Block;
+import com.gugugu.oritech.world.chunk.Chunk;
 
 import java.util.List;
 
@@ -21,22 +22,12 @@ public class ServerWorld extends World {
     }
 
     @Override
-    public List<AABBox> getCubes(AABBox origin) {
+    public Chunk getChunk(int x, int y, int z) {
         return null;
     }
 
     @Override
-    public int getWidth() {
-        return 0;
-    }
-
-    @Override
-    public int getHeight() {
-        return 0;
-    }
-
-    @Override
-    public int getDepth() {
-        return 0;
+    public List<AABBox> getCubes(AABBox origin) {
+        return null;
     }
 }

@@ -66,9 +66,9 @@ public class Entity {
     }
 
     public void resetPos() {
-        setPos((float) (world.getWidth() * Math.random()),
-            world.getHeight() + 10,
-            (float) (world.getDepth() * Math.random()));
+        setPos((float) (256 * Math.random()),
+            5,
+            (float) (256 * Math.random()));
     }
 
     public void kill() {

@@ -24,7 +24,7 @@ public class GameRenderer implements AutoCloseable {
     public final Matrix4fStack view = new Matrix4fStack(16);
     public final Matrix4fStack model = new Matrix4fStack(16);
     private final OriTechClient client;
-    public int renderInstance = 5;
+    public int renderDistance = 5;
     private Shader position;
     private Shader positionColor;
     private Shader positionColorTex;
@@ -88,7 +88,7 @@ public class GameRenderer implements AutoCloseable {
             client.worldRenderer.updateDirtyChunks(client.player);
 
             client.blockAtlas.bind();
-            client.worldRenderer.render();
+            client.worldRenderer.render(client.player);
             bindTexture(0);
         });
         useShader(position, shader -> {

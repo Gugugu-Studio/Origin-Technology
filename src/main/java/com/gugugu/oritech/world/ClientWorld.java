@@ -1,77 +1,35 @@
 package com.gugugu.oritech.world;
 
+import com.gugugu.oritech.client.OriTechClient;
 import com.gugugu.oritech.phys.AABBox;
+import com.gugugu.oritech.util.math.ChunkPos;
 import com.gugugu.oritech.world.block.Block;
 import com.gugugu.oritech.world.block.Blocks;
+import com.gugugu.oritech.world.chunk.Chunk;
 import com.gugugu.oritech.world.chunk.RenderChunk;
+import org.joml.Math;
+import org.joml.Random;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-import static com.gugugu.oritech.world.chunk.Chunk.CHUNK_SIZE;
+import static com.gugugu.oritech.world.chunk.Chunk.*;
 
 /**
  * @author squid233
  * @since 1.0
  */
 public class ClientWorld extends World implements AutoCloseable {
-    private final Block[][][] blocks;
-    public final RenderChunk[][][] chunks;
-    public final int width, height, depth;
-    public final int xChunks, yChunks, zChunks;
+    private final Map<Long, RenderChunk> chunkMap = new HashMap<>();
     private final List<IWorldListener> listeners = new ArrayList<>();
+    private final Random random;
 
-    public ClientWorld(int width, int height, int depth) {
-        this.width = width;
-        this.height = height;
-        this.depth = depth;
-        xChunks = width / CHUNK_SIZE;
-        yChunks = height / CHUNK_SIZE;
-        zChunks = depth / CHUNK_SIZE;
-        blocks = new Block[height][width][depth];
-        for (int x = 0; x < width; x++) {
-            for (int z = 0; z < depth; z++) {
-                for (int y = 0; y < 11; y++) {
-                    blocks[y][x][z] = Blocks.STONE;
-                }
-                for (int y = 11; y < 15; y++) {
-                    blocks[y][x][z] = Blocks.DIRT;
-                }
-                blocks[15][x][z] = Blocks.GRASS_BLOCK;
-                for (int y = 16; y < height; y++) {
-                    blocks[y][x][z] = Blocks.AIR;
-                }
-            }
-        }
-        chunks = new RenderChunk[yChunks][xChunks][zChunks];
-        for (int y = 0; y < chunks.length; y++) {
-            RenderChunk[][] chunks2 = chunks[y];
-            for (int x = 0; x < chunks2.length; x++) {
-                RenderChunk[] chunks1 = chunks2[x];
-                for (int z = 0; z < chunks1.length; z++) {
-                    int x0 = x * CHUNK_SIZE;
-                    int y0 = y * CHUNK_SIZE;
-                    int z0 = z * CHUNK_SIZE;
-                    int x1 = (x + 1) * CHUNK_SIZE;
-                    int y1 = (y + 1) * CHUNK_SIZE;
-                    int z1 = (z + 1) * CHUNK_SIZE;
-
-                    if (x1 > width) {
-                        x1 = width;
-                    }
-                    if (y1 > height) {
-                        y1 = height;
-                    }
-                    if (z1 > depth) {
-                        z1 = depth;
-                    }
-
-                    chunks1[z] = new RenderChunk(this,
-                        x0, y0, z0,
-                        x1, y1, z1);
-                }
-            }
-        }
+    public ClientWorld(OriTechClient client,
+                       long seed,
+                       int spawnX, int spawnY, int spawnZ) {
+        random = new Random(seed);
+        int distance = client.gameRenderer.renderDistance;
+        forEachChunksDistance(distance, spawnX, spawnY, spawnZ, (chunk, x, y, z) -> {
+        });
     }
 
     public void addListener(IWorldListener listener) {
@@ -84,36 +42,76 @@ public class ClientWorld extends World implements AutoCloseable {
 
     public void markDirty(int x0, int y0, int z0,
                           int x1, int y1, int z1) {
-        x0 /= CHUNK_SIZE;
-        y0 /= CHUNK_SIZE;
-        z0 /= CHUNK_SIZE;
-        x1 /= CHUNK_SIZE;
-        y1 /= CHUNK_SIZE;
-        z1 /= CHUNK_SIZE;
-
-        if (x0 < 0) {
-            x0 = 0;
-        }
-        if (y0 < 0) {
-            y0 = 0;
-        }
-        if (z0 < 0) {
-            z0 = 0;
-        }
-        if (x1 >= xChunks) {
-            x1 = xChunks - 1;
-        }
-        if (y1 >= yChunks) {
-            y1 = yChunks - 1;
-        }
-        if (z1 >= zChunks) {
-            z1 = zChunks - 1;
-        }
+        x0 = getChunkPos(x0);
+        y0 = getChunkPos(y0);
+        z0 = getChunkPos(z0);
+        x1 = getChunkPos(x1);
+        y1 = getChunkPos(y1);
+        z1 = getChunkPos(z1);
 
         for (int y = y0; y <= y1; y++) {
             for (int x = x0; x <= x1; x++) {
                 for (int z = z0; z <= z1; z++) {
-                    chunks[y][x][z].markDirty();
+                    getChunk(x, y, z).markDirty();
+                }
+            }
+        }
+    }
+
+    private RenderChunk loadChunk(int x, int y, int z) {
+        int x0 = x * CHUNK_SIZE;
+        int y0 = y * CHUNK_SIZE;
+        int z0 = z * CHUNK_SIZE;
+        int x1 = (x + 1) * CHUNK_SIZE;
+        int y1 = (y + 1) * CHUNK_SIZE;
+        int z1 = (z + 1) * CHUNK_SIZE;
+
+        if (x0 < -LIMIT) {
+            x0 = -LIMIT;
+        }
+        if (y0 < -Y_LIMIT) {
+            y0 = -Y_LIMIT;
+        }
+        if (z0 < -LIMIT) {
+            z0 = -LIMIT;
+        }
+
+        if (x1 > LIMIT) {
+            x1 = LIMIT;
+        }
+        if (y1 > Y_LIMIT) {
+            y1 = Y_LIMIT;
+        }
+        if (z1 > LIMIT) {
+            z1 = LIMIT;
+        }
+
+        return new RenderChunk(
+            this,
+            x0, y0, z0,
+            x1, y1, z1);
+    }
+
+    public void forEachChunksDistance(int distance,
+                                      float xo, float yo, float zo,
+                                      IChunkConsumer action) {
+        final float dc = distance * CHUNK_SIZE * 0.5f;
+        int cx0 = getChunkPos((int) (xo - dc));
+        int cy0 = getChunkPos((int) (yo - dc));
+        int cz0 = getChunkPos((int) (zo - dc));
+        int cx1 = getChunkPos((int) (xo + dc));
+        int cy1 = getChunkPos((int) (yo + dc));
+        int cz1 = getChunkPos((int) (zo + dc));
+        for (int y = cy0; y <= cy1; y++) {
+            for (int x = cx0; x <= cx1; x++) {
+                for (int z = cz0; z <= cz1; z++) {
+                    long pos = ChunkPos.toLong(x, y, z);
+                    RenderChunk chunk = chunkMap.get(pos);
+                    if (chunk == null) {
+                        chunk = loadChunk(x, y, z);
+                        chunkMap.put(pos, chunk);
+                    }
+                    action.accept(chunk, x, y, z);
                 }
             }
         }
@@ -121,18 +119,29 @@ public class ClientWorld extends World implements AutoCloseable {
 
     @Override
     public Block getBlock(int x, int y, int z) {
-        if (isInsideWorld(x, y, z))
-            return blocks[y][x][z];
+        if (isInsideWorld(x, y, z)) {
+            return getChunkByBlockPos(x, y, z)
+                .getBlock(getRelativePos(x), getRelativePos(y), getRelativePos(z));
+        }
         return Blocks.AIR;
     }
 
     @Override
     public boolean setBlock(Block block, int x, int y, int z) {
-        if (isOutsideWorld(x, y, z) ||
-            getBlock(x, y, z) == block) {
+        Chunk chunk;
+        int rpx, rpy, rpz;
+        if (isOutsideWorld(x, y, z)) {
             return false;
+        } else {
+            chunk = getChunkByBlockPos(x, y, z);
+            rpx = getRelativePos(x);
+            rpy = getRelativePos(y);
+            rpz = getRelativePos(z);
+            if (chunk.getBlock(rpx, rpy, rpz) == block) {
+                return false;
+            }
         }
-        blocks[y][x][z] = block;
+        chunk.setBlock(block, rpx, rpy, rpz);
         for (IWorldListener listener : listeners) {
             listener.onBlockChanged(x, y, z);
         }
@@ -142,32 +151,12 @@ public class ClientWorld extends World implements AutoCloseable {
     @Override
     public List<AABBox> getCubes(AABBox origin) {
         List<AABBox> list = new ArrayList<>();
-        int x0 = (int) origin.min.x;
-        int y0 = (int) origin.min.y;
-        int z0 = (int) origin.min.z;
-        int x1 = (int) (origin.max.x + 1.0f);
-        int y1 = (int) (origin.max.y + 1.0f);
-        int z1 = (int) (origin.max.z + 1.0f);
-
-        if (x0 < 0) {
-            x0 = 0;
-        }
-        if (y0 < 0) {
-            y0 = 0;
-        }
-        if (z0 < 0) {
-            z0 = 0;
-        }
-
-        if (x1 > width) {
-            x1 = width;
-        }
-        if (y1 > height) {
-            y1 = height;
-        }
-        if (z1 > depth) {
-            z1 = depth;
-        }
+        int x0 = (int) Math.floor(origin.min.x);
+        int y0 = (int) Math.floor(origin.min.y);
+        int z0 = (int) Math.floor(origin.min.z);
+        int x1 = (int) Math.floor(origin.max.x + 1.0f);
+        int y1 = (int) Math.floor(origin.max.y + 1.0f);
+        int z1 = (int) Math.floor(origin.max.z + 1.0f);
 
         for (int y = y0; y < y1; y++) {
             for (int x = x0; x < x1; x++) {
@@ -186,33 +175,21 @@ public class ClientWorld extends World implements AutoCloseable {
         return list;
     }
 
+    @Override
     public RenderChunk getChunk(int x, int y, int z) {
-        return chunks[y][x][z];
-    }
-
-    @Override
-    public int getWidth() {
-        return width;
-    }
-
-    @Override
-    public int getHeight() {
-        return height;
-    }
-
-    @Override
-    public int getDepth() {
-        return depth;
+        long pos = ChunkPos.toLong(x, y, z);
+        RenderChunk chunk = chunkMap.get(pos);
+        if (chunk == null) {
+            chunk = loadChunk(x, y, z);
+            chunkMap.put(pos, chunk);
+        }
+        return chunk;
     }
 
     @Override
     public void close() {
-        for (RenderChunk[][] chunks2 : chunks) {
-            for (RenderChunk[] chunks1 : chunks2) {
-                for (RenderChunk chunk : chunks1) {
-                    chunk.close();
-                }
-            }
+        for (RenderChunk chunk : chunkMap.values()) {
+            chunk.close();
         }
     }
 }

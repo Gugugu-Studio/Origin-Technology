@@ -38,7 +38,6 @@ import static com.gugugu.oritech.util.math.Direction.*;
  * @since 1.0
  */
 public class AABBox {
-    private static final RayCastResult rayCastResult = new RayCastResult();
     public final Vector3f min = new Vector3f();
     public final Vector3f max = new Vector3f();
 
@@ -103,20 +102,20 @@ public class AABBox {
     }
 
     public Direction rayCastFacing(Vector3fc origin, Vector3fc dir) {
-        rayCastResult.reset();
+        RayCastResult.reset();
         final float epsilon = 0.0001f;
         forEachFace((dir1, minX, minY, minZ, maxX, maxY, maxZ) -> {
             if (Intersectionf.intersectRayAab(origin.x(), origin.y(), origin.z(),
                 dir.x(), dir.y(), dir.z(),
                 minX - epsilon, minY - epsilon, minZ - epsilon,
                 maxX + epsilon, maxY + epsilon, maxZ + epsilon,
-                rayCastResult.nearFar) && rayCastResult.nearFar.x < rayCastResult.distance) {
-                rayCastResult.distance = rayCastResult.nearFar.x;
-                rayCastResult.direction = dir1;
+                RayCastResult.nearFar) && RayCastResult.nearFar.x < RayCastResult.distance) {
+                RayCastResult.distance = RayCastResult.nearFar.x;
+                RayCastResult.direction = dir1;
             }
             return true;
         });
-        return rayCastResult.direction;
+        return RayCastResult.direction;
     }
 
     public AABBox expand(float x, float y, float z) {

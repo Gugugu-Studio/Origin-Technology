@@ -19,6 +19,8 @@ import com.gugugu.oritech.world.ClientWorld;
 import com.gugugu.oritech.world.block.Block;
 import com.gugugu.oritech.world.block.Blocks;
 import com.gugugu.oritech.world.entity.PlayerEntity;
+import org.jetbrains.annotations.Nullable;
+import org.joml.Random;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -43,8 +45,11 @@ public class OriTechClient
     public Mouse mouse;
     public int width, height;
     public TextureAtlas blockAtlas;
+    @Nullable
     public ClientWorld world;
+    @Nullable
     public WorldRenderer worldRenderer;
+    @Nullable
     public PlayerEntity player;
     public int passedTick = 0;
     private int buildTick = 0;
@@ -88,8 +93,8 @@ public class OriTechClient
     }
 
     public void lazyInit() {
-        world = new ClientWorld(256, 64, 256);
-        worldRenderer = new WorldRenderer(world);
+        world = new ClientWorld(this, Random.newSeed(), 0, 5, 0);
+        worldRenderer = new WorldRenderer(this, world);
         player = new PlayerEntity(world);
         player.keyboard = keyboard;
     }

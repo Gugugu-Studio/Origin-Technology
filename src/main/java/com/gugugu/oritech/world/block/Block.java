@@ -100,7 +100,8 @@ public class Block {
         }
     }
 
-    public void render(Batch batch, World world, int x, int y, int z) {
+    public boolean render(Batch batch, World world, int x, int y, int z) {
+        boolean rendered = false;
         for (Direction face : Direction.values()) {
             if (shouldRenderFace(world,
                 x + face.getOffsetX(),
@@ -117,7 +118,9 @@ public class Block {
                     batch.color(c3, c3, c3);
                 }
                 renderFace(batch, face, x, y, z);
+                rendered = true;
             }
         }
+        return rendered;
     }
 }

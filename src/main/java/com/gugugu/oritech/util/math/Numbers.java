@@ -43,6 +43,10 @@ public class Numbers {
      * @since 0.2.0
      */
     public static final double LN2 = Math.log(2);
+    private static final int[] MULTIPLY_DE_BRUIJN_BIT_POSITION = {
+        0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8,
+        31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9
+    };
 
     /**
      * Check if two single float point numbers are equal.
@@ -159,15 +163,13 @@ public class Numbers {
      * @return Is the number power of 2
      */
     public static boolean isPoT(int a) {
-        if (a <= 0)
-            return false;
-        return (a & (a - 1)) == 0;
+        return a > 0 && (a & (a - 1)) == 0;
     }
 
     /**
      * Convert {@code a} to a number that is power of 2.
      *
-     * @param a the number
+     * @param a a value
      * @return the result
      */
     public static int toPoT(int a) {
@@ -199,6 +201,15 @@ public class Numbers {
      */
     public static double log2(double a) {
         return Math.log(a) / LN2;
+    }
+
+    public static int ceilLog2(int value) {
+        value = isPoT(value) ? value : toPoT(value);
+        return MULTIPLY_DE_BRUIJN_BIT_POSITION[(int) ((long) value * 125613361L >> 27) & 31];
+    }
+
+    public static int floorLog2(int value) {
+        return ceilLog2(value) - (isPoT(value) ? 0 : 1);
     }
 
     public static Quaternionf quatFromEulerAngle(Vector3fc eulerAngle,

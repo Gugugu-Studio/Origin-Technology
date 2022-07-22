@@ -16,10 +16,13 @@ import static org.lwjgl.system.MemoryUtil.*;
  * @since 1.0
  */
 public class Batch {
+    /**
+     * The addend to expand the batch.
+     */
+    private static final double expandAddend = 0.6180339887498949; // golden ratio (Math.sqrt(5.0) - 1.0) * 0.5
     private static final int BUFFER_STRIDE = (3 + 1 + 2) * 4;
     private static final int VERTEX_COUNT = 20_000;
-    private static final int BUFFER_SIZE = BUFFER_STRIDE * VERTEX_COUNT;
-    private final ByteBuffer buffer;
+    private ByteBuffer buffer;
     private IntBuffer indexBuffer;
     private final List<Integer> indices = new ArrayList<>();
     private final Vertex vertex = new Vertex();
@@ -27,11 +30,11 @@ public class Batch {
     private boolean hasColor, hasTexture;
     private final int vao, vbo, ebo;
     private int vertexCount;
-    private int bufferSize;
+    private boolean bufferGrew = true;
 
-    public Batch(int drawFreq) {
+    public Batch(int initNum, int drawFreq) {
         this.drawFreq = drawFreq;
-        buffer = memAlloc(BUFFER_SIZE);
+        buffer = memAlloc(initNum * BUFFER_STRIDE);
         vao = glGenVertexArrays();
         glBindVertexArray(vao);
         vbo = glGenBuffers();
@@ -42,8 +45,12 @@ public class Batch {
         glBindVertexArray(0);
     }
 
+    public Batch(int initNum) {
+        this(initNum, GL_DYNAMIC_DRAW);
+    }
+
     public Batch() {
-        this(GL_DYNAMIC_DRAW);
+        this(VERTEX_COUNT);
     }
 
     public Batch begin() {
@@ -108,8 +115,20 @@ public class Batch {
             buffer.putFloat(vertex.s())
                 .putFloat(vertex.t());
         }
+        buffer = tryGrowBuffer(buffer, 128);
         ++vertexCount;
         return this;
+    }
+
+    private ByteBuffer tryGrowBuffer(ByteBuffer buffer, int len) {
+        if (buffer.position() + len >= buffer.capacity()) {
+            int increment = Math.max(len, (int) (buffer.capacity() * expandAddend));
+            // Grows buffer for (1+expandAddend)x or len
+            int sz = buffer.capacity() + increment;
+            bufferGrew = true;
+            return memRealloc(buffer, sz);
+        }
+        return buffer;
     }
 
     public Batch end() {
@@ -127,9 +146,9 @@ public class Batch {
         glBindVertexArray(vao);
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        if (bufferSize < buffer.remaining()) {
-            bufferSize = buffer.remaining();
-            glBufferData(GL_ARRAY_BUFFER, buffer, drawFreq);
+        if (bufferGrew) {
+            nglBufferData(GL_ARRAY_BUFFER, buffer.capacity(), memAddress(buffer), drawFreq);
+            bufferGrew = false;
         } else {
             glBufferSubData(GL_ARRAY_BUFFER, 0L, buffer);
         }
@@ -161,10 +180,14 @@ public class Batch {
         if (hasColor) {
             glEnableVertexAttribArray(1);
             glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, true, stride, 12L);
+        } else {
+            glDisableVertexAttribArray(1);
         }
         if (hasTexture) {
             glEnableVertexAttribArray(2);
             glVertexAttribPointer(2, 2, GL_FLOAT, false, stride, hasColor ? 16L : 12L);
+        } else {
+            glDisableVertexAttribArray(2);
         }
 
         glBindVertexArray(0);

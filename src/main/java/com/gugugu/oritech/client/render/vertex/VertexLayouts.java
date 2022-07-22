@@ -8,4 +8,5 @@ public final class VertexLayouts {
     public static final VertexLayout POSITION = new VertexLayout(VertexFormat.POSITION);
     public static final VertexLayout POSITION_COLOR = new VertexLayout(VertexFormat.POSITION, VertexFormat.COLOR);
     public static final VertexLayout POSITION_COLOR_TEX = new VertexLayout(VertexFormat.POSITION, VertexFormat.COLOR, VertexFormat.TEX_COORDS);
+    public static final VertexLayout POSITION_TEX = new VertexLayout(VertexFormat.POSITION, VertexFormat.GENERIC, VertexFormat.TEX_COORDS);
 }

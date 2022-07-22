@@ -2,15 +2,17 @@ package com.gugugu.oritech.client.render;
 
 import com.gugugu.oritech.client.OriTechClient;
 import com.gugugu.oritech.phys.AABBox;
+import com.gugugu.oritech.phys.RayCastResult;
 import com.gugugu.oritech.util.HitResult;
+import com.gugugu.oritech.util.math.Direction;
 import com.gugugu.oritech.world.ClientWorld;
 import com.gugugu.oritech.world.IWorldListener;
 import com.gugugu.oritech.world.block.Block;
 import com.gugugu.oritech.world.chunk.RenderChunk;
 import com.gugugu.oritech.world.entity.PlayerEntity;
 import org.joml.Intersectionf;
+import org.joml.Math;
 import org.joml.Matrix4fc;
-import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -24,34 +26,36 @@ import static org.lwjgl.opengl.GL11C.*;
  */
 public class WorldRenderer implements IWorldListener {
     public static final int MAX_REBUILD_PER_FRAME = 8;
+    private final OriTechClient client;
     private final ClientWorld world;
+    private final List<RenderChunk> dirtyChunks = new ArrayList<>();
+    private static final Vector3f pickVec = new Vector3f();
     public HitResult hitResult;
 
-    public WorldRenderer(ClientWorld world) {
+    public WorldRenderer(OriTechClient client,
+                         ClientWorld world) {
+        this.client = client;
         this.world = world;
         world.addListener(this);
     }
 
-    public List<RenderChunk> getDirtyChunks() {
-        List<RenderChunk> list = null;
-        for (RenderChunk[][] chunks2 : world.chunks) {
-            for (RenderChunk[] chunks1 : chunks2) {
-                for (RenderChunk chunk : chunks1) {
-                    if (chunk.isDirty()) {
-                        if (list == null) {
-                            list = new ArrayList<>();
-                        }
-                        list.add(chunk);
-                    }
-                }
+    public List<RenderChunk> getDirtyChunks(PlayerEntity player) {
+        dirtyChunks.clear();
+        final int distance = client.gameRenderer.renderDistance;
+        final Vector3f pos = player.position;
+        world.forEachChunksDistance(distance, pos.x(), pos.y(), pos.z(), (chunk, x, y, z) -> {
+            if (chunk instanceof RenderChunk rc &&
+                rc.isDirty() &&
+                rc.testFrustum()) {
+                dirtyChunks.add(rc);
             }
-        }
-        return list;
+        });
+        return dirtyChunks;
     }
 
     public void updateDirtyChunks(PlayerEntity player) {
-        List<RenderChunk> list = getDirtyChunks();
-        if (list != null) {
+        List<RenderChunk> list = getDirtyChunks(player);
+        if (list.size() > 0) {
             DirtyChunkSorter.reset(player);
             list.sort(DirtyChunkSorter::compare);
             for (int i = 0; i < list.size() && i < MAX_REBUILD_PER_FRAME; i++) {
@@ -60,14 +64,11 @@ public class WorldRenderer implements IWorldListener {
         }
     }
 
-    public void render() {
-        for (RenderChunk[][] chunks2 : world.chunks) {
-            for (RenderChunk[] chunks1 : chunks2) {
-                for (RenderChunk chunk : chunks1) {
-                    chunk.render();
-                }
-            }
-        }
+    public void render(PlayerEntity player) {
+        final int distance = client.gameRenderer.renderDistance;
+        final Vector3f pos = player.position;
+        world.forEachChunksDistance(distance, pos.x(), pos.y(), pos.z(), (chunk, x, y, z) ->
+            ((RenderChunk) chunk).render());
     }
 
     public void tryRenderHit() {
@@ -97,17 +98,19 @@ public class WorldRenderer implements IWorldListener {
     public void pick(PlayerEntity player, Matrix4fc viewMatrix, Camera camera) {
         final float r = 5.0f;
         AABBox box = player.aabb.grow(r, r, r);
-        int x0 = (int) box.min.x;
-        int x1 = (int) (box.max.x + 1.0f);
-        int y0 = (int) box.min.y;
-        int y1 = (int) (box.max.y + 1.0f);
-        int z0 = (int) box.min.z;
-        int z1 = (int) (box.max.z + 1.0f);
+        int x0 = (int) Math.floor(box.min.x);
+        int x1 = (int) Math.floor(box.max.x + 1.0f);
+        int y0 = (int) Math.floor(box.min.y);
+        int y1 = (int) Math.floor(box.max.y + 1.0f);
+        int z0 = (int) Math.floor(box.min.z);
+        int z1 = (int) Math.floor(box.max.z + 1.0f);
         float closestDistance = Float.POSITIVE_INFINITY;
-        Vector2f nearFar = new Vector2f();
         hitResult = null;
         AABBox rayCast;
-        Vector3f dir = viewMatrix.positiveZ(new Vector3f()).negate();
+        Vector3f dir = viewMatrix.positiveZ(pickVec).negate();
+        Block hBlock = null;
+        int hX = 0, hY = 0, hZ = 0;
+        Direction hFace = null;
 
         for (int y = y0; y < y1; y++) {
             for (int x = x0; x < x1; x++) {
@@ -122,16 +125,23 @@ public class WorldRenderer implements IWorldListener {
                             dir,
                             rayCast.min,
                             rayCast.max,
-                            nearFar)
-                            && nearFar.x < closestDistance) {
-                            closestDistance = nearFar.x;
-                            hitResult = new HitResult(block,
-                                x, y, z,
-                                rayCast.rayCastFacing(camera.position, dir));
+                            RayCastResult.nearFar)
+                            && RayCastResult.nearFar.x < closestDistance) {
+                            closestDistance = RayCastResult.nearFar.x;
+                            hBlock = block;
+                            hX = x;
+                            hY = y;
+                            hZ = z;
+                            hFace = rayCast.rayCastFacing(camera.position, dir);
                         }
                     }
                 }
             }
+        }
+        if (hBlock != null) {
+            hitResult = new HitResult(hBlock,
+                hX, hY, hZ,
+                hFace);
         }
     }
 

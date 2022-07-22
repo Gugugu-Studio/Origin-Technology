@@ -33,11 +33,11 @@ import org.joml.Vector2f;
  */
 @Deprecated(since = "1.0")
 public class RayCastResult {
-    public final Vector2f nearFar = new Vector2f();
-    public Direction direction = null;
-    public float distance = Float.POSITIVE_INFINITY;
+    public static final Vector2f nearFar = new Vector2f();
+    public static Direction direction = null;
+    public static float distance = Float.POSITIVE_INFINITY;
 
-    public void reset() {
+    public static void reset() {
         nearFar.zero();
         direction = null;
         distance = Float.POSITIVE_INFINITY;
