@@ -1,5 +1,7 @@
 package com.gugugu.oritech.client.render;
 
+import com.gugugu.oritech.util.Side;
+import com.gugugu.oritech.util.SideOnly;
 import com.gugugu.oritech.util.Timer;
 import com.gugugu.oritech.world.chunk.RenderChunk;
 import com.gugugu.oritech.world.entity.PlayerEntity;
@@ -8,6 +10,7 @@ import com.gugugu.oritech.world.entity.PlayerEntity;
  * @author squid233
  * @since 1.0
  */
+@SideOnly(Side.CLIENT)
 public class DirtyChunkSorter {
     private static PlayerEntity playerEntity;
     private static double now = Timer.getTime();

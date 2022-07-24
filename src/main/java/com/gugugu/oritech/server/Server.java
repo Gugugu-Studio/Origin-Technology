@@ -7,7 +7,9 @@ import org.jetbrains.annotations.Nullable;
  * @author squid233
  * @since 1.0
  */
-public class OriTechServer {
+public abstract class Server implements Runnable {
     @Nullable
     public ServerWorld world;
+
+    public abstract boolean isIntegrated();
 }

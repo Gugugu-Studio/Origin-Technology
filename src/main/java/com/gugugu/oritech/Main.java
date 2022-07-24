@@ -2,6 +2,7 @@ package com.gugugu.oritech;
 
 import com.gugugu.oritech.client.OriTechClient;
 import com.gugugu.oritech.ui.Window;
+import org.lwjgl.opengl.GL11C;
 
 import static org.lwjgl.opengl.GL11C.*;
 
@@ -37,10 +38,7 @@ public class Main extends Window {
 
     @Override
     public void update() {
-        client.updateTime();
-        // Render
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        client.render();
+        client.run();
     }
 
     @Override
@@ -56,13 +54,18 @@ public class Main extends Window {
     }
 
     @Override
+    public void onScroll(long window, double xoffset, double yoffset) {
+        client.onScroll(xoffset, yoffset);
+    }
+
+    @Override
     public void onCursorPos(double x, double y, double xd, double yd) {
         client.onCursorPos(x, y, xd, yd);
     }
 
     @Override
     public void onResize(long window, int width, int height) {
-        glViewport(0, 0, width, height);
+        GL11C.glViewport(0, 0, width, height);
         if (client != null) {
             client.onResize(window, width, height);
         }

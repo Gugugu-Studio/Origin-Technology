@@ -1,5 +1,7 @@
 package com.gugugu.oritech.client.gl;
 
+import com.gugugu.oritech.util.Side;
+import com.gugugu.oritech.util.SideOnly;
 import org.joml.Matrix4fc;
 import org.joml.Vector4fc;
 import org.lwjgl.system.MemoryUtil;
@@ -12,6 +14,7 @@ import static org.lwjgl.opengl.GL20C.*;
  * @author squid233
  * @since 1.0
  */
+@SideOnly(Side.CLIENT)
 public final class GLUniform implements AutoCloseable {
     private final int location;
     private final ByteBuffer buffer;

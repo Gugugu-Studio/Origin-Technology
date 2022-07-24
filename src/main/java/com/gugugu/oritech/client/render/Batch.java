@@ -1,11 +1,12 @@
 package com.gugugu.oritech.client.render;
 
 import com.gugugu.oritech.client.render.vertex.Vertex;
+import com.gugugu.oritech.util.Side;
+import com.gugugu.oritech.util.SideOnly;
 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.List;
 
 import static com.gugugu.oritech.util.FloatByteUtil.color2byte;
 import static org.lwjgl.opengl.GL30C.*;
@@ -15,34 +16,29 @@ import static org.lwjgl.system.MemoryUtil.*;
  * @author squid233
  * @since 1.0
  */
+@SideOnly(Side.CLIENT)
 public class Batch {
     /**
      * The addend to expand the batch.
      */
-    private static final double expandAddend = 0.6180339887498949; // golden ratio (Math.sqrt(5.0) - 1.0) * 0.5
-    private static final int BUFFER_STRIDE = (3 + 1 + 2) * 4;
-    private static final int VERTEX_COUNT = 20_000;
+    private static final double expandAddend = 0.2;
+    public static final int BUFFER_STRIDE = (3 + 1 + 2) * 4;
+    public static final int VERTEX_COUNT = 20_000;
     private ByteBuffer buffer;
     private IntBuffer indexBuffer;
-    private final List<Integer> indices = new ArrayList<>();
     private final Vertex vertex = new Vertex();
     private final int drawFreq;
     private boolean hasColor, hasTexture;
-    private final int vao, vbo, ebo;
-    private int vertexCount;
-    private boolean bufferGrew = true;
+    private int vao, vbo, ebo;
+    private int vertexCount, indexCount;
+    private boolean bufferGrew = true, indexBufferGrew = true;
+    private boolean uploaded = false;
+    private boolean built = false;
+    private boolean hasInitGL = false;
 
     public Batch(int initNum, int drawFreq) {
         this.drawFreq = drawFreq;
         buffer = memAlloc(initNum * BUFFER_STRIDE);
-        vao = glGenVertexArrays();
-        glBindVertexArray(vao);
-        vbo = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        ebo = glGenBuffers();
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        glEnableVertexAttribArray(0);
-        glBindVertexArray(0);
     }
 
     public Batch(int initNum) {
@@ -53,21 +49,42 @@ public class Batch {
         this(VERTEX_COUNT);
     }
 
+    public Batch initGL() {
+        if (hasInitGL) {
+            return this;
+        }
+        vao = glGenVertexArrays();
+        glBindVertexArray(vao);
+        vbo = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        ebo = glGenBuffers();
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        glEnableVertexAttribArray(0);
+        glBindVertexArray(0);
+        hasInitGL = true;
+        return this;
+    }
+
     public Batch begin() {
         buffer.clear();
         if (indexBuffer != null) {
             indexBuffer.clear();
         }
-        indices.clear();
         vertexCount = 0;
+        indexCount = 0;
         hasColor = false;
         hasTexture = false;
+        built = false;
         return this;
     }
 
     public Batch indices(int... indices) {
-        for (int i : indices) {
-            this.indices.add(i + vertexCount);
+        if (indices.length > 0) {
+            createIB(indices.length);
+            for (int i : indices) {
+                indexBuffer.put(i + vertexCount);
+            }
+            indexCount += indices.length;
         }
         return this;
     }
@@ -115,27 +132,51 @@ public class Batch {
             buffer.putFloat(vertex.s())
                 .putFloat(vertex.t());
         }
-        buffer = tryGrowBuffer(buffer, 128);
+        buffer = (ByteBuffer) tryGrowBuffer(buffer, 128);
         ++vertexCount;
         return this;
     }
 
-    private ByteBuffer tryGrowBuffer(ByteBuffer buffer, int len) {
+    private Buffer tryGrowBuffer(Buffer buffer, int len) {
         if (buffer.position() + len >= buffer.capacity()) {
             int increment = Math.max(len, (int) (buffer.capacity() * expandAddend));
             // Grows buffer for (1+expandAddend)x or len
             int sz = buffer.capacity() + increment;
-            bufferGrew = true;
-            return memRealloc(buffer, sz);
+            if (buffer instanceof IntBuffer b) {
+                indexBufferGrew = true;
+                return memRealloc(b, sz);
+            }
+            if (buffer instanceof ByteBuffer b) {
+                bufferGrew = true;
+                return memRealloc(b, sz);
+            }
         }
         return buffer;
+    }
+
+    private void createIB(int len) {
+        if (indexBuffer == null) {
+            final int sz = Math.max(len, 2);
+            indexBuffer = memAllocInt(sz);
+        } else {
+            indexBuffer = (IntBuffer) tryGrowBuffer(indexBuffer, len);
+        }
     }
 
     public Batch end() {
         if (buffer.position() > 0) {
             buffer.flip();
         }
+        if (indexBuffer != null && indexBuffer.position() > 0) {
+            indexBuffer.flip();
+        }
 
+        uploaded = false;
+        built = true;
+        return this;
+    }
+
+    public Batch upload() {
         int stride = 12;
         if (hasColor) {
             stride += 4;
@@ -152,24 +193,14 @@ public class Batch {
         } else {
             glBufferSubData(GL_ARRAY_BUFFER, 0L, buffer);
         }
-        boolean reallocated = false;
-        if (indices.size() > 0) {
-            if (indexBuffer == null) {
-                indexBuffer = memAllocInt(indices.size());
-                reallocated = true;
-            } else if (indices.size() > indexBuffer.capacity()) {
-                indexBuffer = memRealloc(indexBuffer, indices.size());
-                reallocated = true;
-            }
-            for (int index : indices) {
-                indexBuffer.put(index);
-            }
-            if (indexBuffer.position() > 0) {
-                indexBuffer.flip();
-            }
+        if (indexCount > 0) {
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-            if (reallocated) {
-                glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBuffer, drawFreq);
+            if (indexBufferGrew) {
+                nglBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                    Integer.toUnsignedLong(indexBuffer.capacity()) << 2,
+                    memAddress(indexBuffer),
+                    drawFreq);
+                indexBufferGrew = false;
             } else {
                 glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0L, indexBuffer);
             }
@@ -191,13 +222,22 @@ public class Batch {
         }
 
         glBindVertexArray(0);
+        uploaded = true;
         return this;
+    }
+
+    public boolean uploaded() {
+        return uploaded;
+    }
+
+    public boolean hasBuilt() {
+        return built;
     }
 
     public void render(int mode) {
         glBindVertexArray(vao);
-        if (indices.size() > 0) {
-            glDrawElements(mode, indices.size(), GL_UNSIGNED_INT, 0L);
+        if (indexCount > 0) {
+            glDrawElements(mode, indexCount, GL_UNSIGNED_INT, 0L);
         } else {
             glDrawArrays(mode, 0, vertexCount);
         }
@@ -211,6 +251,7 @@ public class Batch {
 
     public void free() {
         memFree(buffer);
+        memFree(indexBuffer);
         glDeleteVertexArrays(vao);
         glDeleteBuffers(vbo);
         glDeleteBuffers(ebo);

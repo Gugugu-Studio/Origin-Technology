@@ -1,6 +1,8 @@
 package com.gugugu.oritech.client.render.vertex;
 
 import com.gugugu.oritech.client.gl.DataType;
+import com.gugugu.oritech.util.Side;
+import com.gugugu.oritech.util.SideOnly;
 
 import static org.lwjgl.opengl.GL20C.*;
 
@@ -8,6 +10,7 @@ import static org.lwjgl.opengl.GL20C.*;
  * @author squid233
  * @since 1.0
  */
+@SideOnly(Side.CLIENT)
 public enum VertexFormat {
     POSITION(3, GL_FLOAT, false, DataType.FLOAT.repeat(3)),
     COLOR(4, GL_UNSIGNED_BYTE, true, DataType.UNSIGNED_BYTE.repeat(4)),

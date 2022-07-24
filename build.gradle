@@ -8,6 +8,8 @@ version '1.0-SNAPSHOT'
 
 import org.gradle.internal.os.OperatingSystem
 
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
+
 project.ext.lwjglVersion = "3.3.1"
 project.ext.jomlVersion = "1.10.4"
 

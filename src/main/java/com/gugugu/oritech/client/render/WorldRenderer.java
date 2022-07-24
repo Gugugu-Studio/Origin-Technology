@@ -4,6 +4,8 @@ import com.gugugu.oritech.client.OriTechClient;
 import com.gugugu.oritech.phys.AABBox;
 import com.gugugu.oritech.phys.RayCastResult;
 import com.gugugu.oritech.util.HitResult;
+import com.gugugu.oritech.util.Side;
+import com.gugugu.oritech.util.SideOnly;
 import com.gugugu.oritech.util.math.Direction;
 import com.gugugu.oritech.world.ClientWorld;
 import com.gugugu.oritech.world.IWorldListener;
@@ -24,8 +26,9 @@ import static org.lwjgl.opengl.GL11C.*;
  * @author squid233
  * @since 1.0
  */
-public class WorldRenderer implements IWorldListener {
-    public static final int MAX_REBUILD_PER_FRAME = 8;
+@SideOnly(Side.CLIENT)
+public class WorldRenderer implements IWorldListener, AutoCloseable {
+    public static final int MAX_REBUILD_PER_FRAME = 6;
     private final OriTechClient client;
     private final ClientWorld world;
     private final List<RenderChunk> dirtyChunks = new ArrayList<>();
@@ -37,6 +40,7 @@ public class WorldRenderer implements IWorldListener {
         this.client = client;
         this.world = world;
         world.addListener(this);
+        OriTechClient.getServer().world.addListener(this);
     }
 
     public List<RenderChunk> getDirtyChunks(PlayerEntity player) {
@@ -59,7 +63,14 @@ public class WorldRenderer implements IWorldListener {
             DirtyChunkSorter.reset(player);
             list.sort(DirtyChunkSorter::compare);
             for (int i = 0; i < list.size() && i < MAX_REBUILD_PER_FRAME; i++) {
-                list.get(i).rebuild();
+                RenderChunk chunk = list.get(i);
+                chunk.rebuild();
+                if (chunk.batch != null) {
+                    chunk.batch.initGL();
+                    if (chunk.batch.hasBuilt() && !chunk.batch.uploaded()) {
+                        chunk.batch.upload();
+                    }
+                }
             }
         }
     }
@@ -87,7 +98,7 @@ public class WorldRenderer implements IWorldListener {
                         .vertex(maxX + epsilon, maxY + epsilon, maxZ + epsilon);
                     return true;
                 });
-                batch.end().render(GL_LINES);
+                batch.end().upload().render(GL_LINES);
             });
             glLineWidth(1.0f);
             glDisable(GL_BLEND);
@@ -148,5 +159,9 @@ public class WorldRenderer implements IWorldListener {
     @Override
     public void onBlockChanged(int x, int y, int z) {
         world.markDirty(x - 1, y - 1, z - 1, x + 1, y + 1, z + 1);
+    }
+
+    @Override
+    public void close() {
     }
 }

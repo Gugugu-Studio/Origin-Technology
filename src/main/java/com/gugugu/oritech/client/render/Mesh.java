@@ -4,6 +4,8 @@ import com.gugugu.oritech.client.gl.DataType;
 import com.gugugu.oritech.client.render.vertex.Vertex;
 import com.gugugu.oritech.client.render.vertex.VertexFormat;
 import com.gugugu.oritech.client.render.vertex.VertexLayout;
+import com.gugugu.oritech.util.Side;
+import com.gugugu.oritech.util.SideOnly;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -17,6 +19,7 @@ import static org.lwjgl.system.MemoryUtil.*;
  * @author squid233
  * @since 1.0
  */
+@SideOnly(Side.CLIENT)
 public class Mesh implements AutoCloseable {
     private final List<Vertex> vertices = new ArrayList<>();
     private final List<Integer> indices = new ArrayList<>();

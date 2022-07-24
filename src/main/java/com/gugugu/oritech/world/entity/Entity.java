@@ -66,9 +66,7 @@ public class Entity {
     }
 
     public void resetPos() {
-        setPos((float) (256 * Math.random()),
-            5,
-            (float) (256 * Math.random()));
+        setPos(0.5f, 5, 0.5f);
     }
 
     public void kill() {

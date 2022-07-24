@@ -54,6 +54,7 @@ public abstract class Window
                 case GLFW_RELEASE -> onMouseBtnRelease(button, mods);
             }
         });
+        glfwSetScrollCallback(handle, this::onScroll);
         keyboard = new Keyboard();
         keyboard.setWindow(handle);
         mouse = new Mouse(this);
@@ -87,6 +88,9 @@ public abstract class Window
     }
 
     public void onMouseBtnRelease(int btn, int mods) {
+    }
+
+    public void onScroll(long window, double xoffset, double yoffset) {
     }
 
     public void mainLoop() {
