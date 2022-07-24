@@ -54,8 +54,13 @@ public class OriTechClient
     public PlayerEntity player;
     public int passedTick = 0;
     private int buildTick = 0;
-    private Block handBlock = Blocks.STONE;
     private IntegratedServer integratedServer;
+    public boolean isPausing = false;
+    private final Block[] hotBar = {
+        Blocks.STONE, Blocks.GRASS_BLOCK, Blocks.DIRT, Blocks.AIR, Blocks.AIR,
+        Blocks.AIR, Blocks.AIR, Blocks.AIR, Blocks.AIR, Blocks.AIR
+    };
+    private int handBlock = 0;
 
     public OriTechClient(int width, int height) {
         this.width = width;
@@ -150,7 +155,7 @@ public class OriTechClient
             final int hrx = hitResult.x();
             final int hry = hitResult.y();
             final int hrz = hitResult.z();
-            if (world.canBlockPlaceOn(handBlock,
+            if (world.canBlockPlaceOn(hotBar[handBlock],
                 hrx,
                 hry,
                 hrz,
@@ -158,7 +163,7 @@ public class OriTechClient
                 final int x = hrx + face.getOffsetX();
                 final int y = hry + face.getOffsetY();
                 final int z = hrz + face.getOffsetZ();
-                world.setBlock(handBlock, x, y, z);
+                world.setBlock(hotBar[handBlock], x, y, z);
             }
         }
     }
@@ -174,14 +179,33 @@ public class OriTechClient
         gameRenderer.render();
     }
 
+    private void rotateCamera(float xd, float yd) {
+        player.rotate(xd, -yd);
+        gameRenderer.camera.setRotation(player.rotation.y - 90.0f, player.rotation.x);
+    }
+
     @Override
     public void onKey(long window, int key, int scancode, int action, int mods) {
         if (action == GLFW_PRESS) {
             switch (key) {
                 case GLFW_KEY_ESCAPE -> mouse.setGrabbed(!mouse.isGrabbed());
-                case GLFW_KEY_1 -> handBlock = Blocks.STONE;
-                case GLFW_KEY_2 -> handBlock = Blocks.GRASS_BLOCK;
-                case GLFW_KEY_3 -> handBlock = Blocks.DIRT;
+                case GLFW_KEY_1 -> handBlock = 0;
+                case GLFW_KEY_2 -> handBlock = 1;
+                case GLFW_KEY_3 -> handBlock = 2;
+            }
+        }
+    }
+
+    public void onScroll(double xo, double yo) {
+        if (yo < 0.0) {
+            ++handBlock;
+            if (handBlock > 2) {
+                handBlock = 0;
+            }
+        } else if (yo > 0.0) {
+            --handBlock;
+            if (handBlock < 0) {
+                handBlock = 2;
             }
         }
     }
@@ -195,9 +219,8 @@ public class OriTechClient
     @Override
     public void onCursorPos(double x, double y, double xd, double yd) {
         if (mouse.isGrabbed()) {
-            player.rotate((float) xd * SENSITIVITY,
-                (float) -yd * SENSITIVITY);
-            gameRenderer.camera.setRotation(player.rotation.y - 90.0f, player.rotation.x);
+            rotateCamera((float) xd * SENSITIVITY,
+                (float) yd * SENSITIVITY);
         }
     }
 

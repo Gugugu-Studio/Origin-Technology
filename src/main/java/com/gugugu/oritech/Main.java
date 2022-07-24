@@ -54,6 +54,11 @@ public class Main extends Window {
     }
 
     @Override
+    public void onScroll(long window, double xoffset, double yoffset) {
+        client.onScroll(xoffset, yoffset);
+    }
+
+    @Override
     public void onCursorPos(double x, double y, double xd, double yd) {
         client.onCursorPos(x, y, xd, yd);
     }

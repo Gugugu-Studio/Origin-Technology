@@ -52,6 +52,12 @@ public class PlayerEntity extends Entity {
         if (keyboard.isKeyDown(GLFW_KEY_D)) {
             ++xa;
         }
+        if (keyboard.isKeyDown(GLFW_KEY_W)) {
+            --za;
+        }
+        if (keyboard.isKeyDown(GLFW_KEY_S)) {
+            ++za;
+        }
         if (keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
             if (flying)
                 velocity.y = -0.5f;
@@ -66,12 +72,6 @@ public class PlayerEntity extends Entity {
         }
         if (keyboard.isKeyDown(GLFW_KEY_SPACE)/* && onGround*/) {
             velocity.y = getJumpVelocity();
-        }
-        if (keyboard.isKeyDown(GLFW_KEY_W)) {
-            --za;
-        }
-        if (keyboard.isKeyDown(GLFW_KEY_S)) {
-            ++za;
         }
         if (keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL) && za < 0.0f)
             speed += 0.02f;
