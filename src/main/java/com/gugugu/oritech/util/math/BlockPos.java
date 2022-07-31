@@ -3,7 +3,7 @@ package com.gugugu.oritech.util.math;
 import com.gugugu.oritech.world.World;
 
 /**
- * A block pos.
+ * A block pos. Relative range [0..16)
  *
  * @param x pos x
  * @param y pos y

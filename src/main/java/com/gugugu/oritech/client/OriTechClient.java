@@ -6,13 +6,13 @@ import com.gugugu.oritech.client.render.WorldRenderer;
 import com.gugugu.oritech.resource.ResLocation;
 import com.gugugu.oritech.resource.tex.SpriteInfo;
 import com.gugugu.oritech.resource.tex.TextureAtlas;
+import com.gugugu.oritech.server.IntegratedServer;
+import com.gugugu.oritech.server.Server;
 import com.gugugu.oritech.ui.IKeyListener;
 import com.gugugu.oritech.ui.ISizeListener;
 import com.gugugu.oritech.ui.Keyboard;
 import com.gugugu.oritech.ui.Mouse;
-import com.gugugu.oritech.util.HitResult;
-import com.gugugu.oritech.util.Identifier;
-import com.gugugu.oritech.util.Timer;
+import com.gugugu.oritech.util.*;
 import com.gugugu.oritech.util.math.Direction;
 import com.gugugu.oritech.util.registry.Registry;
 import com.gugugu.oritech.world.ClientWorld;
@@ -20,7 +20,6 @@ import com.gugugu.oritech.world.block.Block;
 import com.gugugu.oritech.world.block.Blocks;
 import com.gugugu.oritech.world.entity.PlayerEntity;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Random;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -35,8 +34,10 @@ import static org.lwjgl.opengl.GL12C.*;
  * @author squid233
  * @since 1.0
  */
+@SideOnly(Side.CLIENT)
 public class OriTechClient
-    implements IKeyListener, ISizeListener, Mouse.Callback, AutoCloseable {
+    implements IKeyListener, ISizeListener, Mouse.Callback,
+    Runnable, AutoCloseable {
     public static final float SENSITIVITY = 0.15f;
     private static OriTechClient instance;
     public final GameRenderer gameRenderer;
@@ -53,7 +54,13 @@ public class OriTechClient
     public PlayerEntity player;
     public int passedTick = 0;
     private int buildTick = 0;
-    private Block handBlock = Blocks.STONE;
+    private IntegratedServer integratedServer;
+    public boolean isPausing = false;
+    private final Block[] hotBar = {
+        Blocks.STONE, Blocks.GRASS_BLOCK, Blocks.DIRT, Blocks.AIR, Blocks.AIR,
+        Blocks.AIR, Blocks.AIR, Blocks.AIR, Blocks.AIR, Blocks.AIR
+    };
+    private int handBlock = 0;
 
     public OriTechClient(int width, int height) {
         this.width = width;
@@ -93,10 +100,19 @@ public class OriTechClient
     }
 
     public void lazyInit() {
-        world = new ClientWorld(this, Random.newSeed(), 0, 5, 0);
+        integratedServer = new IntegratedServer(this);
+        integratedServer.start();
+        world = new ClientWorld(this, integratedServer.world.seed, 0, 5, 0);
         worldRenderer = new WorldRenderer(this, world);
         player = new PlayerEntity(world);
         player.keyboard = keyboard;
+    }
+
+    @Override
+    public void run() {
+        updateTime();
+        integratedServer.run();
+        render();
     }
 
     public void updateTime() {
@@ -139,7 +155,7 @@ public class OriTechClient
             final int hrx = hitResult.x();
             final int hry = hitResult.y();
             final int hrz = hitResult.z();
-            if (world.canBlockPlaceOn(handBlock,
+            if (world.canBlockPlaceOn(hotBar[handBlock],
                 hrx,
                 hry,
                 hrz,
@@ -147,7 +163,7 @@ public class OriTechClient
                 final int x = hrx + face.getOffsetX();
                 final int y = hry + face.getOffsetY();
                 final int z = hrz + face.getOffsetZ();
-                world.setBlock(handBlock, x, y, z);
+                world.setBlock(hotBar[handBlock], x, y, z);
             }
         }
     }
@@ -163,14 +179,33 @@ public class OriTechClient
         gameRenderer.render();
     }
 
+    private void rotateCamera(float xd, float yd) {
+        player.rotate(xd, -yd);
+        gameRenderer.camera.setRotation(player.rotation.y - 90.0f, player.rotation.x);
+    }
+
     @Override
     public void onKey(long window, int key, int scancode, int action, int mods) {
         if (action == GLFW_PRESS) {
             switch (key) {
                 case GLFW_KEY_ESCAPE -> mouse.setGrabbed(!mouse.isGrabbed());
-                case GLFW_KEY_1 -> handBlock = Blocks.STONE;
-                case GLFW_KEY_2 -> handBlock = Blocks.GRASS_BLOCK;
-                case GLFW_KEY_3 -> handBlock = Blocks.DIRT;
+                case GLFW_KEY_1 -> handBlock = 0;
+                case GLFW_KEY_2 -> handBlock = 1;
+                case GLFW_KEY_3 -> handBlock = 2;
+            }
+        }
+    }
+
+    public void onScroll(double xo, double yo) {
+        if (yo < 0.0) {
+            ++handBlock;
+            if (handBlock > 2) {
+                handBlock = 0;
+            }
+        } else if (yo > 0.0) {
+            --handBlock;
+            if (handBlock < 0) {
+                handBlock = 2;
             }
         }
     }
@@ -184,9 +219,8 @@ public class OriTechClient
     @Override
     public void onCursorPos(double x, double y, double xd, double yd) {
         if (mouse.isGrabbed()) {
-            player.rotate((float) xd * SENSITIVITY,
-                (float) -yd * SENSITIVITY);
-            gameRenderer.camera.setRotation(player.rotation.y - 90.0f, player.rotation.x);
+            rotateCamera((float) xd * SENSITIVITY,
+                (float) yd * SENSITIVITY);
         }
     }
 
@@ -198,10 +232,19 @@ public class OriTechClient
 
     @Override
     public void close() {
+        integratedServer.close();
         blockAtlas.close();
         world.close();
         gameRenderer.close();
         GLStateMgr.close();
+    }
+
+    public static Server getServer() {
+        return getIntegratedServer();
+    }
+
+    public static IntegratedServer getIntegratedServer() {
+        return getClient().integratedServer;
     }
 
     public static OriTechClient getClient() {

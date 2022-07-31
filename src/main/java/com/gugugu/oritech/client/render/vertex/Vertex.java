@@ -1,5 +1,7 @@
 package com.gugugu.oritech.client.render.vertex;
 
+import com.gugugu.oritech.util.Side;
+import com.gugugu.oritech.util.SideOnly;
 import org.joml.Vector2fc;
 import org.joml.Vector3fc;
 import org.joml.Vector4fc;
@@ -10,6 +12,7 @@ import java.util.Objects;
  * @author squid233
  * @since 1.0
  */
+@SideOnly(Side.CLIENT)
 public class Vertex {
     public float x, y, z;
     public float r, g, b, a;

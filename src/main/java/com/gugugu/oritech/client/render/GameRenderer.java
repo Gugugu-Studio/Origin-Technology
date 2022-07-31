@@ -6,6 +6,8 @@ import com.gugugu.oritech.client.gui.DrawableHelper;
 import com.gugugu.oritech.client.gui.Screen;
 import com.gugugu.oritech.resource.ResLocation;
 import com.gugugu.oritech.resource.ResourceLoader;
+import com.gugugu.oritech.util.Side;
+import com.gugugu.oritech.util.SideOnly;
 import com.gugugu.oritech.util.math.Numbers;
 import org.joml.Matrix4fStack;
 
@@ -18,6 +20,7 @@ import static org.lwjgl.opengl.GL14C.*;
  * @author squid233
  * @since 1.0
  */
+@SideOnly(Side.CLIENT)
 public class GameRenderer implements AutoCloseable {
     public final Camera camera = new Camera();
     public final Matrix4fStack projection = new Matrix4fStack(4);
@@ -82,7 +85,11 @@ public class GameRenderer implements AutoCloseable {
         setupCamera((float) client.timer.partialTick, client.width, client.height);
         Frustum.update(projection.pushMatrix().mul(view));
         projection.popMatrix();
+
         client.worldRenderer.pick(client.player, view, camera);
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         useShader(positionColorTex, shader -> {
             setupShaderMatrix(shader);
             client.worldRenderer.updateDirtyChunks(client.player);
@@ -91,6 +98,7 @@ public class GameRenderer implements AutoCloseable {
             client.worldRenderer.render(client.player);
             bindTexture(0);
         });
+
         useShader(position, shader -> {
             setupShaderMatrix(shader);
             client.worldRenderer.tryRenderHit();

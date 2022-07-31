@@ -1,5 +1,7 @@
 package com.gugugu.oritech.client.render;
 
+import com.gugugu.oritech.util.Side;
+import com.gugugu.oritech.util.SideOnly;
 import com.gugugu.oritech.util.math.Direction;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -11,6 +13,7 @@ import static org.joml.Math.*;
  * @author theflysong
  * @since 1.0
  */
+@SideOnly(Side.CLIENT)
 public class Camera {
     public static final float YAW = -90.0f;
     public static final float PITCH = 0.0f;
@@ -82,24 +85,24 @@ public class Camera {
         position.set(x, y, z);
     }
 
-    public void setRotation(float xo, float yo, boolean constrainPitch) {
-        yaw = xo;
-        pitch = yo;
+    public void setRotation(float yaw, float pitch, boolean constrainPitch) {
+        this.yaw = yaw;
+        this.pitch = pitch;
         // make sure that when pitch is out of bounds, screen doesn't get flipped
         if (constrainPitch) {
-            if (pitch > 89.5f) {
-                pitch = 89.5f;
+            if (this.pitch > 89.5f) {
+                this.pitch = 89.5f;
             }
-            if (pitch < -89.5f) {
-                pitch = -89.5f;
+            if (this.pitch < -89.5f) {
+                this.pitch = -89.5f;
             }
         }
         // update front, right and up vectors using the updated euler angles
         updateCameraVec();
     }
 
-    public void setRotation(float xo, float yo) {
-        setRotation(xo, yo, true);
+    public void setRotation(float yaw, float pitch) {
+        setRotation(yaw, pitch, true);
     }
 
     public void rotate(float xo, float yo, boolean constrainPitch) {

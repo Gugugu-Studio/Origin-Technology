@@ -1,6 +1,8 @@
 package com.gugugu.oritech.client.render;
 
 import com.gugugu.oritech.phys.AABBox;
+import com.gugugu.oritech.util.Side;
+import com.gugugu.oritech.util.SideOnly;
 import org.joml.FrustumIntersection;
 import org.joml.Matrix4fc;
 
@@ -8,6 +10,7 @@ import org.joml.Matrix4fc;
  * @author squid233
  * @since 1.0
  */
+@SideOnly(Side.CLIENT)
 public class Frustum {
     private static final FrustumIntersection frustum = new FrustumIntersection();
 

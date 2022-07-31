@@ -2,6 +2,8 @@ package com.gugugu.oritech.client.gui;
 
 import com.gugugu.oritech.client.render.Tesselator;
 import com.gugugu.oritech.util.Identifier;
+import com.gugugu.oritech.util.Side;
+import com.gugugu.oritech.util.SideOnly;
 
 import static com.gugugu.oritech.client.gl.GLStateMgr.*;
 
@@ -9,6 +11,7 @@ import static com.gugugu.oritech.client.gl.GLStateMgr.*;
  * @author squid233
  * @since 1.0
  */
+@SideOnly(Side.CLIENT)
 public class DrawableHelper {
     public static void drawSprite(Identifier id,
                                   float x, float y,
@@ -47,7 +50,7 @@ public class DrawableHelper {
                 .texCoords(u0, v1).vertex(x, y1)
                 .texCoords(u1, v1).vertex(x1, y1)
                 .texCoords(u1, v0).vertex(x1, y)
-                .end().render());
+                .end().upload().render());
         bindTexture(lastUnit, lastId);
     }
 }
