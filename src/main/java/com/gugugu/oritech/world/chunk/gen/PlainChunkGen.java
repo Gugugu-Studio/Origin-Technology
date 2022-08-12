@@ -3,14 +3,18 @@ package com.gugugu.oritech.world.chunk.gen;
 import com.gugugu.oritech.world.block.Block;
 import com.gugugu.oritech.world.block.Blocks;
 import com.gugugu.oritech.world.chunk.Chunk;
+import org.joml.Random;
 
+/**
+ * @author theflysong
+ * @since 1.0
+ */
 public class PlainChunkGen implements IChunkGen {
     @Override
     public void generate(Chunk chunk, Block[][][] blocks,
                          int height, int width, int depth,
-                         int chunkX, int chunkY, int chunkZ)
-    {
-        PerlinNoise noise = new PerlinNoise(114514);
+                         int chunkX, int chunkY, int chunkZ) {
+        PerlinNoise noise = new PerlinNoise((int) Random.newSeed());
         for (int y = 0; y < height; y++) {
             int abs_y = Chunk.getAbsolutePos(chunkY, y);
             for (int x = 0; x < width; x++) {
