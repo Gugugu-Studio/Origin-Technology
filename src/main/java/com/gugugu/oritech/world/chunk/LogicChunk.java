@@ -43,7 +43,7 @@ public class LogicChunk extends Chunk {
         depth = z1 - z0;
         blocks = new Block[height][width][depth];
 
-        ChunkGens.SMOOTH.generate(this, blocks,
+        ChunkGens.PLAIN.generate(this, blocks,
             width, height, depth,
             chunkX, chunkY, chunkZ);
     }
