@@ -10,7 +10,7 @@ public class PlainChunkGen implements IChunkGen {
                          int height, int width, int depth,
                          int chunkX, int chunkY, int chunkZ)
     {
-        PerlinNoise noise = new PerlinNoise(114514);
+        SimplexNoise noise = new SimplexNoise(114514);
         for (int y = 0; y < height; y++) {
             int abs_y = Chunk.getAbsolutePos(chunkY, y);
             for (int x = 0; x < width; x++) {
