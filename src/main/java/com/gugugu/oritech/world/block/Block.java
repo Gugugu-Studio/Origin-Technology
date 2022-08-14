@@ -10,6 +10,9 @@ import com.gugugu.oritech.util.math.Direction;
 import com.gugugu.oritech.util.registry.Registry;
 import com.gugugu.oritech.world.World;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author squid233
  * @since 1.0
@@ -50,6 +53,18 @@ public class Block {
             z + face.getOffsetZ()).isSolid();
     }
 
+    public String getFaceTexture(Direction face) {
+        Identifier id = Registry.BLOCK.getId(this);
+        return ResLocation.ofAssets(id.namespace(), "textures/block/" + id.path() + ".png").toString();
+    }
+
+    public List<String> getTextures() {
+        List<String> list = new ArrayList<>();
+        Identifier id = Registry.BLOCK.getId(this);
+        list.add(id.path());
+        return list;
+    }
+
     public void renderFace(Batch batch, Direction face, int x, int y, int z) {
         float x0 = (float) x;
         float y0 = (float) y;
@@ -59,8 +74,7 @@ public class Block {
         float z1 = z0 + 1.0f;
 
         TextureAtlas atlas = OriTechClient.getClient().blockAtlas;
-        Identifier id = Registry.BLOCK.getId(this);
-        String texName = ResLocation.ofAssets(id.namespace(), "textures/block/" + id.path() + ".png").toString();
+        String texName = getFaceTexture(face);
         float u0 = atlas.getU0n(texName);
         float v0 = atlas.getV0n(texName);
         float u1 = atlas.getU1n(texName);
