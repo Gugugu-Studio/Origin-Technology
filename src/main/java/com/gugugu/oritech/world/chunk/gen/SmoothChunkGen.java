@@ -1,12 +1,13 @@
 package com.gugugu.oritech.world.chunk.gen;
 
+import com.gugugu.oritech.world.ServerWorld;
 import com.gugugu.oritech.world.block.Block;
 import com.gugugu.oritech.world.block.Blocks;
 import com.gugugu.oritech.world.chunk.Chunk;
 
 public class SmoothChunkGen implements IChunkGen {
     @Override
-    public void generate(Chunk chunk, Block[][][] blocks,
+    public void generate(ServerWorld world, Chunk chunk, Block[][][] blocks,
                          int height, int width, int depth,
                          int chunkX, int chunkY, int chunkZ)
     {
