@@ -204,13 +204,13 @@ public class OriTechClient
     public void onScroll(double xo, double yo) {
         if (yo < 0.0) {
             ++handBlock;
-            if (handBlock > 2) {
+            if (handBlock > 3) {
                 handBlock = 0;
             }
         } else if (yo > 0.0) {
             --handBlock;
             if (handBlock < 0) {
-                handBlock = 2;
+                handBlock = 3;
             }
         }
     }
