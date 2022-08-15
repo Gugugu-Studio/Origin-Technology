@@ -57,7 +57,7 @@ public class OriTechClient
     private IntegratedServer integratedServer;
     public boolean isPausing = false;
     private final Block[] hotBar = {
-        Blocks.STONE, Blocks.GRASS_BLOCK, Blocks.DIRT, Blocks.LOG, Blocks.AIR,
+        Blocks.STONE, Blocks.GRASS_BLOCK, Blocks.DIRT, Blocks.LOG, Blocks.LEAVES,
         Blocks.AIR, Blocks.AIR, Blocks.AIR, Blocks.AIR, Blocks.AIR
     };
     private int handBlock = 0;
@@ -197,6 +197,7 @@ public class OriTechClient
                 case GLFW_KEY_2 -> handBlock = 1;
                 case GLFW_KEY_3 -> handBlock = 2;
                 case GLFW_KEY_4 -> handBlock = 3;
+                case GLFW_KEY_5 -> handBlock = 4;
             }
         }
     }
@@ -204,13 +205,13 @@ public class OriTechClient
     public void onScroll(double xo, double yo) {
         if (yo < 0.0) {
             ++handBlock;
-            if (handBlock > 3) {
+            if (handBlock > 4) {
                 handBlock = 0;
             }
         } else if (yo > 0.0) {
             --handBlock;
             if (handBlock < 0) {
-                handBlock = 3;
+                handBlock = 4;
             }
         }
     }
