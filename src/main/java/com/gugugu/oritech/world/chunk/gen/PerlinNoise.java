@@ -1,12 +1,17 @@
 package com.gugugu.oritech.world.chunk.gen;
 
+/**
+ * @author theflysong
+ * @since 1.0
+ */
+@Deprecated
 public class PerlinNoise {
     private final int seed;
-    private static final int MAGIC_A = 114514;
-    private static final int MAGIC_B = 1919810;
-    private static final int MAGIC_C = 5141919;
-    private static final int MAGIC_D = 1419198;
-    private static final int MAGIC_E = 1414;
+    private static final int MAGIC_A = 874598;
+    private static final int MAGIC_B = 4557986;
+    private static final int MAGIC_C = 8741232;
+    private static final int MAGIC_D = 2134375;
+    private static final int MAGIC_E = 9785;
     private static final int MAGIC_F = 3145;
     private static final int MAGIC_G = 2718;
     private static final int UNIT_P = 1000000;
@@ -50,8 +55,8 @@ public class PerlinNoise {
     }
 
     public float normalize(float x, float y) {
-        int _x = (int)x;
-        int _y = (int)y;
+        int _x = (int) x;
+        int _y = (int) y;
 
         float bx = x - _x;
         float by = y - _y;
@@ -66,14 +71,15 @@ public class PerlinNoise {
 
         return normalizeCos(i1, i2, (bx + by) / 2);
     }
+
     public float normalizeCos(float k1, float k2, float x) {
-        float f = (float)(1 - Math.cos(Math.PI * x)) * 0.5f;
+        float f = (float) (1 - Math.cos(Math.PI * x)) * 0.5f;
         return k1 * (1 - f) + k2 * f;
     }
 
     private static final float SMOOTH_K = 4.59871f;
 
     public long randWithin(long x, long y, long maxx) {
-        return (long)(normalize(x / SMOOTH_K, y / SMOOTH_K) * maxx);
+        return (long) (normalize(x / SMOOTH_K, y / SMOOTH_K) * maxx);
     }
 }
