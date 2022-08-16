@@ -1,8 +1,16 @@
 package com.gugugu.oritech;
 
 import com.gugugu.oritech.client.OriTechClient;
+import com.gugugu.oritech.server.IntegratedServer;
 import com.gugugu.oritech.ui.Window;
+import com.gugugu.oritech.world.ServerWorld;
+import com.gugugu.oritech.world.block.Block;
+import com.gugugu.oritech.world.block.Blocks;
+import com.gugugu.oritech.world.chunk.LogicChunk;
+import com.gugugu.oritech.world.save.BlocksCoders;
 import org.lwjgl.opengl.GL11C;
+
+import java.io.*;
 
 import static org.lwjgl.opengl.GL11C.*;
 
@@ -34,6 +42,21 @@ public class Main extends Window {
         client.keyboard = keyboard;
         client.mouse = mouse;
         client.lazyInit();
+
+        //test
+        try {
+            DataInputStream input = new DataInputStream(new FileInputStream("save.dat"));
+            Block[][][] blocks = BlocksCoders.RAW.getBlocks(input);
+            for (int y = 0 ; y < 32 ; y ++) {
+                for (int x = 0 ; x < 32 ; x ++) {
+                    for (int z = 0 ; z < 32 ; z ++) {
+                        LogicChunk chunk = OriTechClient.getServer().world.getChunk(0, 0, 0);
+                        chunk.setBlock(blocks[y][x][z], x, y, z);
+                    }
+                }
+            }
+        } catch (FileNotFoundException e) {
+        }
     }
 
     @Override
@@ -43,6 +66,17 @@ public class Main extends Window {
 
     @Override
     public void close() {
+        //test
+        LogicChunk chunk = OriTechClient.getServer().world.getChunk(0, 0, 0);
+        Block[][][] blocks = chunk.getBlocks();
+
+        try {
+            DataOutputStream output = new DataOutputStream(new FileOutputStream("save.dat"));
+            BlocksCoders.RAW.saveBlocks(32, 32, 32, blocks, output);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
         // Free resources here
         client.close();
         super.close();

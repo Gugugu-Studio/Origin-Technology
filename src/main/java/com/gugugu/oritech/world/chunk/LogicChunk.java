@@ -71,6 +71,10 @@ public class LogicChunk extends Chunk {
         isDirty = true;
     }
 
+    public Block[][][] getBlocks() {
+        return blocks;
+    }
+
     @Override
     public float distanceSqr(PlayerEntity player) {
         return player.position.distanceSquared(x, y, z);
