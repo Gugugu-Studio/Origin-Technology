@@ -43,20 +43,7 @@ public class Main extends Window {
         client.mouse = mouse;
         client.lazyInit();
 
-        //test
-        try {
-            DataInputStream input = new DataInputStream(new FileInputStream("save.dat"));
-            Block[][][] blocks = BlocksCoders.RAW.getBlocks(input);
-            for (int y = 0 ; y < 32 ; y ++) {
-                for (int x = 0 ; x < 32 ; x ++) {
-                    for (int z = 0 ; z < 32 ; z ++) {
-                        LogicChunk chunk = OriTechClient.getServer().world.getChunk(0, 0, 0);
-                        chunk.setBlock(blocks[y][x][z], x, y, z);
-                    }
-                }
-            }
-        } catch (FileNotFoundException e) {
-        }
+        client.world.load("./save/");
     }
 
     @Override
@@ -66,16 +53,14 @@ public class Main extends Window {
 
     @Override
     public void close() {
-        //test
-        LogicChunk chunk = OriTechClient.getServer().world.getChunk(0, 0, 0);
-        Block[][][] blocks = chunk.getBlocks();
-
-        try {
-            DataOutputStream output = new DataOutputStream(new FileOutputStream("save.dat"));
-            BlocksCoders.RAW.saveBlocks(32, 32, 32, blocks, output);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+        File directory = new File("./save/");
+        if (! directory.exists()) {
+            if (! directory.mkdir()) {
+                System.err.println("Couldn't create save directory!");
+            }
         }
+
+        client.world.save("./save/");
 
         // Free resources here
         client.close();

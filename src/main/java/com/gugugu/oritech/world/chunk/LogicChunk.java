@@ -69,6 +69,7 @@ public class LogicChunk extends Chunk {
             dirtiedTime = System.currentTimeMillis();
         }
         isDirty = true;
+        world.dirtyChunks.add(this);
     }
 
     public Block[][][] getBlocks() {

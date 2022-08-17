@@ -1,11 +1,15 @@
 package com.gugugu.oritech.world;
 
+import com.gugugu.oritech.client.OriTechClient;
 import com.gugugu.oritech.util.math.ChunkPos;
 import com.gugugu.oritech.world.block.Block;
 import com.gugugu.oritech.world.chunk.Chunk;
 import com.gugugu.oritech.world.chunk.LogicChunk;
+import com.gugugu.oritech.world.chunk.RenderChunk;
+import com.gugugu.oritech.world.save.BlocksCoders;
 import org.joml.Random;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +27,7 @@ public class ServerWorld extends World {
     private final List<IWorldListener> listeners = new ArrayList<>();
     public final Random random;
     public final long seed;
+    public List<LogicChunk> dirtyChunks = new ArrayList<>();
 
     public ServerWorld(long seed,
                        int distance,
@@ -105,6 +110,70 @@ public class ServerWorld extends World {
             chunkMap.put(pos, chunk);
         }
         return chunk;
+    }
+
+    private void saveChunk(String directory, LogicChunk chunk) {
+        int x = chunk.chunkX;
+        int y = chunk.chunkY;
+        int z = chunk.chunkZ;
+        String filename = directory + "/" + "chunk_" + x + "_" + y + "_" + z + ".dat";
+        DataOutputStream output;
+
+        try {
+            File chunk_save = new File(filename);
+            if (! chunk_save.exists()) {
+                if (! chunk_save.createNewFile()) {
+                    System.err.println("Couldn't create save file");
+                }
+            }
+            output = new DataOutputStream(new FileOutputStream(chunk_save));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        BlocksCoders.RAW.saveBlocks(chunk.width, chunk.depth, chunk.height, chunk.getBlocks(), output);
+    }
+
+    @Override
+    public void save(String directory) {
+        for (LogicChunk chunk : dirtyChunks) {
+            saveChunk(directory, chunk);
+        }
+    }
+
+    private void loadChunk(LogicChunk chunk, DataInputStream input) {
+        Block[][][] blocks = BlocksCoders.RAW.getBlocks(input);
+        for (int y = 0 ; y < 32 ; y ++) {
+            for (int x = 0 ; x < 32 ; x ++) {
+                for (int z = 0 ; z < 32 ; z ++) {
+                    chunk.setBlock(blocks[y][x][z], x, y, z);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void load(String directory) {
+        File dir = new File(directory);
+        if (dir.exists()) {
+            if (dir.isDirectory()) {
+                for (File chunk_dat : dir.listFiles()) {
+                    String name = chunk_dat.getName();
+                    String[] name_ext = name.split("\\.");
+                    String[] names = name_ext[0].split("_");
+                    int x = Integer.parseInt(names[1]);
+                    int y = Integer.parseInt(names[2]);
+                    int z = Integer.parseInt(names[3]);
+
+                    LogicChunk chunk = getChunk(x, y, z);
+                    try {
+                        loadChunk(chunk, new DataInputStream(new FileInputStream(chunk_dat)));
+                    } catch (FileNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        }
     }
 
     @Override
