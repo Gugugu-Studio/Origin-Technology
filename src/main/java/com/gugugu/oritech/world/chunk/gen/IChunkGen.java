@@ -8,7 +8,8 @@ import com.gugugu.oritech.world.chunk.Chunk;
  * @since 1.0
  */
 public interface IChunkGen {
-    void generate(Chunk chunk, Block[][][] blocks,
-                  int height, int width, int depth,
+    void generate(long seed,
+                  Chunk chunk, Block[][][] blocks,
+                  int width, int height, int depth,
                   int chunkX, int chunkY, int chunkZ);
 }

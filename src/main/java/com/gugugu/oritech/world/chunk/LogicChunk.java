@@ -2,9 +2,7 @@ package com.gugugu.oritech.world.chunk;
 
 import com.gugugu.oritech.world.ServerWorld;
 import com.gugugu.oritech.world.block.Block;
-import com.gugugu.oritech.world.block.Blocks;
 import com.gugugu.oritech.world.chunk.gen.ChunkGens;
-import com.gugugu.oritech.world.chunk.gen.SmoothChunkGen;
 import com.gugugu.oritech.world.entity.PlayerEntity;
 
 /**
@@ -43,9 +41,9 @@ public class LogicChunk extends Chunk {
         depth = z1 - z0;
         blocks = new Block[height][width][depth];
 
-        ChunkGens.PLAIN.generate(this, blocks,
-            width, height, depth,
-            chunkX, chunkY, chunkZ);
+        ChunkGens.PLAIN.generate(world.seed, this,
+            blocks, width, height,
+            depth, chunkX, chunkY, chunkZ);
     }
 
     @Override
