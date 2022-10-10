@@ -41,9 +41,9 @@ public class LogicChunk extends Chunk {
         depth = z1 - z0;
         blocks = new Block[height][width][depth];
 
-        ChunkGens.PLAIN.generate(world.seed, this,
-            blocks, width, height,
-            depth, chunkX, chunkY, chunkZ);
+        ChunkGens.PLAIN.generate(world, this, blocks,
+            width, height, depth,
+            chunkX, chunkY, chunkZ);
     }
 
     @Override
@@ -67,6 +67,11 @@ public class LogicChunk extends Chunk {
             dirtiedTime = System.currentTimeMillis();
         }
         isDirty = true;
+        world.dirtyChunks.add(this);
+    }
+
+    public Block[][][] getBlocks() {
+        return blocks;
     }
 
     @Override

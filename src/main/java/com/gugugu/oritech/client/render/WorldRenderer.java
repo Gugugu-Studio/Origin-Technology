@@ -167,6 +167,7 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
     @Override
     public void onBlockChanged(int x, int y, int z) {
         world.markDirty(x - 1, y - 1, z - 1, x + 1, y + 1, z + 1);
+        OriTechClient.getServer().world.markDirty(x - 1, y - 1, z - 1, x + 1, y + 1, z + 1);
     }
 
     @Override

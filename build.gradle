@@ -53,7 +53,6 @@ dependencies {
     runtimeOnly "org.lwjgl:lwjgl-sse::$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-stb::$lwjglNatives"
     implementation "org.joml:joml:${jomlVersion}"
-    implementation "io.github.over-run:perlinoisej:0.1.0"
 
     compileOnly "org.jetbrains:annotations:23.0.0"
 }

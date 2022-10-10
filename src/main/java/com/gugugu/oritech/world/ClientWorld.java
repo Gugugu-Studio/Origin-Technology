@@ -65,6 +65,16 @@ public class ClientWorld extends World implements AutoCloseable {
     }
 
     @Override
+    public void save(String directory) {
+        OriTechClient.getServer().world.save(directory);
+    }
+
+    @Override
+    public void load(String directory) {
+        OriTechClient.getServer().world.load(directory);
+    }
+
+    @Override
     public boolean isClient() {
         return true;
     }

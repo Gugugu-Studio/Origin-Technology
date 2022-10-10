@@ -1,5 +1,6 @@
 package com.gugugu.oritech.world.chunk.gen;
 
+import com.gugugu.oritech.world.ServerWorld;
 import com.gugugu.oritech.world.block.Block;
 import com.gugugu.oritech.world.block.Blocks;
 import com.gugugu.oritech.world.chunk.Chunk;
@@ -10,23 +11,22 @@ import com.gugugu.oritech.world.chunk.Chunk;
  */
 public class PlainChunkGen implements IChunkGen {
     @Override
-    public void generate(long seed,
-                         Chunk chunk, Block[][][] blocks,
+    public void generate(ServerWorld world, Chunk chunk, Block[][][] blocks,
                          int width, int height, int depth,
                          int chunkX, int chunkY, int chunkZ) {
-//        PerlinNoise noise = new PerlinNoise((int) seed);
+//        SimplexNoise noise = new SimplexNoise(world.seed);
         for (int y = 0; y < height; y++) {
             int absY = Chunk.getAbsolutePos(chunkY, y);
             for (int x = 0; x < width; x++) {
                 int absX = Chunk.getAbsolutePos(chunkX, x);
                 for (int z = 0; z < depth; z++) {
                     int absZ = Chunk.getAbsolutePos(chunkZ, z);
-//                    long grassDepth = noise.randWithin(absX, absZ, 3) + 4;
-                    int grassDepth = (int) TerrainNoise.sumOcatave(3,
-                        absX, absZ,
-                        .5f,
-                        .007f,
-                        0, 4);
+                    long grassDepth = SimplexNoise.randWithin(world.seed, absX, absZ, 3) + 4;
+//                    int grassDepth = (int) TerrainNoise.sumOcatave(3,
+//                        absX, absZ,
+//                        .5f,
+//                        .007f,
+//                        0, 4);
                     if (absY < 0) {
                         blocks[y][x][z] = Blocks.STONE;
                     } else if (absY < grassDepth) {

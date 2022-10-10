@@ -1,5 +1,6 @@
 package com.gugugu.oritech.world.chunk.gen;
 
+import com.gugugu.oritech.world.ServerWorld;
 import com.gugugu.oritech.world.block.Block;
 import com.gugugu.oritech.world.block.Blocks;
 import com.gugugu.oritech.world.chunk.Chunk;
@@ -10,8 +11,7 @@ import com.gugugu.oritech.world.chunk.Chunk;
  */
 public class FlatChunkGen implements IChunkGen {
     @Override
-    public void generate(long seed,
-                         Chunk chunk, Block[][][] blocks,
+    public void generate(ServerWorld world, Chunk chunk, Block[][][] blocks,
                          int width, int height, int depth,
                          int chunkX, int chunkY, int chunkZ) {
         for (int y = 0; y < height; y++) {
