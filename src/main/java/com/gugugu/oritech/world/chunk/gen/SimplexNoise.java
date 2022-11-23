@@ -13,7 +13,8 @@ public class SimplexNoise {
         long _t2 = (seed / 1048576) % 1048576;
         float t2 = _t2 * 1.0f;
         float t3 = seed % 1048576;
-        long result = (long)(org.joml.SimplexNoise.noise(x / SMOOTH_K + t1, y / SMOOTH_K + t1, t2, t3) * maxx);
+        float _ret = org.joml.SimplexNoise.noise(x / SMOOTH_K + t1, y / SMOOTH_K + t1, t2, t3);
+        long result = (long)((_ret + 1) / 2 * maxx);
         return Math.max(result, 0);
     }
 }

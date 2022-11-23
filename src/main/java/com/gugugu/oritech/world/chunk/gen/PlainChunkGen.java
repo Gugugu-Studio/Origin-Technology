@@ -23,7 +23,7 @@ public class PlainChunkGen implements IChunkGen {
                 int abs_x = Chunk.getAbsolutePos(chunkX, x);
                 for (int z = 0; z < depth; z++) {
                     int abs_z = Chunk.getAbsolutePos(chunkZ, z);
-                    long grass_depth = noise.randWithin(abs_x, abs_z, 3) + 4;
+                    long grass_depth = noise.randWithin(abs_x, abs_z, 5) + 4;
                     if (abs_y < 0) {
                         blocks[y][x][z] = Blocks.STONE;
                     } else if (abs_y < grass_depth) {
