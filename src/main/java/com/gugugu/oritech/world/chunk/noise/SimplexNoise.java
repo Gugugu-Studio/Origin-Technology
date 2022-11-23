@@ -1,4 +1,4 @@
-package com.gugugu.oritech.world.chunk.gen;
+package com.gugugu.oritech.world.chunk.noise;
 
 public class SimplexNoise {
     private final long seed;
