@@ -2,6 +2,7 @@ package com.gugugu.oritech.world.block;
 
 import com.gugugu.oritech.client.OriTechClient;
 import com.gugugu.oritech.client.render.Batch;
+import com.gugugu.oritech.client.render.RenderBox;
 import com.gugugu.oritech.phys.AABBox;
 import com.gugugu.oritech.resource.ResLocation;
 import com.gugugu.oritech.resource.tex.TextureAtlas;
@@ -9,6 +10,9 @@ import com.gugugu.oritech.util.Identifier;
 import com.gugugu.oritech.util.math.Direction;
 import com.gugugu.oritech.util.registry.Registry;
 import com.gugugu.oritech.world.World;
+import org.joml.Vector2d;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +22,14 @@ import java.util.List;
  * @since 1.0
  */
 public class Block {
+    protected List<RenderBox> renderBoxes = new ArrayList<>();
+    private static final Vector3f ZERO = new Vector3f(0, 0, 0);
+    private static final Vector3f ONE = new Vector3f(1, 1, 1);
+
+    public Block() {
+        renderBoxes.add(new RenderBox(ZERO, ONE, new Vector2d(0, 0), new Vector2d(32, 32)));
+    }
+
     public boolean isAir() {
         return false;
     }
@@ -66,51 +78,14 @@ public class Block {
     }
 
     public void renderFace(Batch batch, Direction face, int x, int y, int z) {
-        float x0 = (float) x;
-        float y0 = (float) y;
-        float z0 = (float) z;
-        float x1 = x0 + 1.0f;
-        float y1 = y0 + 1.0f;
-        float z1 = z0 + 1.0f;
+        String texName = getFaceTexture(face);
 
         TextureAtlas atlas = OriTechClient.getClient().blockAtlas;
-        String texName = getFaceTexture(face);
-        float u0 = atlas.getU0n(texName);
-        float v0 = atlas.getV0n(texName);
-        float u1 = atlas.getU1n(texName);
-        float v1 = atlas.getV1n(texName);
+        Vector2d uv0 = new Vector2d(atlas.getU0(texName), atlas.getV0(texName));
+        Vector2d uv1 = new Vector2d(atlas.getU1(texName), atlas.getV1(texName));
 
-        switch (face) {
-            case WEST -> batch.quadIndices()
-                .texCoords(u0, v0).vertex(x0, y1, z0)
-                .texCoords(u0, v1).vertex(x0, y0, z0)
-                .texCoords(u1, v1).vertex(x0, y0, z1)
-                .texCoords(u1, v0).vertex(x0, y1, z1);
-            case EAST -> batch.quadIndices()
-                .texCoords(u0, v0).vertex(x1, y1, z1)
-                .texCoords(u0, v1).vertex(x1, y0, z1)
-                .texCoords(u1, v1).vertex(x1, y0, z0)
-                .texCoords(u1, v0).vertex(x1, y1, z0);
-            case DOWN -> batch.quadIndices()
-                .texCoords(u0, v0).vertex(x0, y0, z1)
-                .texCoords(u0, v1).vertex(x0, y0, z0)
-                .texCoords(u1, v1).vertex(x1, y0, z0)
-                .texCoords(u1, v0).vertex(x1, y0, z1);
-            case UP -> batch.quadIndices()
-                .texCoords(u0, v0).vertex(x0, y1, z0)
-                .texCoords(u0, v1).vertex(x0, y1, z1)
-                .texCoords(u1, v1).vertex(x1, y1, z1)
-                .texCoords(u1, v0).vertex(x1, y1, z0);
-            case NORTH -> batch.quadIndices()
-                .texCoords(u0, v0).vertex(x1, y1, z0)
-                .texCoords(u0, v1).vertex(x1, y0, z0)
-                .texCoords(u1, v1).vertex(x0, y0, z0)
-                .texCoords(u1, v0).vertex(x0, y1, z0);
-            case SOUTH -> batch.quadIndices()
-                .texCoords(u0, v0).vertex(x0, y1, z1)
-                .texCoords(u0, v1).vertex(x0, y0, z1)
-                .texCoords(u1, v1).vertex(x1, y0, z1)
-                .texCoords(u1, v0).vertex(x1, y1, z1);
+        for (RenderBox renderBox : renderBoxes) {
+            renderBox.renderFace(batch, face, x, y, z, uv0, uv1, atlas);
         }
     }
 
