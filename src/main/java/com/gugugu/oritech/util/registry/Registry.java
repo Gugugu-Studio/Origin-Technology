@@ -34,9 +34,9 @@ public abstract class Registry<T> implements Iterable<T> {
     public abstract <R extends T> R add(Identifier id, R r);
 
     static {
-        BLOCK     = create(() -> Blocks.AIR);
-        CODER     = create(() -> BlocksCoders.RAW);
-        CHUNK_GEN = create(() -> ChunkGens.SMOOTH);
+        BLOCK = create(() -> Blocks.AIR);
+        CODER = create(() -> BlocksCoders.RAW);
+        CHUNK_GEN = create(() -> ChunkGens.FLAT);
     }
 
     private static <T> DefaultedRegistry<T> create(Supplier<T> defaultEntry) {

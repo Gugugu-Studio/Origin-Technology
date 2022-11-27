@@ -9,22 +9,22 @@ import com.gugugu.oritech.world.chunk.Chunk;
  * @author theflysong
  * @since 1.0
  */
-public class SmoothChunkGen implements IChunkGen {
+public class FlatChunkGen implements IChunkGen {
     @Override
     public void generate(ServerWorld world, Chunk chunk, Block[][][] blocks,
-                         int height, int width, int depth,
+                         int width, int height, int depth,
                          int chunkX, int chunkY, int chunkZ) {
         for (int y = 0; y < height; y++) {
-            int abs_y = Chunk.getAbsolutePos(chunkY, y);
+            int absY = Chunk.getAbsolutePos(chunkY, y);
             for (int x = 0; x < width; x++) {
-                int abs_x = Chunk.getAbsolutePos(chunkX, x);
+//                int absX = Chunk.getAbsolutePos(chunkX, x);
                 for (int z = 0; z < depth; z++) {
-                    int abs_z = Chunk.getAbsolutePos(chunkZ, z);
-                    if (abs_y < 0) {
+//                    int absZ = Chunk.getAbsolutePos(chunkZ, z);
+                    if (absY < 0) {
                         blocks[y][x][z] = Blocks.STONE;
-                    } else if (abs_y < 4) {
+                    } else if (absY < 4) {
                         blocks[y][x][z] = Blocks.DIRT;
-                    } else if (abs_y == 4) {
+                    } else if (absY == 4) {
                         blocks[y][x][z] = Blocks.GRASS_BLOCK;
                     } else {
                         blocks[y][x][z] = Blocks.AIR;

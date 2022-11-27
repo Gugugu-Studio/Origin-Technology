@@ -7,11 +7,11 @@ package com.gugugu.oritech.world.chunk.noise;
 @Deprecated
 public class PerlinNoise {
     private final int seed;
-    private static final int MAGIC_A = 874598;
-    private static final int MAGIC_B = 4557986;
-    private static final int MAGIC_C = 8741232;
-    private static final int MAGIC_D = 2134375;
-    private static final int MAGIC_E = 9785;
+    private static final int MAGIC_A = 100000;
+    private static final int MAGIC_B = 2000000;
+    private static final int MAGIC_C = 3000000;
+    private static final int MAGIC_D = 2500000;
+    private static final int MAGIC_E = 1500;
     private static final int MAGIC_F = 3145;
     private static final int MAGIC_G = 2718;
     private static final int UNIT_P = 1000000;

@@ -2,9 +2,7 @@ package com.gugugu.oritech.world.chunk;
 
 import com.gugugu.oritech.world.ServerWorld;
 import com.gugugu.oritech.world.block.Block;
-import com.gugugu.oritech.world.block.Blocks;
 import com.gugugu.oritech.world.chunk.gen.ChunkGens;
-import com.gugugu.oritech.world.chunk.gen.SmoothChunkGen;
 import com.gugugu.oritech.world.entity.PlayerEntity;
 
 /**

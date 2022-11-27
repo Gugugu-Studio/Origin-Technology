@@ -34,6 +34,7 @@ public abstract class World {
     public abstract Chunk getChunk(int x, int y, int z);
 
     public abstract void save(String directory);
+
     public abstract void load(String directory);
 
     public abstract boolean isClient();

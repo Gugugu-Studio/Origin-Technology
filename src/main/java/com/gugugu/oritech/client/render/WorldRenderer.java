@@ -13,13 +13,13 @@ import com.gugugu.oritech.world.block.Block;
 import com.gugugu.oritech.world.chunk.RenderChunk;
 import com.gugugu.oritech.world.entity.PlayerEntity;
 import org.joml.Intersectionf;
-import org.joml.Math;
 import org.joml.Matrix4fc;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.joml.Math.floor;
 import static org.lwjgl.opengl.GL11C.*;
 
 /**
@@ -28,7 +28,7 @@ import static org.lwjgl.opengl.GL11C.*;
  */
 @SideOnly(Side.CLIENT)
 public class WorldRenderer implements IWorldListener, AutoCloseable {
-    public static final int MAX_REBUILD_PER_FRAME = 6;
+    public static final int MAX_REBUILD_PER_FRAME = 4;
     private final OriTechClient client;
     private final ClientWorld world;
     private final List<RenderChunk> dirtyChunks = new ArrayList<>();
@@ -94,8 +94,16 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
             Tesselator.getInstance().withBatch(batch -> {
                 batch.begin();
                 outline.forEachEdge((dir, minX, minY, minZ, maxX, maxY, maxZ) -> {
-                    batch.vertex(minX, minY, minZ)
-                        .vertex(maxX + epsilon, maxY + epsilon, maxZ + epsilon);
+                    boolean transparency =
+                        world.getBlock((int) floor(minX) + dir.getOffsetX(),
+                            (int) floor(minY) + dir.getOffsetY(),
+                            (int) floor(minZ) + dir.getOffsetZ()).hasSideTransparency();
+                    float offset = transparency ? epsilon : 0;
+                    float xo = dir.getOffsetX() * offset;
+                    float yo = dir.getOffsetY() * offset;
+                    float zo = dir.getOffsetZ() * offset;
+                    batch.vertex(minX + xo, minY+yo, minZ+zo)
+                        .vertex(maxX + xo, maxY + yo, maxZ + zo);
                     return true;
                 });
                 batch.end().upload().render(GL_LINES);
@@ -109,12 +117,12 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
     public void pick(PlayerEntity player, Matrix4fc viewMatrix, Camera camera) {
         final float r = 5.0f;
         AABBox box = player.aabb.grow(r, r, r);
-        int x0 = (int) Math.floor(box.min.x);
-        int x1 = (int) Math.floor(box.max.x + 1.0f);
-        int y0 = (int) Math.floor(box.min.y);
-        int y1 = (int) Math.floor(box.max.y + 1.0f);
-        int z0 = (int) Math.floor(box.min.z);
-        int z1 = (int) Math.floor(box.max.z + 1.0f);
+        int x0 = (int) floor(box.min.x);
+        int x1 = (int) floor(box.max.x + 1.0f);
+        int y0 = (int) floor(box.min.y);
+        int y1 = (int) floor(box.max.y + 1.0f);
+        int z0 = (int) floor(box.min.z);
+        int z1 = (int) floor(box.max.z + 1.0f);
         float closestDistance = Float.POSITIVE_INFINITY;
         hitResult = null;
         AABBox rayCast;

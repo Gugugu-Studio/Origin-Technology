@@ -1,19 +1,14 @@
 package com.gugugu.oritech.world;
 
-import com.gugugu.oritech.client.OriTechClient;
 import com.gugugu.oritech.util.math.ChunkPos;
 import com.gugugu.oritech.world.block.Block;
 import com.gugugu.oritech.world.chunk.Chunk;
 import com.gugugu.oritech.world.chunk.LogicChunk;
-import com.gugugu.oritech.world.chunk.RenderChunk;
 import com.gugugu.oritech.world.save.BlocksCoders;
 import org.joml.Random;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.gugugu.oritech.world.chunk.Chunk.CHUNK_SIZE;
 import static com.gugugu.oritech.world.chunk.Chunk.getRelativePos;
@@ -112,7 +107,7 @@ public class ServerWorld extends World {
         return chunk;
     }
 
-    private void saveChunk(String directory, LogicChunk chunk) {
+    private boolean saveChunk(String directory, LogicChunk chunk) {
         int x = chunk.chunkX;
         int y = chunk.chunkY;
         int z = chunk.chunkZ;
@@ -121,9 +116,10 @@ public class ServerWorld extends World {
 
         try {
             File chunk_save = new File(filename);
-            if (! chunk_save.exists()) {
-                if (! chunk_save.createNewFile()) {
+            if (!chunk_save.exists()) {
+                if (!chunk_save.createNewFile()) {
                     System.err.println("Couldn't create save file");
+                    return false;
                 }
             }
             output = new DataOutputStream(new FileOutputStream(chunk_save));
@@ -132,20 +128,19 @@ public class ServerWorld extends World {
         }
 
         BlocksCoders.RAW.saveBlocks(chunk.width, chunk.depth, chunk.height, chunk.getBlocks(), output);
+        return true;
     }
 
     @Override
     public void save(String directory) {
-        for (LogicChunk chunk : dirtyChunks) {
-            saveChunk(directory, chunk);
-        }
+        dirtyChunks.removeIf(chunk -> saveChunk(directory, chunk));
     }
 
     private void loadChunk(LogicChunk chunk, DataInputStream input) {
         Block[][][] blocks = BlocksCoders.RAW.getBlocks(input);
-        for (int y = 0 ; y < 32 ; y ++) {
-            for (int x = 0 ; x < 32 ; x ++) {
-                for (int z = 0 ; z < 32 ; z ++) {
+        for (int y = 0; y < 32; y++) {
+            for (int x = 0; x < 32; x++) {
+                for (int z = 0; z < 32; z++) {
                     chunk.setBlock(blocks[y][x][z], x, y, z);
                 }
             }

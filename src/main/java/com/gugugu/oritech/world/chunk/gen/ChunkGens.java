@@ -9,7 +9,7 @@ import com.gugugu.oritech.world.block.Block;
  * @since 1.0
  */
 public class ChunkGens {
-    public static final IChunkGen SMOOTH = register(0, "smooth", new SmoothChunkGen());
+    public static final IChunkGen FLAT = register(0, "flat", new FlatChunkGen());
     public static final IChunkGen PLAIN = register(1, "plain", new PlainChunkGen());
 
     private static IChunkGen register(int rawId, String id, IChunkGen gen) {
