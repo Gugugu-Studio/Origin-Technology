@@ -27,7 +27,15 @@ public class Block {
     private static final Vector3f ONE = new Vector3f(1, 1, 1);
 
     public Block() {
-        renderBoxes.add(new RenderBox(ZERO, ONE, new Vector2d(0, 0), new Vector2d(32, 32)));
+        RenderBox.Builder builder = new RenderBox.Builder();
+        builder.min(ZERO);
+        builder.max(ONE);
+        RenderBox.UVGroup group = new RenderBox.UVGroup();
+        group.uv_min = new Vector2d(0, 0);
+        group.uv_max = new Vector2d(1, 1);
+        builder.allGroup(group);
+
+        renderBoxes.add(builder.build());
     }
 
     public boolean isAir() {
@@ -85,7 +93,7 @@ public class Block {
         Vector2d uv1 = new Vector2d(atlas.getU1(texName), atlas.getV1(texName));
 
         for (RenderBox renderBox : renderBoxes) {
-            renderBox.renderFace(batch, face, x, y, z, uv0, uv1, atlas);
+            renderBox.renderFace(batch, face, x, y, z, uv0, uv1, atlas, 1);
         }
     }
 
