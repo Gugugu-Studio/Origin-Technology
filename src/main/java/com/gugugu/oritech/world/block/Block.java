@@ -67,18 +67,7 @@ public class Block {
             z + face.getOffsetZ()).isSolid();
     }
 
-    public List<String> getTextures() {
-        List<String> list = new ArrayList<>();
-        Identifier id = Registry.BLOCK.getId(this);
-        list.add(id.path());
-        return list;
-    }
-
     public void renderFace(Batch batch, Direction face, int x, int y, int z) {
-        Identifier id = Registry.BLOCK.getId(this);
-        if (model == null) {
-            model = ModelLoader.loadModel(new ResLocation(ResType.ASSETS, "oritech:models/block/" + id.path() + ".json"));
-        }
         model.renderFace(batch, face, x, y, z);
     }
 
@@ -104,5 +93,13 @@ public class Block {
             }
         }
         return rendered;
+    }
+
+    public Model getModel() {
+        Identifier id = Registry.BLOCK.getId(this);
+        if (model == null) {
+            model = ModelLoader.loadModel(new ResLocation(ResType.ASSETS, "oritech:models/block/" + id.path() + ".json"));
+        }
+        return model;
     }
 }

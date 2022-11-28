@@ -83,12 +83,8 @@ public class OriTechClient
                 continue;
             }
 
-            Identifier id = Registry.BLOCK.getId(block);
-
-            for (String path : block.getTextures()) {
-                list.add(new SpriteInfo(ResLocation.ofAssets(id.namespace(), "textures/block/" + path + ".png"),
-                    32,
-                    32));
+            for (ResLocation path : block.getModel().getAllTextures()) {
+                list.add(new SpriteInfo(path, 32, 32));
             }
         }
         blockAtlas.extraParam(target -> {

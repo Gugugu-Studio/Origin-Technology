@@ -16,6 +16,16 @@ public class Model {
     public Map<Direction, ResLocation> textures;
     public int granularity;
 
+    public List<ResLocation> getAllTextures() {
+        List<ResLocation> text = new ArrayList<>();
+        for (ResLocation p : textures.values()) {
+            if (! text.contains(p)) {
+                text.add(p);
+            }
+        }
+        return text;
+    }
+
     public Model(List<RenderBox> boxes, Map<Direction, ResLocation> textures, int granularity) {
         this.boxes = boxes;
         this.textures = textures;

@@ -1,0 +1,14 @@
+{
+    "textures": {
+        "all": "oritech:block/leaves.png",
+        "granularity": 1
+    },
+    "cubes": [
+        {
+            "vertex": [[0, 0, 0], [1, 1, 1]],
+            "uv": {
+                "all": [[0, 0], [1, 1]]
+            }
+        }
+    ]
+}
