@@ -2,9 +2,12 @@ package com.gugugu.oritech.world.block;
 
 import com.gugugu.oritech.client.OriTechClient;
 import com.gugugu.oritech.client.render.Batch;
+import com.gugugu.oritech.client.render.Model;
 import com.gugugu.oritech.client.render.RenderBox;
 import com.gugugu.oritech.phys.AABBox;
+import com.gugugu.oritech.resource.ModelLoader;
 import com.gugugu.oritech.resource.ResLocation;
+import com.gugugu.oritech.resource.ResType;
 import com.gugugu.oritech.resource.tex.TextureAtlas;
 import com.gugugu.oritech.util.Identifier;
 import com.gugugu.oritech.util.math.Direction;
@@ -22,20 +25,11 @@ import java.util.List;
  * @since 1.0
  */
 public class Block {
-    protected List<RenderBox> renderBoxes = new ArrayList<>();
+    protected Model model;
     private static final Vector3f ZERO = new Vector3f(0, 0, 0);
     private static final Vector3f ONE = new Vector3f(1, 1, 1);
 
     public Block() {
-        RenderBox.Builder builder = new RenderBox.Builder();
-        builder.min(ZERO);
-        builder.max(ONE);
-        RenderBox.UVGroup group = new RenderBox.UVGroup();
-        group.uv_min = new Vector2d(0, 0);
-        group.uv_max = new Vector2d(1, 1);
-        builder.allGroup(group);
-
-        renderBoxes.add(builder.build());
     }
 
     public boolean isAir() {
@@ -73,11 +67,6 @@ public class Block {
             z + face.getOffsetZ()).isSolid();
     }
 
-    public String getFaceTexture(Direction face) {
-        Identifier id = Registry.BLOCK.getId(this);
-        return ResLocation.ofAssets(id.namespace(), "textures/block/" + id.path() + ".png").toString();
-    }
-
     public List<String> getTextures() {
         List<String> list = new ArrayList<>();
         Identifier id = Registry.BLOCK.getId(this);
@@ -86,15 +75,11 @@ public class Block {
     }
 
     public void renderFace(Batch batch, Direction face, int x, int y, int z) {
-        String texName = getFaceTexture(face);
-
-        TextureAtlas atlas = OriTechClient.getClient().blockAtlas;
-        Vector2d uv0 = new Vector2d(atlas.getU0(texName), atlas.getV0(texName));
-        Vector2d uv1 = new Vector2d(atlas.getU1(texName), atlas.getV1(texName));
-
-        for (RenderBox renderBox : renderBoxes) {
-            renderBox.renderFace(batch, face, x, y, z, uv0, uv1, atlas, 1);
+        Identifier id = Registry.BLOCK.getId(this);
+        if (model == null) {
+            model = ModelLoader.loadModel(new ResLocation(ResType.ASSETS, "oritech:models/block/" + id.path() + ".json"));
         }
+        model.renderFace(batch, face, x, y, z);
     }
 
     public boolean render(Batch batch, World world, int x, int y, int z) {

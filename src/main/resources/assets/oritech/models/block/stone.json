@@ -1,6 +1,6 @@
 {
     "textures": {
-        "all": "oritech:block/dirt.png",
+        "all": "oritech:block/stone.png",
         "granularity": 1
     },
     "cubes": [

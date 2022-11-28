@@ -9,15 +9,6 @@ import java.util.List;
 
 public class LogBlock extends Block {
     @Override
-    public String getFaceTexture(Direction face) {
-        Identifier id = Registry.BLOCK.getId(this);
-        if (face == Direction.UP || face == Direction.DOWN) {
-            return ResLocation.ofAssets(id.namespace(), "textures/block/log_top.png").toString();
-        }
-        return super.getFaceTexture(face);
-    }
-
-    @Override
     public List<String> getTextures() {
         List<String> array = super.getTextures();
         array.add("log_top");
