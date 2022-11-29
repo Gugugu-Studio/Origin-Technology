@@ -59,9 +59,14 @@ public abstract class World {
                 for (int z = z0; z < z1; z++) {
                     var block = getBlock(x, y, z);
                     if (!block.isAir()) {
-                        AABBox aabb = block.getCollision(x, y, z);
-                        if (aabb != null) {
-                            list.add(aabb);
+                        List<AABBox> aabBoxes = block.getCollision(x, y, z);
+                        if (aabBoxes == null) {
+                            continue;
+                        }
+                        for (AABBox aabb : aabBoxes) {
+                            if (aabb != null) {
+                                list.add(aabb);
+                            }
                         }
                     }
                 }

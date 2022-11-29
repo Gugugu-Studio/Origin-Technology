@@ -83,35 +83,7 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
     }
 
     public void tryRenderHit() {
-        if (hitResult != null) {
-            GameRenderer gameRenderer = OriTechClient.getClient().gameRenderer;
-            gameRenderer.setShaderColor(0.0f, 0.0f, 0.0f, 0.4f);
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            glLineWidth(2.0f);
-            AABBox outline = hitResult.block().getOutline(hitResult.x(), hitResult.y(), hitResult.z());
-            final float epsilon = 0.001f;
-            Tesselator.getInstance().withBatch(batch -> {
-                batch.begin();
-                outline.forEachEdge((dir, minX, minY, minZ, maxX, maxY, maxZ) -> {
-                    boolean transparency =
-                        world.getBlock((int) floor(minX) + dir.getOffsetX(),
-                            (int) floor(minY) + dir.getOffsetY(),
-                            (int) floor(minZ) + dir.getOffsetZ()).hasSideTransparency();
-                    float offset = transparency ? epsilon : 0;
-                    float xo = dir.getOffsetX() * offset;
-                    float yo = dir.getOffsetY() * offset;
-                    float zo = dir.getOffsetZ() * offset;
-                    batch.vertex(minX + xo, minY+yo, minZ+zo)
-                        .vertex(maxX + xo, maxY + yo, maxZ + zo);
-                    return true;
-                });
-                batch.end().upload().render(GL_LINES);
-            });
-            glLineWidth(1.0f);
-            glDisable(GL_BLEND);
-            gameRenderer.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        }
+        TryHitRenderer.render(hitResult);
     }
 
     public void pick(PlayerEntity player, Matrix4fc viewMatrix, Camera camera) {
@@ -125,7 +97,6 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
         int z1 = (int) floor(box.max.z + 1.0f);
         float closestDistance = Float.POSITIVE_INFINITY;
         hitResult = null;
-        AABBox rayCast;
         Vector3f dir = viewMatrix.positiveZ(pickVec).negate();
         Block hBlock = null;
         int hX = 0, hY = 0, hZ = 0;
@@ -136,22 +107,27 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
                 for (int z = z0; z < z1; z++) {
                     Block block = world.getBlock(x, y, z);
                     if (!block.isAir()) {
-                        rayCast = block.getRayCast(x, y, z);
-                        if (!Frustum.test(rayCast)) {
+                        List<AABBox> rayCasts = block.getRayCast(x, y, z);
+                        if (rayCasts == null) {
                             continue;
                         }
-                        if (Intersectionf.intersectRayAab(camera.position,
-                            dir,
-                            rayCast.min,
-                            rayCast.max,
-                            RayCastResult.nearFar)
-                            && RayCastResult.nearFar.x < closestDistance) {
-                            closestDistance = RayCastResult.nearFar.x;
-                            hBlock = block;
-                            hX = x;
-                            hY = y;
-                            hZ = z;
-                            hFace = rayCast.rayCastFacing(camera.position, dir);
+                        for (AABBox rayCast : rayCasts) {
+                            if (!Frustum.test(rayCast)) {
+                                continue;
+                            }
+                            if (Intersectionf.intersectRayAab(camera.position,
+                                dir,
+                                rayCast.min,
+                                rayCast.max,
+                                RayCastResult.nearFar)
+                                && RayCastResult.nearFar.x < closestDistance) {
+                                closestDistance = RayCastResult.nearFar.x;
+                                hBlock = block;
+                                hX = x;
+                                hY = y;
+                                hZ = z;
+                                hFace = rayCast.rayCastFacing(camera.position, dir);
+                            }
                         }
                     }
                 }

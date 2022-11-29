@@ -1,20 +1,15 @@
 package com.gugugu.oritech.world.block;
 
-import com.gugugu.oritech.client.OriTechClient;
 import com.gugugu.oritech.client.render.Batch;
 import com.gugugu.oritech.client.render.Model;
-import com.gugugu.oritech.client.render.RenderBox;
 import com.gugugu.oritech.phys.AABBox;
 import com.gugugu.oritech.resource.ModelLoader;
 import com.gugugu.oritech.resource.ResLocation;
 import com.gugugu.oritech.resource.ResType;
-import com.gugugu.oritech.resource.tex.TextureAtlas;
 import com.gugugu.oritech.util.Identifier;
 import com.gugugu.oritech.util.math.Direction;
 import com.gugugu.oritech.util.registry.Registry;
 import com.gugugu.oritech.world.World;
-import org.joml.Vector2d;
-import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -44,21 +39,27 @@ public class Block {
         return true;
     }
 
-    public AABBox getOutline(int x, int y, int z) {
-        return new AABBox(x, y, z,
-            x + 1.0f, y + 1.0f, z + 1.0f);
+    public List<AABBox> getOutline(int x, int y, int z) {
+        return new ArrayList<>() {
+            {
+                add(new AABBox(
+                    x, y, z,
+                    x + 1.0f, y + 1.0f, z + 1.0f
+                ));
+            }
+        };
     }
 
-    public AABBox getRayCast(int x, int y, int z) {
+    public List<AABBox> getRayCast(int x, int y, int z) {
         return getOutline(x, y, z);
     }
 
-    public AABBox getCollision(int x, int y, int z) {
+    public List<AABBox> getCollision(int x, int y, int z) {
         return getOutline(x, y, z);
     }
 
     public boolean shouldRenderFace(World world, int x, int y, int z) {
-        return world.getBlock(x, y, z).hasSideTransparency();
+        return this.hasSideTransparency() || world.getBlock(x, y, z).hasSideTransparency();
     }
 
     public boolean canPlaceOn(Block target, World world, int x, int y, int z, Direction face) {
