@@ -1,5 +1,6 @@
 package com.gugugu.oritech.client.render;
 
+import com.gugugu.oritech.block.BlockState;
 import com.gugugu.oritech.client.OriTechClient;
 import com.gugugu.oritech.phys.AABBox;
 import com.gugugu.oritech.phys.RayCastResult;
@@ -9,9 +10,9 @@ import com.gugugu.oritech.util.SideOnly;
 import com.gugugu.oritech.util.math.Direction;
 import com.gugugu.oritech.world.ClientWorld;
 import com.gugugu.oritech.world.IWorldListener;
-import com.gugugu.oritech.world.block.Block;
+import com.gugugu.oritech.block.Block;
 import com.gugugu.oritech.world.chunk.RenderChunk;
-import com.gugugu.oritech.world.entity.PlayerEntity;
+import com.gugugu.oritech.entity.PlayerEntity;
 import org.joml.Intersectionf;
 import org.joml.Matrix4fc;
 import org.joml.Vector3f;
@@ -20,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.joml.Math.floor;
-import static org.lwjgl.opengl.GL11C.*;
 
 /**
  * @author squid233
@@ -105,11 +105,15 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
         for (int y = y0; y < y1; y++) {
             for (int x = x0; x < x1; x++) {
                 for (int z = z0; z < z1; z++) {
-                    Block block = world.getBlock(x, y, z);
+                    BlockState block = world.getBlock(x, y, z);
                     if (!block.isAir()) {
-                        List<AABBox> rayCasts = block.getRayCast(x, y, z);
+                        List<AABBox> rayCasts = block.getRayCast();
                         if (rayCasts == null) {
                             continue;
+                        }
+                        for (AABBox aabb : rayCasts) {
+                            aabb.min.add(x, y, z);
+                            aabb.max.add(x, y, z);
                         }
                         for (AABBox rayCast : rayCasts) {
                             if (!Frustum.test(rayCast)) {
@@ -122,7 +126,7 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
                                 RayCastResult.nearFar)
                                 && RayCastResult.nearFar.x < closestDistance) {
                                 closestDistance = RayCastResult.nearFar.x;
-                                hBlock = block;
+                                hBlock = block.getBlock();
                                 hX = x;
                                 hY = y;
                                 hZ = z;

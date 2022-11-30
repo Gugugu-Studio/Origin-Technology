@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.gugugu.oritech.world.entity;
+package com.gugugu.oritech.entity;
 
 import com.gugugu.oritech.ui.Keyboard;
 import com.gugugu.oritech.world.World;

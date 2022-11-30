@@ -1,4 +1,4 @@
-package com.gugugu.oritech.world.block;
+package com.gugugu.oritech.block;
 
 import com.gugugu.oritech.phys.AABBox;
 
@@ -12,14 +12,14 @@ public class DirtStairBlock extends Block{
     }
 
     @Override
-    public List<AABBox> getOutline(int x, int y, int z) {
+    public List<AABBox> getOutline() {
         AABBox box1 = new AABBox(
-            x + 0.0f, y + 0.0f, z + 0.0f,
-            x + 1.0f, y + 0.5f, z + 1.0f
+            0.0f, 0.0f, 0.0f,
+            1.0f, 0.5f, 1.0f
         );
         AABBox box2 = new AABBox(
-            x + 0.0f, y + 0.5f, z + 0.5f,
-            x + 1.0f, y + 1.0f, z + 1.0f
+            0.0f, 0.5f, 0.5f,
+            1.0f, 1.0f, 1.0f
         );
         return new ArrayList<>() {
             {

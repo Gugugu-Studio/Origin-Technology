@@ -1,8 +1,8 @@
 package com.gugugu.oritech.util.registry;
 
 import com.gugugu.oritech.util.Identifier;
-import com.gugugu.oritech.world.block.Block;
-import com.gugugu.oritech.world.block.Blocks;
+import com.gugugu.oritech.block.Block;
+import com.gugugu.oritech.block.Blocks;
 import com.gugugu.oritech.world.chunk.gen.ChunkGens;
 import com.gugugu.oritech.world.chunk.gen.IChunkGen;
 import com.gugugu.oritech.world.save.BlocksCoders;

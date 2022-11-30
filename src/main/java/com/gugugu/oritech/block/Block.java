@@ -1,7 +1,7 @@
-package com.gugugu.oritech.world.block;
+package com.gugugu.oritech.block;
 
 import com.gugugu.oritech.client.render.Batch;
-import com.gugugu.oritech.client.render.Model;
+import com.gugugu.oritech.client.model.Model;
 import com.gugugu.oritech.phys.AABBox;
 import com.gugugu.oritech.resource.ModelLoader;
 import com.gugugu.oritech.resource.ResLocation;
@@ -39,37 +39,38 @@ public class Block {
         return true;
     }
 
-    public List<AABBox> getOutline(int x, int y, int z) {
+    public List<AABBox> getOutline() {
         return new ArrayList<>() {
             {
                 add(new AABBox(
-                    x, y, z,
-                    x + 1.0f, y + 1.0f, z + 1.0f
+                    0, 0, 0,
+                    1.0f, 1.0f, 1.0f
                 ));
             }
         };
     }
 
-    public List<AABBox> getRayCast(int x, int y, int z) {
-        return getOutline(x, y, z);
+    public List<AABBox> getRayCast() {
+        return getOutline();
     }
 
-    public List<AABBox> getCollision(int x, int y, int z) {
-        return getOutline(x, y, z);
+    public List<AABBox> getCollision() {
+        return getOutline();
     }
 
     public boolean shouldRenderFace(World world, int x, int y, int z) {
-        return this.hasSideTransparency() || world.getBlock(x, y, z).hasSideTransparency();
+//        return true;
+        return this.hasSideTransparency() || world.getBlock(x, y, z).block.hasSideTransparency();
     }
 
-    public boolean canPlaceOn(Block target, World world, int x, int y, int z, Direction face) {
+    public boolean canPlaceOn(BlockState target, World world, int x, int y, int z, Direction face) {
         return !world.getBlock(x + face.getOffsetX(),
             y + face.getOffsetY(),
-            z + face.getOffsetZ()).isSolid();
+            z + face.getOffsetZ()).block.isSolid();
     }
 
-    public void renderFace(Batch batch, Direction face, int x, int y, int z) {
-        model.renderFace(batch, face, x, y, z);
+    public void renderFace(Batch batch, Direction face) {
+        model.renderFace(batch, face);
     }
 
     public boolean render(Batch batch, World world, int x, int y, int z) {
@@ -89,7 +90,7 @@ public class Block {
                 } else if (face.isOnAxisZ()) {
                     batch.color(c3, c3, c3);
                 }
-                renderFace(batch, face, x, y, z);
+                renderFace(batch, face);
                 rendered = true;
             }
         }

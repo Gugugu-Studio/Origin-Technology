@@ -1,8 +1,7 @@
-package com.gugugu.oritech.world.block;
+package com.gugugu.oritech.block;
 
 import com.gugugu.oritech.phys.AABBox;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,7 +25,7 @@ public class AirBlock extends Block {
     }
 
     @Override
-    public List<AABBox> getOutline(int x, int y, int z) {
+    public List<AABBox> getOutline() {
         return null;
     }
 }

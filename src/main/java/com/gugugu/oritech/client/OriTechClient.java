@@ -1,5 +1,6 @@
 package com.gugugu.oritech.client;
 
+import com.gugugu.oritech.block.BlockState;
 import com.gugugu.oritech.client.gl.GLStateMgr;
 import com.gugugu.oritech.client.render.GameRenderer;
 import com.gugugu.oritech.client.render.WorldRenderer;
@@ -16,9 +17,9 @@ import com.gugugu.oritech.util.*;
 import com.gugugu.oritech.util.math.Direction;
 import com.gugugu.oritech.util.registry.Registry;
 import com.gugugu.oritech.world.ClientWorld;
-import com.gugugu.oritech.world.block.Block;
-import com.gugugu.oritech.world.block.Blocks;
-import com.gugugu.oritech.world.entity.PlayerEntity;
+import com.gugugu.oritech.block.Block;
+import com.gugugu.oritech.block.Blocks;
+import com.gugugu.oritech.entity.PlayerEntity;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -141,7 +142,7 @@ public class OriTechClient
     private void destroyBlock() {
         final HitResult hitResult = worldRenderer.hitResult;
         if (hitResult != null) {
-            world.setBlock(Blocks.AIR, hitResult.x(), hitResult.y(), hitResult.z());
+            world.setBlock(new BlockState(Blocks.AIR), hitResult.x(), hitResult.y(), hitResult.z());
         }
     }
 
@@ -155,7 +156,7 @@ public class OriTechClient
             final int hrx = hitResult.x();
             final int hry = hitResult.y();
             final int hrz = hitResult.z();
-            if (world.canBlockPlaceOn(hotBar[handBlock],
+            if (world.canBlockPlaceOn(new BlockState(hotBar[handBlock]),
                 hrx,
                 hry,
                 hrz,
@@ -163,7 +164,7 @@ public class OriTechClient
                 final int x = hrx + face.getOffsetX();
                 final int y = hry + face.getOffsetY();
                 final int z = hrz + face.getOffsetZ();
-                world.setBlock(hotBar[handBlock], x, y, z);
+                world.setBlock(new BlockState(hotBar[handBlock]), x, y, z);
             }
         }
     }

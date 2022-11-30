@@ -3,6 +3,9 @@ package com.gugugu.oritech.client.render;
 import com.gugugu.oritech.client.render.vertex.Vertex;
 import com.gugugu.oritech.util.Side;
 import com.gugugu.oritech.util.SideOnly;
+import org.joml.Matrix4f;
+import org.joml.Matrix4fStack;
+import org.joml.Vector4f;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -24,6 +27,7 @@ public class Batch {
     private static final double expandAddend = 0.2;
     public static final int BUFFER_STRIDE = (3 + 1 + 2) * 4;
     public static final int VERTEX_COUNT = 20_000;
+    public Matrix4fStack matrix = new Matrix4fStack(64);
     private ByteBuffer buffer;
     private IntBuffer indexBuffer;
     private final Vertex vertex = new Vertex();
@@ -110,7 +114,9 @@ public class Batch {
     }
 
     public Batch vertex(float x, float y, float z) {
-        vertex.position(x, y, z);
+        Vector4f position = new Vector4f(x, y, z, 1);
+        matrix.transform(position);
+        vertex.position(position.x, position.y, position.z);
         return emit();
     }
 

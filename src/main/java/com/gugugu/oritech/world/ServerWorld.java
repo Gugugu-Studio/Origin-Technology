@@ -1,7 +1,8 @@
 package com.gugugu.oritech.world;
 
+import com.gugugu.oritech.block.BlockState;
 import com.gugugu.oritech.util.math.ChunkPos;
-import com.gugugu.oritech.world.block.Block;
+import com.gugugu.oritech.block.Block;
 import com.gugugu.oritech.world.chunk.Chunk;
 import com.gugugu.oritech.world.chunk.LogicChunk;
 import com.gugugu.oritech.world.save.BlocksCoders;
@@ -76,7 +77,7 @@ public class ServerWorld extends World {
     }
 
     @Override
-    public boolean setBlock(Block block, int x, int y, int z) {
+    public boolean setBlock(BlockState block, int x, int y, int z) {
         Chunk chunk;
         int rpx, rpy, rpz;
         if (isOutsideWorld(x, y, z)) {
@@ -137,7 +138,7 @@ public class ServerWorld extends World {
     }
 
     private void loadChunk(LogicChunk chunk, DataInputStream input) {
-        Block[][][] blocks = BlocksCoders.RAW.getBlocks(input);
+        BlockState[][][] blocks = BlocksCoders.RAW.getBlocks(input);
         for (int y = 0; y < 32; y++) {
             for (int x = 0; x < 32; x++) {
                 for (int z = 0; z < 32; z++) {

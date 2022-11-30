@@ -2,7 +2,6 @@ package com.gugugu.oritech.world.chunk.gen;
 
 import com.gugugu.oritech.util.Identifier;
 import com.gugugu.oritech.util.registry.Registry;
-import com.gugugu.oritech.world.block.Block;
 
 /**
  * @author theflysong

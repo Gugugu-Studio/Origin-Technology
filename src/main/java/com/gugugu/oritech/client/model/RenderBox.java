@@ -1,10 +1,9 @@
-package com.gugugu.oritech.client.render;
+package com.gugugu.oritech.client.model;
 
-import com.gugugu.oritech.client.OriTechClient;
+import com.gugugu.oritech.client.render.Batch;
 import com.gugugu.oritech.resource.tex.TextureAtlas;
 import com.gugugu.oritech.util.math.Direction;
 import org.joml.Vector2d;
-import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import java.util.HashMap;
@@ -25,13 +24,13 @@ public class RenderBox {
         this.uvGroups = uvGroups;
     }
 
-    public void renderFace(Batch batch, Direction face, int x, int y, int z, Vector2d uv0, Vector2d uv1, TextureAtlas atlas, int granularity) {
-        float x0 = min.x + (float) x;
-        float y0 = min.y + (float) y;
-        float z0 = min.z + (float) z;
-        float x1 = max.x + (float) x;
-        float y1 = max.y + (float) y;
-        float z1 = max.z + (float) z;
+    public void renderFace(Batch batch, Direction face, Vector2d uv0, Vector2d uv1, TextureAtlas atlas, int granularity) {
+        float x0 = min.x;
+        float y0 = min.y;
+        float z0 = min.z;
+        float x1 = max.x;
+        float y1 = max.y;
+        float z1 = max.z;
 
         float u_len = (float) (uv1.x - uv0.x);
         float v_len = (float) (uv1.y - uv0.y);

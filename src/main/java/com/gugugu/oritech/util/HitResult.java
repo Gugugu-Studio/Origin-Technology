@@ -1,7 +1,7 @@
 package com.gugugu.oritech.util;
 
 import com.gugugu.oritech.util.math.Direction;
-import com.gugugu.oritech.world.block.Block;
+import com.gugugu.oritech.block.Block;
 
 /**
  * The hit result.

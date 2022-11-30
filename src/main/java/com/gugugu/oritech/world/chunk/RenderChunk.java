@@ -1,5 +1,6 @@
 package com.gugugu.oritech.world.chunk;
 
+import com.gugugu.oritech.block.BlockState;
 import com.gugugu.oritech.client.OriTechClient;
 import com.gugugu.oritech.client.render.Batch;
 import com.gugugu.oritech.client.render.Frustum;
@@ -7,8 +8,9 @@ import com.gugugu.oritech.util.Side;
 import com.gugugu.oritech.util.SideOnly;
 import com.gugugu.oritech.util.Timer;
 import com.gugugu.oritech.world.ClientWorld;
-import com.gugugu.oritech.world.block.Block;
-import com.gugugu.oritech.world.entity.PlayerEntity;
+import com.gugugu.oritech.block.Block;
+import com.gugugu.oritech.entity.PlayerEntity;
+import com.gugugu.oritech.world.World;
 
 /**
  * @author squid233
@@ -48,14 +50,14 @@ public class RenderChunk extends Chunk implements AutoCloseable {
     }
 
     @Override
-    public Block getBlock(int x, int y, int z) {
+    public BlockState getBlock(int x, int y, int z) {
         return OriTechClient.getServer().world
             .getChunk(chunkX, chunkY, chunkZ)
             .getBlock(x, y, z);
     }
 
     @Override
-    public void setBlock(Block block, int x, int y, int z) {
+    public void setBlock(BlockState block, int x, int y, int z) {
         OriTechClient.getServer().world
             .getChunk(chunkX, chunkY, chunkZ)
             .setBlock(block, x, y, z);
@@ -78,19 +80,27 @@ public class RenderChunk extends Chunk implements AutoCloseable {
         //int blocks = 0;
         boolean rendered = false;
         batch.begin();
+        batch.matrix.clear();
+        batch.matrix.identity();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 for (int z = 0; z < depth; z++) {
-                    Block block = getBlock(x, y, z);
+                    BlockState block = getBlock(x, y, z);
                     if (!block.isAir()) {
-                        boolean b = block.render(batch,
-                            world,
+                        batch.matrix.pushMatrix();
+                        batch.matrix.translate(
                             getAbsolutePos(chunkX, x),
                             getAbsolutePos(chunkY, y),
-                            getAbsolutePos(chunkZ, z));
+                            getAbsolutePos(chunkZ, z)
+                        );
+                        boolean b = block.getBlock().render(batch, world,
+                            getAbsolutePos(this.chunkX, x),
+                            getAbsolutePos(this.chunkY, y),
+                            getAbsolutePos(this.chunkZ, z));
                         if (b) {
                             rendered = true;
                         }
+                        batch.matrix.popMatrix();
                         //++blocks;
                     }
                 }
@@ -124,5 +134,10 @@ public class RenderChunk extends Chunk implements AutoCloseable {
         if (batch != null) {
             batch.free();
         }
+    }
+
+    @Override
+    public World getWorld() {
+        return world;
     }
 }

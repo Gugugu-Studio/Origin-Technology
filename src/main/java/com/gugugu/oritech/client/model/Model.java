@@ -1,6 +1,7 @@
-package com.gugugu.oritech.client.render;
+package com.gugugu.oritech.client.model;
 
 import com.gugugu.oritech.client.OriTechClient;
+import com.gugugu.oritech.client.render.Batch;
 import com.gugugu.oritech.resource.ResLocation;
 import com.gugugu.oritech.resource.tex.TextureAtlas;
 import com.gugugu.oritech.util.math.Direction;
@@ -32,7 +33,7 @@ public class Model {
         this.granularity = granularity;
     }
 
-    public void renderFace(Batch batch, Direction face, int x, int y, int z) {
+    public void renderFace(Batch batch, Direction face) {
         String texName = textures.get(face).toString();
 
         TextureAtlas atlas = OriTechClient.getClient().blockAtlas;
@@ -40,7 +41,7 @@ public class Model {
         Vector2d uv1 = new Vector2d(atlas.getU1(texName), atlas.getV1(texName));
 
         for (RenderBox renderBox : boxes) {
-            renderBox.renderFace(batch, face, x, y, z, uv0, uv1, atlas, granularity);
+            renderBox.renderFace(batch, face, uv0, uv1, atlas, granularity);
         }
     }
 

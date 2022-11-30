@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.gugugu.oritech.world.entity;
+package com.gugugu.oritech.entity;
 
 import com.gugugu.oritech.phys.AABBox;
 import com.gugugu.oritech.util.math.Numbers;

@@ -1,8 +1,8 @@
 package com.gugugu.oritech.resource;
 
 import com.google.gson.*;
-import com.gugugu.oritech.client.render.Model;
-import com.gugugu.oritech.client.render.RenderBox;
+import com.gugugu.oritech.client.model.Model;
+import com.gugugu.oritech.client.model.RenderBox;
 import com.gugugu.oritech.util.math.Direction;
 import org.joml.Vector2d;
 import org.joml.Vector3f;

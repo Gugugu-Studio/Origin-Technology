@@ -1,4 +1,4 @@
-package com.gugugu.oritech.world.block;
+package com.gugugu.oritech.block;
 
 import com.gugugu.oritech.util.Identifier;
 import com.gugugu.oritech.util.registry.Registry;

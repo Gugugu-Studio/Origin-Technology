@@ -58,7 +58,11 @@ public class TryHitRenderer {
 
     public static void render(HitResult hitResult) {
         if (hitResult != null) {
-            List<AABBox> outlines = hitResult.block().getOutline(hitResult.x(), hitResult.y(), hitResult.z());
+            List<AABBox> outlines = hitResult.block().getOutline();
+            for (AABBox aabb : outlines) {
+                aabb.min.add(hitResult.x(), hitResult.y(), hitResult.z());
+                aabb.max.add(hitResult.x(), hitResult.y(), hitResult.z());
+            }
             collectEdges(outlines);
 
             GameRenderer gameRenderer = OriTechClient.getClient().gameRenderer;
