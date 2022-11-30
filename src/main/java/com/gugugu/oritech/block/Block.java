@@ -20,7 +20,6 @@ import java.util.List;
  * @since 1.0
  */
 public class Block {
-    protected Model model;
     private static final Vector3f ZERO = new Vector3f(0, 0, 0);
     private static final Vector3f ONE = new Vector3f(1, 1, 1);
 
@@ -59,7 +58,6 @@ public class Block {
     }
 
     public boolean shouldRenderFace(World world, int x, int y, int z) {
-//        return true;
         return this.hasSideTransparency() || world.getBlock(x, y, z).block.hasSideTransparency();
     }
 
@@ -69,39 +67,11 @@ public class Block {
             z + face.getOffsetZ()).block.isSolid();
     }
 
-    public void renderFace(Batch batch, Direction face) {
-        model.renderFace(batch, face);
+    public boolean hasModel() {
+        return true;
     }
 
-    public boolean render(Batch batch, World world, int x, int y, int z) {
-        boolean rendered = false;
-        for (Direction face : Direction.values()) {
-            if (shouldRenderFace(world,
-                x + face.getOffsetX(),
-                y + face.getOffsetY(),
-                z + face.getOffsetZ())) {
-                final float c1 = 1.0f;
-                final float c2 = 0.8f;
-                final float c3 = 0.6f;
-                if (face.isOnAxisX()) {
-                    batch.color(c1, c1, c1);
-                } else if (face.isOnAxisY()) {
-                    batch.color(c2, c2, c2);
-                } else if (face.isOnAxisZ()) {
-                    batch.color(c3, c3, c3);
-                }
-                renderFace(batch, face);
-                rendered = true;
-            }
-        }
-        return rendered;
-    }
-
-    public Model getModel() {
-        Identifier id = Registry.BLOCK.getId(this);
-        if (model == null) {
-            model = ModelLoader.loadModel(new ResLocation(ResType.ASSETS, "oritech:models/block/" + id.path() + ".json"));
-        }
-        return model;
+    public Identifier getRenderer() {
+        return new Identifier("common");
     }
 }

@@ -4,6 +4,8 @@ import com.gugugu.oritech.client.OriTechClient;
 import com.gugugu.oritech.client.render.Batch;
 import com.gugugu.oritech.resource.ResLocation;
 import com.gugugu.oritech.resource.tex.TextureAtlas;
+import com.gugugu.oritech.util.Side;
+import com.gugugu.oritech.util.SideOnly;
 import com.gugugu.oritech.util.math.Direction;
 import org.joml.Vector2d;
 
@@ -12,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@SideOnly(Side.CLIENT)
 public class Model {
     public List<RenderBox> boxes;
     public Map<Direction, ResLocation> textures;

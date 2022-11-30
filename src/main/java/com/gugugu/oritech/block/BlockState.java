@@ -1,6 +1,7 @@
 package com.gugugu.oritech.block;
 
 import com.gugugu.oritech.phys.AABBox;
+import com.gugugu.oritech.util.Identifier;
 import com.gugugu.oritech.util.math.BlockPos;
 import com.gugugu.oritech.util.math.Direction;
 import com.gugugu.oritech.world.World;
@@ -73,5 +74,13 @@ public class BlockState {
 
     public List<AABBox> getRayCast() {
         return block.getRayCast();
+    }
+
+    public boolean shouldRenderFace(World world, int x, int y, int z) {
+        return block.shouldRenderFace(world, x, y, z);
+    }
+
+    public Identifier getRenderer() {
+        return block.getRenderer();
     }
 }

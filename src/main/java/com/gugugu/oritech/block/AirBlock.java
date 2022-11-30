@@ -28,4 +28,9 @@ public class AirBlock extends Block {
     public List<AABBox> getOutline() {
         return null;
     }
+
+    @Override
+    public boolean hasModel() {
+        return false;
+    }
 }

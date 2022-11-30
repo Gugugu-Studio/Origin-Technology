@@ -2,6 +2,8 @@ package com.gugugu.oritech.client.model;
 
 import com.gugugu.oritech.client.render.Batch;
 import com.gugugu.oritech.resource.tex.TextureAtlas;
+import com.gugugu.oritech.util.Side;
+import com.gugugu.oritech.util.SideOnly;
 import com.gugugu.oritech.util.math.Direction;
 import org.joml.Vector2d;
 import org.joml.Vector3f;
@@ -9,6 +11,7 @@ import org.joml.Vector3f;
 import java.util.HashMap;
 import java.util.Map;
 
+@SideOnly(Side.CLIENT)
 public class RenderBox {
     public Vector3f min;
     public Vector3f max;

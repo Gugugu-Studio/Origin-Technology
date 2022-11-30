@@ -51,7 +51,11 @@ public class LogicChunk extends Chunk {
         for (int y = 0 ; y < height ; y ++) {
             for (int x = 0 ; x < height ; x ++) {
                 for (int z = 0 ; z < depth ; z ++) {
-                    blocks[y][x][z].setPos(new BlockPos(x, y, z));
+                    blocks[y][x][z].setPos(new BlockPos(
+                        getAbsolutePos(chunkX, x),
+                        getAbsolutePos(chunkY, y),
+                        getAbsolutePos(chunkZ, z)
+                    ));
                     blocks[y][x][z].setChunk(this);
                 }
             }
@@ -67,7 +71,11 @@ public class LogicChunk extends Chunk {
     public void setBlock(BlockState block, int x, int y, int z) {
         blocks[y][x][z] = block;
         block.setChunk(this);
-        block.setPos(new BlockPos(x, y, z));
+        block.setPos(new BlockPos(
+            getAbsolutePos(chunkX, x),
+            getAbsolutePos(chunkY, y),
+            getAbsolutePos(chunkZ, z)
+        ));
     }
 
     @Override

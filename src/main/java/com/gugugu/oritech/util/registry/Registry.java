@@ -1,5 +1,8 @@
 package com.gugugu.oritech.util.registry;
 
+import com.gugugu.oritech.block.BlockState;
+import com.gugugu.oritech.client.renderer.AbstractBlockStateRenderer;
+import com.gugugu.oritech.client.renderer.BlockStateRenderers;
 import com.gugugu.oritech.util.Identifier;
 import com.gugugu.oritech.block.Block;
 import com.gugugu.oritech.block.Blocks;
@@ -18,6 +21,7 @@ public abstract class Registry<T> implements Iterable<T> {
     public static DefaultedRegistry<Block> BLOCK;
     public static DefaultedRegistry<IBlocksCoder> CODER;
     public static DefaultedRegistry<IChunkGen> CHUNK_GEN;
+    public static DefaultedRegistry<AbstractBlockStateRenderer> BLOCKSTATE_RENDERER;
 
     public static <T, R extends T> R register(Registry<T> registry,
                                               Identifier id,
@@ -37,6 +41,7 @@ public abstract class Registry<T> implements Iterable<T> {
         BLOCK = create(() -> Blocks.AIR);
         CODER = create(() -> BlocksCoders.RAW);
         CHUNK_GEN = create(() -> ChunkGens.FLAT);
+        BLOCKSTATE_RENDERER = create(() -> BlockStateRenderers.COMMON);
     }
 
     private static <T> DefaultedRegistry<T> create(Supplier<T> defaultEntry) {
