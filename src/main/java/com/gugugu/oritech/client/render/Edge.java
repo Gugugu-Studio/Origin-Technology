@@ -1,5 +1,7 @@
 package com.gugugu.oritech.client.render;
 
+import com.gugugu.oritech.util.Side;
+import com.gugugu.oritech.util.SideOnly;
 import com.gugugu.oritech.util.math.Direction;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -7,6 +9,7 @@ import org.joml.Vector3f;
 import java.util.ArrayList;
 import java.util.List;
 
+@SideOnly(Side.CLIENT)
 public class Edge {
     public Vector2f xy;
     public float min_z;

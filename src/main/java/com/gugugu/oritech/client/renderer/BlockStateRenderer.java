@@ -5,10 +5,13 @@ import com.gugugu.oritech.block.Blocks;
 import com.gugugu.oritech.client.model.Model;
 import com.gugugu.oritech.client.render.Batch;
 import com.gugugu.oritech.util.Identifier;
+import com.gugugu.oritech.util.Side;
+import com.gugugu.oritech.util.SideOnly;
 import com.gugugu.oritech.util.math.Direction;
 import com.gugugu.oritech.util.registry.Registry;
 import com.gugugu.oritech.world.World;
 
+@SideOnly(Side.CLIENT)
 public class BlockStateRenderer extends AbstractBlockStateRenderer {
 
     public void renderFace(Batch batch, Direction face, BlockState obj) {
