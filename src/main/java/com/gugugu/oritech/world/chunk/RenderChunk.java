@@ -9,6 +9,7 @@ import com.gugugu.oritech.client.renderer.BlockStateRenderer;
 import com.gugugu.oritech.util.Side;
 import com.gugugu.oritech.util.SideOnly;
 import com.gugugu.oritech.util.Timer;
+import com.gugugu.oritech.util.registry.ClientRegistry;
 import com.gugugu.oritech.util.registry.Registry;
 import com.gugugu.oritech.world.ClientWorld;
 import com.gugugu.oritech.block.Block;
@@ -96,7 +97,7 @@ public class RenderChunk extends Chunk implements AutoCloseable {
                             getAbsolutePos(chunkY, y),
                             getAbsolutePos(chunkZ, z)
                         );
-                        AbstractBlockStateRenderer renderer = Registry.BLOCKSTATE_RENDERER.get(block.getRenderer());
+                        AbstractBlockStateRenderer renderer = ClientRegistry.BLOCKSTATE_RENDERER.get(block.getRenderer());
                         boolean b = renderer.render(batch, world, block);
                         if (b) {
                             rendered = true;

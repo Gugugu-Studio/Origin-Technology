@@ -4,6 +4,9 @@ import com.gugugu.oritech.client.render.Tesselator;
 import com.gugugu.oritech.util.Identifier;
 import com.gugugu.oritech.util.Side;
 import com.gugugu.oritech.util.SideOnly;
+import org.joml.Matrix4fStack;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import static com.gugugu.oritech.client.gl.GLStateMgr.*;
 
@@ -13,22 +16,22 @@ import static com.gugugu.oritech.client.gl.GLStateMgr.*;
  */
 @SideOnly(Side.CLIENT)
 public class DrawableHelper {
-    public static void drawSprite(Identifier id,
+    public static void drawSprite(Matrix4fStack model, Identifier id,
                                   float x, float y,
                                   float w, float h,
                                   int u, int v) {
-        drawSprite(id, x, y, w, h, u, v, w, h);
+        drawSprite(model, id, x, y, w, h, u, v, w, h);
     }
 
-    public static void drawSprite(Identifier id,
+    public static void drawSprite(Matrix4fStack model, Identifier id,
                                   float x, float y,
                                   float w, float h,
                                   int u, int v,
                                   float spriteW, float spriteH) {
-        drawSprite(id, x, y, w, h, u, v, spriteW, spriteH, 256, 256);
+        drawSprite(model, id, x, y, w, h, u, v, spriteW, spriteH, 256, 256);
     }
 
-    public static void drawSprite(Identifier id,
+    public static void drawSprite(Matrix4fStack model, Identifier id,
                                   float x, float y,
                                   float w, float h,
                                   int u, int v,
@@ -43,13 +46,15 @@ public class DrawableHelper {
         int lastUnit = getActiveTexture2d();
         int lastId = getTexture2dId();
         bindTexture(0, id);
+        final Vector4f xy0 = model.transform(new Vector4f(x, y, 1, 1));
+        final Vector4f xy1 = model.transform(new Vector4f(x1, y1, 1, 1));
         Tesselator.getInstance().withBatch(batch ->
             batch.begin()
                 .quadIndices()
-                .texCoords(u0, v0).vertex(x, y)
-                .texCoords(u0, v1).vertex(x, y1)
-                .texCoords(u1, v1).vertex(x1, y1)
-                .texCoords(u1, v0).vertex(x1, y)
+                .texCoords(u0, v0).vertex(xy0.x, xy0.y)
+                .texCoords(u0, v1).vertex(xy0.x, xy1.y)
+                .texCoords(u1, v1).vertex(xy1.x, xy1.y)
+                .texCoords(u1, v0).vertex(xy1.x, xy0.y)
                 .end().upload().render());
         bindTexture(lastUnit, lastId);
     }

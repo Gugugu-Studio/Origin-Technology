@@ -1,14 +1,9 @@
 package com.gugugu.oritech.block;
 
-import com.gugugu.oritech.client.render.Batch;
-import com.gugugu.oritech.client.model.Model;
+import com.gugugu.oritech.block.properties.IProperty;
 import com.gugugu.oritech.phys.AABBox;
-import com.gugugu.oritech.resource.ModelLoader;
-import com.gugugu.oritech.resource.ResLocation;
-import com.gugugu.oritech.resource.ResType;
 import com.gugugu.oritech.util.Identifier;
 import com.gugugu.oritech.util.math.Direction;
-import com.gugugu.oritech.util.registry.Registry;
 import com.gugugu.oritech.world.World;
 import org.joml.Vector3f;
 
@@ -73,5 +68,9 @@ public class Block {
 
     public Identifier getRenderer() {
         return new Identifier("common");
+    }
+
+    public List<IProperty> getProperties() {
+        return new ArrayList<>();
     }
 }

@@ -1,5 +1,6 @@
 package com.gugugu.oritech.block;
 
+import com.gugugu.oritech.block.properties.IProperty;
 import com.gugugu.oritech.phys.AABBox;
 import com.gugugu.oritech.util.Identifier;
 import com.gugugu.oritech.util.math.BlockPos;
@@ -8,6 +9,7 @@ import com.gugugu.oritech.world.World;
 import com.gugugu.oritech.world.chunk.Chunk;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class BlockState {
@@ -15,6 +17,7 @@ public class BlockState {
     protected @Nullable BlockPos pos;
     protected @Nullable Chunk chunk;
     protected @Nullable World world;
+    protected List<IProperty> properties = new ArrayList<>();
 
     public BlockState(Block block) {
         this(block, null, null);

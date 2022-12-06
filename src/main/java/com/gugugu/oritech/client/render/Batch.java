@@ -3,10 +3,9 @@ package com.gugugu.oritech.client.render;
 import com.gugugu.oritech.client.render.vertex.Vertex;
 import com.gugugu.oritech.util.Side;
 import com.gugugu.oritech.util.SideOnly;
-import org.joml.Matrix4f;
-import org.joml.Matrix4fStack;
-import org.joml.Vector4f;
+import org.joml.*;
 
+import java.lang.Math;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -32,7 +31,7 @@ public class Batch {
     private IntBuffer indexBuffer;
     private final Vertex vertex = new Vertex();
     private final int drawFreq;
-    private boolean hasColor, hasTexture;
+    private boolean hasColor, hasTexture, hasNormal;
     private int vao, vbo, ebo;
     private int vertexCount, indexCount;
     private boolean bufferGrew = true, indexBufferGrew = true;
@@ -113,6 +112,19 @@ public class Batch {
         return this;
     }
 
+    public Batch normal(float nx, float ny, float nz) {
+        Matrix3f normalMatrix = new Matrix3f();
+        normalMatrix.identity();
+        Matrix4f copy_matrix = new Matrix4f(matrix);
+        normalMatrix = copy_matrix.invert().transpose3x3(normalMatrix);
+        Vector3f n_pos = new Vector3f(nx, ny, nz);
+        n_pos = normalMatrix.transform(n_pos);
+        vertex.normal(n_pos.x, n_pos.y, n_pos.z);
+//        vertex.normal(nx, ny, nz);
+        hasNormal = true;
+        return this;
+    }
+
     public Batch vertex(float x, float y, float z) {
         Vector4f position = new Vector4f(x, y, z, 1);
         matrix.transform(position);
@@ -137,6 +149,11 @@ public class Batch {
         if (hasTexture) {
             buffer.putFloat(vertex.s())
                 .putFloat(vertex.t());
+        }
+        if (hasNormal) {
+            buffer.putFloat(vertex.nx())
+                .putFloat(vertex.ny())
+                .putFloat(vertex.nz());
         }
         buffer = (ByteBuffer) tryGrowBuffer(buffer, 128);
         ++vertexCount;
@@ -190,6 +207,9 @@ public class Batch {
         if (hasTexture) {
             stride += 8;
         }
+        if (hasNormal) {
+            stride += 12;
+        }
         glBindVertexArray(vao);
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -213,18 +233,29 @@ public class Batch {
         } else {
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         }
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, stride, 0L);
+        long pointer = 0;
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, stride, pointer);
+        pointer += 12;
         if (hasColor) {
             glEnableVertexAttribArray(1);
-            glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, true, stride, 12L);
+            glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, true, stride, pointer);
+            pointer += 4;
         } else {
             glDisableVertexAttribArray(1);
         }
         if (hasTexture) {
             glEnableVertexAttribArray(2);
-            glVertexAttribPointer(2, 2, GL_FLOAT, false, stride, hasColor ? 16L : 12L);
+            glVertexAttribPointer(2, 2, GL_FLOAT, false, stride, pointer);
+            pointer += 8;
         } else {
             glDisableVertexAttribArray(2);
+        }
+        if (hasTexture) {
+            glEnableVertexAttribArray(3);
+            glVertexAttribPointer(3, 3, GL_FLOAT, false, stride, pointer);
+            pointer += 12;
+        } else {
+            glDisableVertexAttribArray(3);
         }
 
         glBindVertexArray(0);

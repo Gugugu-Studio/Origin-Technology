@@ -47,35 +47,35 @@ public class RenderBox {
 
         switch (face) {
             case WEST -> batch.quadIndices()
-                .texCoords(u0, v0).vertex(x0, y1, z0)
-                .texCoords(u0, v1).vertex(x0, y0, z0)
-                .texCoords(u1, v1).vertex(x0, y0, z1)
-                .texCoords(u1, v0).vertex(x0, y1, z1);
+                .texCoords(u0, v0).normal(-1, 0, 0).vertex(x0, y1, z0)
+                .texCoords(u0, v1).normal(-1, 0, 0).vertex(x0, y0, z0)
+                .texCoords(u1, v1).normal(-1, 0, 0).vertex(x0, y0, z1)
+                .texCoords(u1, v0).normal(-1, 0, 0).vertex(x0, y1, z1);
             case EAST -> batch.quadIndices()
-                .texCoords(u0, v0).vertex(x1, y1, z1)
-                .texCoords(u0, v1).vertex(x1, y0, z1)
-                .texCoords(u1, v1).vertex(x1, y0, z0)
-                .texCoords(u1, v0).vertex(x1, y1, z0);
+                .texCoords(u0, v0).normal(1, 0, 0).vertex(x1, y1, z1)
+                .texCoords(u0, v1).normal(1, 0, 0).vertex(x1, y0, z1)
+                .texCoords(u1, v1).normal(1, 0, 0).vertex(x1, y0, z0)
+                .texCoords(u1, v0).normal(1, 0, 0).vertex(x1, y1, z0);
             case DOWN -> batch.quadIndices()
-                .texCoords(u0, v0).vertex(x0, y0, z1)
-                .texCoords(u0, v1).vertex(x0, y0, z0)
-                .texCoords(u1, v1).vertex(x1, y0, z0)
-                .texCoords(u1, v0).vertex(x1, y0, z1);
+                .texCoords(u0, v0).normal(0, -1, 0).vertex(x0, y0, z1)
+                .texCoords(u0, v1).normal(0, -1, 0).vertex(x0, y0, z0)
+                .texCoords(u1, v1).normal(0, -1, 0).vertex(x1, y0, z0)
+                .texCoords(u1, v0).normal(0, -1, 0).vertex(x1, y0, z1);
             case UP -> batch.quadIndices()
-                .texCoords(u0, v0).vertex(x0, y1, z0)
-                .texCoords(u0, v1).vertex(x0, y1, z1)
-                .texCoords(u1, v1).vertex(x1, y1, z1)
-                .texCoords(u1, v0).vertex(x1, y1, z0);
+                .texCoords(u0, v0).normal(0, 1, 0).vertex(x0, y1, z0)
+                .texCoords(u0, v1).normal(0, 1, 0).vertex(x0, y1, z1)
+                .texCoords(u1, v1).normal(0, 1, 0).vertex(x1, y1, z1)
+                .texCoords(u1, v0).normal(0, 1, 0).vertex(x1, y1, z0);
             case NORTH -> batch.quadIndices()
-                .texCoords(u0, v0).vertex(x1, y1, z0)
-                .texCoords(u0, v1).vertex(x1, y0, z0)
-                .texCoords(u1, v1).vertex(x0, y0, z0)
-                .texCoords(u1, v0).vertex(x0, y1, z0);
+                .texCoords(u0, v0).normal(0, 0, 1).vertex(x1, y1, z0)
+                .texCoords(u0, v1).normal(0, 0, 1).vertex(x1, y0, z0)
+                .texCoords(u1, v1).normal(0, 0, 1).vertex(x0, y0, z0)
+                .texCoords(u1, v0).normal(0, 0, 1).vertex(x0, y1, z0);
             case SOUTH -> batch.quadIndices()
-                .texCoords(u0, v0).vertex(x0, y1, z1)
-                .texCoords(u0, v1).vertex(x0, y0, z1)
-                .texCoords(u1, v1).vertex(x1, y0, z1)
-                .texCoords(u1, v0).vertex(x1, y1, z1);
+                .texCoords(u0, v0).normal(0, 0, -1).vertex(x0, y1, z1)
+                .texCoords(u0, v1).normal(0, 0, -1).vertex(x0, y0, z1)
+                .texCoords(u1, v1).normal(0, 0, -1).vertex(x1, y0, z1)
+                .texCoords(u1, v0).normal(0, 0, -1).vertex(x1, y1, z1);
         }
     }
 

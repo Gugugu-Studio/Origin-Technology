@@ -1,0 +1,17 @@
+{
+    "mapping": {
+        "dir=up": 0,
+        "dir=down": 0,
+        "dir=west": 1,
+        "dir=east": 2,
+        "dir=north": 3,
+        "dir=south": 4
+    },
+    "models": [
+        {"model": "oritech:log"},
+        {"model": "oritech:log", "rotate": [0, 0, 90]},
+        {"model": "oritech:log", "rotate": [0, 0, -90]},
+        {"model": "oritech:log", "rotate": [-90, 0, 0]},
+        {"model": "oritech:log", "rotate": [90, 0, 0]}
+    ]
+}
