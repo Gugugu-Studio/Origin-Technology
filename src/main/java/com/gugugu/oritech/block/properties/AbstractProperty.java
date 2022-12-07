@@ -1,6 +1,6 @@
 package com.gugugu.oritech.block.properties;
 
-public abstract class AbstractProperty<T> implements IProperty<T> {
+public abstract class AbstractProperty implements IProperty {
     protected String name;
     protected ValueHolder holder;
 
@@ -12,5 +12,10 @@ public abstract class AbstractProperty<T> implements IProperty<T> {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public ValueHolder getHolder() {
+        return holder;
     }
 }

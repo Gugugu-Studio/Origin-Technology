@@ -99,9 +99,7 @@ public class ModelLoader {
 
     public static Model loadModel(ResLocation location) {
         String data = ResourceLoader.loadText(location);
-
         JsonObject object = JsonParser.parseString(data).getAsJsonObject();
-
         return parseModel(object);
     }
 }

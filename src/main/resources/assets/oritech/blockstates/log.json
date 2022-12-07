@@ -1,11 +1,12 @@
 {
     "mapping": {
-        "dir=up": 0,
-        "dir=down": 0,
-        "dir=west": 1,
-        "dir=east": 2,
-        "dir=north": 3,
-        "dir=south": 4
+        "name": "dir",
+        "UP": 0,
+        "DOWN": 0,
+        "WEST": 1,
+        "EAST": 2,
+        "NORTH": 3,
+        "SOUTH": 4
     },
     "models": [
         {"model": "oritech:log"},

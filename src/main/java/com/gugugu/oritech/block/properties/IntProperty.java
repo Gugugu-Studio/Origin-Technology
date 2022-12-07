@@ -1,12 +1,16 @@
 package com.gugugu.oritech.block.properties;
 
-public class IntProperty extends AbstractProperty<Integer> {
+public class IntProperty extends AbstractProperty {
     public IntProperty(String name, int defVal) {
         super(name, new ValueHolder(defVal));
     }
 
-    @Override
-    public Integer getValue() {
+    public int getValue() {
         return holder.getValueAsInteger();
+    }
+
+    @Override
+    public String valueToString() {
+        return Integer.toString(holder.getValueAsInteger());
     }
 }

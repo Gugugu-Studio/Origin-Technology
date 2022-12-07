@@ -92,10 +92,11 @@ public class RenderChunk extends Chunk implements AutoCloseable {
                     BlockState block = getBlock(x, y, z);
                     if (!block.isAir()) {
                         batch.matrix.pushMatrix();
+                        batch.matrix.scale(0.5f);
                         batch.matrix.translate(
-                            getAbsolutePos(chunkX, x),
-                            getAbsolutePos(chunkY, y),
-                            getAbsolutePos(chunkZ, z)
+                            getAbsolutePos(chunkX, x) * 2 + 1,
+                            getAbsolutePos(chunkY, y) * 2 + 1,
+                            getAbsolutePos(chunkZ, z) * 2 + 1
                         );
                         AbstractBlockStateRenderer renderer = ClientRegistry.BLOCKSTATE_RENDERER.get(block.getRenderer());
                         boolean b = renderer.render(batch, world, block);

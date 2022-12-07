@@ -3,7 +3,9 @@ package com.gugugu.oritech.client;
 import com.gugugu.oritech.block.BlockState;
 import com.gugugu.oritech.client.gl.GLStateMgr;
 import com.gugugu.oritech.client.model.BlockModelManager;
+import com.gugugu.oritech.client.model.BlockStateModels;
 import com.gugugu.oritech.client.model.Model;
+import com.gugugu.oritech.client.model.ModelOperators;
 import com.gugugu.oritech.client.render.GameRenderer;
 import com.gugugu.oritech.client.render.WorldRenderer;
 import com.gugugu.oritech.resource.ResLocation;
@@ -82,9 +84,11 @@ public class OriTechClient
 
         blockAtlas = new TextureAtlas();
         List<SpriteInfo> list = new ArrayList<>();
-        for (Model model : BlockModelManager.modelMap.values()) {
-            for (ResLocation path : model.getAllTextures()) {
-                list.add(new SpriteInfo(path, 32, 32));
+        for (BlockStateModels bsModel : BlockModelManager.modelMap.values()) {
+            for (ModelOperators model : bsModel.models) {
+                for (ResLocation path : model.model.textures.values()) {
+                    list.add(new SpriteInfo(path, 32, 32));
+                }
             }
         }
         blockAtlas.extraParam(target -> {

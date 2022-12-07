@@ -1,6 +1,7 @@
 package com.gugugu.oritech.block.properties;
 
-public interface IProperty<T> {
+public interface IProperty {
     String getName();
-    T getValue();
+    ValueHolder getHolder();
+    String valueToString();
 }

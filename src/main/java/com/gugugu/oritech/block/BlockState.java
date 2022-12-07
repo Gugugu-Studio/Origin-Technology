@@ -17,7 +17,7 @@ public class BlockState {
     protected @Nullable BlockPos pos;
     protected @Nullable Chunk chunk;
     protected @Nullable World world;
-    protected List<IProperty> properties = new ArrayList<>();
+    protected List<IProperty> properties;
 
     public BlockState(Block block) {
         this(block, null, null);
@@ -25,6 +25,7 @@ public class BlockState {
 
     public BlockState(Block block, @Nullable BlockPos pos, @Nullable Chunk chunk) {
         this.block = block;
+        this.properties = block.getProperties();
         this.pos = pos;
         this.chunk = chunk;
         this.world = chunk != null ? chunk.getWorld() : null;
@@ -79,11 +80,24 @@ public class BlockState {
         return block.getRayCast();
     }
 
-    public boolean shouldRenderFace(World world, int x, int y, int z) {
-        return block.shouldRenderFace(world, x, y, z);
+    public boolean shouldRenderFace(BlockState state, Direction face) {
+        return block.shouldRenderFace(state, face);
     }
 
     public Identifier getRenderer() {
         return block.getRenderer();
+    }
+
+    public List<IProperty> getProperties() {
+        return properties;
+    }
+
+    public IProperty getProperty(String name) {
+        for (IProperty property : properties) {
+            if (property.getName().equals(name)) {
+                return property;
+            }
+        }
+        return null;
     }
 }

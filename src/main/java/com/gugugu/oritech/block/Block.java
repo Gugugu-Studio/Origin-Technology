@@ -52,8 +52,11 @@ public class Block {
         return getOutline();
     }
 
-    public boolean shouldRenderFace(World world, int x, int y, int z) {
-        return this.hasSideTransparency() || world.getBlock(x, y, z).block.hasSideTransparency();
+    public boolean shouldRenderFace(BlockState state, Direction face) {
+        int x = state.getPos().x() + face.getOffsetX();
+        int y = state.getPos().y() + face.getOffsetY();
+        int z = state.getPos().z() + face.getOffsetZ();
+        return this.hasSideTransparency() || state.getWorld().getBlock(x, y, z).block.hasSideTransparency();
     }
 
     public boolean canPlaceOn(BlockState target, World world, int x, int y, int z, Direction face) {

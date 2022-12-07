@@ -1,6 +1,9 @@
 package com.gugugu.oritech.block;
 
+import com.gugugu.oritech.block.properties.DirectionProperty;
+import com.gugugu.oritech.block.properties.IProperty;
 import com.gugugu.oritech.phys.AABBox;
+import com.gugugu.oritech.util.math.Direction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,5 +30,12 @@ public class DirtStairBlock extends Block{
                 add(box2);
             }
         };
+    }
+
+    @Override
+    public List<IProperty> getProperties() {
+        List<IProperty> properties = super.getProperties();
+        properties.add(new DirectionProperty("dir", Direction.EAST));
+        return properties;
     }
 }
