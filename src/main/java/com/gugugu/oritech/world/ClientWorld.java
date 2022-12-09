@@ -1,10 +1,10 @@
 package com.gugugu.oritech.world;
 
+import com.gugugu.oritech.world.block.BlockState;
 import com.gugugu.oritech.client.OriTechClient;
 import com.gugugu.oritech.util.Side;
 import com.gugugu.oritech.util.SideOnly;
 import com.gugugu.oritech.util.math.ChunkPos;
-import com.gugugu.oritech.world.block.Block;
 import com.gugugu.oritech.world.chunk.RenderChunk;
 import org.joml.Random;
 
@@ -49,7 +49,7 @@ public class ClientWorld extends World implements AutoCloseable {
     }
 
     @Override
-    public boolean setBlock(Block block, int x, int y, int z) {
+    public boolean setBlock(BlockState block, int x, int y, int z) {
         return OriTechClient.getServer().world.setBlock(block, x, y, z);
     }
 

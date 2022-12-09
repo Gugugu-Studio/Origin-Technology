@@ -53,6 +53,7 @@ dependencies {
     runtimeOnly "org.lwjgl:lwjgl-sse::$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-stb::$lwjglNatives"
     implementation "org.joml:joml:${jomlVersion}"
+    implementation 'com.google.code.gson:gson:2.10'
 
     compileOnly "org.jetbrains:annotations:23.0.0"
 }

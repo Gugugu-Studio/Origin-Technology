@@ -25,13 +25,18 @@ public class GameRenderer implements AutoCloseable {
     public final Camera camera = new Camera();
     public final Matrix4fStack projection = new Matrix4fStack(4);
     public final Matrix4fStack view = new Matrix4fStack(16);
+    // Model Use in CPU
     public final Matrix4fStack model = new Matrix4fStack(16);
     private final OriTechClient client;
     public int renderDistance = 5;
-    private Shader position;
-    private Shader positionColor;
-    private Shader positionColorTex;
-    private Shader positionTex;
+    private Shader nolightPosition;
+    private Shader nolightPositionColor;
+    private Shader nolightPositionColorTex;
+    private Shader nolightPositionTex;
+    private Shader positionNormal;
+    private Shader positionColorNormal;
+    private Shader positionColorTexNormal;
+    private Shader positionTexNormal;
     private Shader currentShader;
 
     private static Shader loadShader(String name) {
@@ -44,10 +49,14 @@ public class GameRenderer implements AutoCloseable {
     }
 
     public void init() {
-        position = loadShader("position");
-        positionColor = loadShader("position_color");
-        positionColorTex = loadShader("position_color_tex");
-        positionTex = loadShader("position_tex");
+        nolightPosition = loadShader("nolight/position");
+        nolightPositionColor = loadShader("nolight/position_color");
+        nolightPositionColorTex = loadShader("nolight/position_color_tex");
+        nolightPositionTex = loadShader("nolight/position_tex");
+        positionNormal = loadShader("light/position_normal");
+        positionColorNormal = loadShader("light/position_color_normal");
+        positionColorTexNormal = loadShader("light/position_color_tex_normal");
+        positionTexNormal = loadShader("light/position_tex_normal");
     }
 
     public void useShader(Shader shader,
@@ -60,7 +69,6 @@ public class GameRenderer implements AutoCloseable {
     public void setupShaderMatrix(Shader shader) {
         shader.getUniform("Projection").ifPresent(uniform -> uniform.set(projection));
         shader.getUniform("View").ifPresent(uniform -> uniform.set(view));
-        shader.getUniform("Model").ifPresent(uniform -> uniform.set(model));
         shader.uploadUniforms();
     }
 
@@ -76,19 +84,19 @@ public class GameRenderer implements AutoCloseable {
             1000.0f);
         view.identity();
         moveCameraToPlayer(delta);
-        model.identity();
     }
 
     public void render() {
         setupCamera((float) client.timer.partialTick, client.width, client.height);
-        Frustum.update(projection.pushMatrix().mul(view));
+        projection.pushMatrix();
+        Frustum.update(projection.mul(view));
         projection.popMatrix();
 
         client.worldRenderer.pick(client.player, view, camera);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        useShader(positionColorTex, shader -> {
+        useShader(positionColorTexNormal, shader -> {
             setupShaderMatrix(shader);
             client.worldRenderer.updateDirtyChunks(client.player);
 
@@ -97,7 +105,7 @@ public class GameRenderer implements AutoCloseable {
             bindTexture(0);
         });
 
-        useShader(position, shader -> {
+        useShader(positionNormal, shader -> {
             setupShaderMatrix(shader);
             client.worldRenderer.tryRenderHit();
         });
@@ -112,17 +120,17 @@ public class GameRenderer implements AutoCloseable {
         view.identity();
         model.identity();
 
-        useShader(positionTex, shader -> {
+        useShader(nolightPositionTex, shader -> {
             glEnable(GL_BLEND);
             glBlendFuncSeparate(GL_ONE_MINUS_DST_COLOR, GL_ONE_MINUS_SRC_COLOR, GL_ONE, GL_ZERO);
 
             model.pushMatrix().translate(width * 0.5f, height * 0.5f, 0.0f);
             setupShaderMatrix(shader);
-            model.popMatrix();
-            DrawableHelper.drawSprite(Screen.WIDGETS_TEXTURES,
+            DrawableHelper.drawSprite(model, Screen.WIDGETS_TEXTURES,
                 -8.0f, -8.0f,
                 16.0f, 16.0f,
                 240, 0);
+            model.popMatrix();
 
             glDisable(GL_BLEND);
         });
@@ -146,28 +154,48 @@ public class GameRenderer implements AutoCloseable {
         currentShader.uploadUniforms();
     }
 
-    public Shader position() {
-        return position;
+    public Shader nolightPosition() {
+        return nolightPosition;
     }
 
-    public Shader positionColor() {
-        return positionColor;
+    public Shader nolightPositionColor() {
+        return nolightPositionColor;
     }
 
-    public Shader positionColorTex() {
-        return positionColorTex;
+    public Shader nolightPositionColorTex() {
+        return nolightPositionColorTex;
     }
 
-    public Shader positionTex() {
-        return positionTex;
+    public Shader nolightPositionTex() {
+        return nolightPositionTex;
+    }
+
+    public Shader positionNormal() {
+        return positionNormal;
+    }
+
+    public Shader positionColorNormal() {
+        return positionColorNormal;
+    }
+
+    public Shader positionColorTexNormal() {
+        return positionColorTexNormal;
+    }
+
+    public Shader positionTexNormal() {
+        return positionTexNormal;
     }
 
     @Override
     public void close() {
         Tesselator.getInstance().free();
-        position.close();
-        positionColor.close();
-        positionColorTex.close();
-        positionTex.close();
+        nolightPosition.close();
+        nolightPositionColor.close();
+        nolightPositionColorTex.close();
+        nolightPositionTex.close();
+        positionNormal.close();
+        positionColorNormal.close();
+        positionColorTexNormal.close();
+        positionTexNormal.close();
     }
 }

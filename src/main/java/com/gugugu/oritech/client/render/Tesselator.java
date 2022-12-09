@@ -3,6 +3,8 @@ package com.gugugu.oritech.client.render;
 import com.gugugu.oritech.util.FloatByteUtil;
 import com.gugugu.oritech.util.Side;
 import com.gugugu.oritech.util.SideOnly;
+import org.joml.Math;
+import org.joml.Matrix4fStack;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -16,13 +18,13 @@ import static org.lwjgl.system.MemoryUtil.*;
  */
 @SideOnly(Side.CLIENT)
 public class Tesselator {
-    private static final int MEMORY_USE = 4 * 1024 * 1024;
+    private static final int MEMORY_USE = 10 * 1024 * 1024;
     private static Tesselator instance;
     private final ByteBuffer buffer = memAlloc(MEMORY_USE);
     private IntBuffer indexBuffer;
     private int stride = 12, vertexCount;
-    private boolean hasColor, hasTexCoord;
-    private float x, y, z, r, g, b, u, v;
+    private boolean hasColor, hasTexCoord, hasNormal;
+    private float x, y, z, r, g, b, u, v, nx, ny, nz;
     private int builtVao, builtVbo, builtEbo;
     private EndProperty builtProperty;
 
@@ -69,7 +71,7 @@ public class Tesselator {
      * @since 1.0
      */
     public static final class EndProperty {
-        public boolean vaVertex, vaColor, vaTexCoord;
+        public boolean vaVertex, vaColor, vaTexCoord, vaNormal;
         public int bufferSize, indicesSize;
     }
 
@@ -82,9 +84,13 @@ public class Tesselator {
     }
 
     public Tesselator vertex(float x, float y, float z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        Matrix4fStack mat = RenderSystem.getMatrixStack();
+        float fx = Math.fma(mat.m00(), x, Math.fma(mat.m10(), y, Math.fma(mat.m20(), z, mat.m30())));
+        float fy = Math.fma(mat.m01(), x, Math.fma(mat.m11(), y, Math.fma(mat.m21(), z, mat.m31())));
+        float fz = Math.fma(mat.m02(), x, Math.fma(mat.m12(), y, Math.fma(mat.m22(), z, mat.m32())));
+        this.x = fx;
+        this.y = fy;
+        this.z = fz;
         return this;
     }
 
@@ -109,6 +115,24 @@ public class Tesselator {
         if (!hasTexCoord) {
             hasTexCoord = true;
             stride += 8;
+        }
+        return this;
+    }
+
+    public Tesselator normal(float nx, float ny, float nz) {
+        Matrix4fStack mat = RenderSystem.getMatrixStack();
+        mat.pushMatrix();
+        mat.invert().transpose3x3();
+        float fnx = Math.fma(mat.m00(), nx, Math.fma(mat.m10(), ny, mat.m20() * nz));
+        float fny = Math.fma(mat.m01(), nx, Math.fma(mat.m11(), ny, mat.m21() * nz));
+        float fnz = Math.fma(mat.m02(), nx, Math.fma(mat.m12(), ny, mat.m22() * nz));
+        this.nx = fnx;
+        this.ny = fny;
+        this.nz = fnz;
+        mat.popMatrix();
+        if (!hasNormal) {
+            hasNormal = true;
+            stride += 3;
         }
         return this;
     }
@@ -141,6 +165,11 @@ public class Tesselator {
         if (hasTexCoord) {
             buffer.putFloat(u);
             buffer.putFloat(v);
+        }
+        if (hasNormal) {
+            buffer.put(FloatByteUtil.normal2byte(nx));
+            buffer.put(FloatByteUtil.normal2byte(ny));
+            buffer.put(FloatByteUtil.normal2byte(nz));
         }
         ++vertexCount;
     }
@@ -189,6 +218,11 @@ public class Tesselator {
             property.vaTexCoord = true;
             glEnableVertexAttribArray(2);
             glVertexAttribPointer(2, 2, GL_FLOAT, false, stride, hasColor ? 15 : 12);
+        }
+        if (hasNormal && !property.vaNormal) {
+            property.vaNormal = true;
+            glEnableVertexAttribArray(3);
+            glVertexAttribPointer(3, 3, GL_BYTE, true, stride, hasColor ? (hasTexCoord ? 23 : 15) : (hasTexCoord ? 20 : 12));
         }
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         if (vaChanged) {

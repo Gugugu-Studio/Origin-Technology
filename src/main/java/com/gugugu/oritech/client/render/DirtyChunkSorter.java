@@ -4,7 +4,7 @@ import com.gugugu.oritech.util.Side;
 import com.gugugu.oritech.util.SideOnly;
 import com.gugugu.oritech.util.Timer;
 import com.gugugu.oritech.world.chunk.RenderChunk;
-import com.gugugu.oritech.world.entity.PlayerEntity;
+import com.gugugu.oritech.entity.PlayerEntity;
 
 /**
  * @author squid233

@@ -7,10 +7,10 @@ layout (location = 2) in vec2 UV0;
 out vec4 vertexColor;
 out vec2 texCoord0;
 
-uniform mat4 Projection, View, Model;
+uniform mat4 Projection, View;
 
 void main() {
-    gl_Position = Projection * View * Model * vec4(Position, 1.0);
+    gl_Position = Projection * View  * vec4(Position, 1.0);
     vertexColor = Color;
     texCoord0 = UV0;
 }

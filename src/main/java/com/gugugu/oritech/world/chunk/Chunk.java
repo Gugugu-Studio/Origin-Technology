@@ -1,7 +1,8 @@
 package com.gugugu.oritech.world.chunk;
 
-import com.gugugu.oritech.world.block.Block;
-import com.gugugu.oritech.world.entity.PlayerEntity;
+import com.gugugu.oritech.world.block.BlockState;
+import com.gugugu.oritech.entity.PlayerEntity;
+import com.gugugu.oritech.world.World;
 
 /**
  * @author squid233
@@ -30,9 +31,9 @@ public abstract class Chunk {
      * @param z the pos z
      * @return the block
      */
-    public abstract Block getBlock(int x, int y, int z);
+    public abstract BlockState getBlock(int x, int y, int z);
 
-    public Block getBlockAbsolute(int x, int y, int z) {
+    public BlockState getBlockAbsolute(int x, int y, int z) {
         return getBlock(getRelativePos(x), getRelativePos(y), getRelativePos(z));
     }
 
@@ -44,9 +45,9 @@ public abstract class Chunk {
      * @param y     the pos y
      * @param z     the pos z
      */
-    public abstract void setBlock(Block block, int x, int y, int z);
+    public abstract void setBlock(BlockState block, int x, int y, int z);
 
-    public void setBlockAbsolute(Block block, int x, int y, int z) {
+    public void setBlockAbsolute(BlockState block, int x, int y, int z) {
         setBlock(block, getRelativePos(x), getRelativePos(y), getRelativePos(z));
     }
 
@@ -55,4 +56,6 @@ public abstract class Chunk {
     public abstract void markDirty();
 
     public abstract float distanceSqr(PlayerEntity player);
+
+    public abstract World getWorld();
 }

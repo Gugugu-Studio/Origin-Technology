@@ -1,26 +1,26 @@
 package com.gugugu.oritech.world.save;
 
+import com.gugugu.oritech.world.block.BlockState;
 import com.gugugu.oritech.util.registry.Registry;
-import com.gugugu.oritech.world.block.Block;
 
 import java.io.*;
 
 public class RawBlocksCoder implements IBlocksCoder {
     @Override
-    public Block[][][] getBlocks(DataInputStream save) {
-        Block[][][] blocks;
+    public BlockState[][][] getBlocks(DataInputStream save) {
+        BlockState[][][] blocks;
         try {
             short width = save.readShort();
             short depth = save.readShort();
             short height = save.readShort();
             short reserved = save.readShort();
 
-            blocks = new Block[height][width][depth];
+            blocks = new BlockState[height][width][depth];
             for (int y = 0 ; y < height ; y ++) {
                 for (int x = 0 ; x < width ; x ++) {
                     for (int z = 0 ; z < depth ; z ++) {
                         int rawId = save.readInt();
-                        blocks[y][x][z] = Registry.BLOCK.get(rawId);
+                        blocks[y][x][z] = new BlockState(Registry.BLOCK.get(rawId));
                     }
                 }
             }
@@ -32,7 +32,7 @@ public class RawBlocksCoder implements IBlocksCoder {
     }
 
     @Override
-    public void saveBlocks(int width, int depth, int height, Block[][][] blocks, DataOutputStream save) {
+    public void saveBlocks(int width, int depth, int height, BlockState[][][] blocks, DataOutputStream save) {
         try {
             save.writeShort(width);
             save.writeShort(depth);
@@ -42,7 +42,7 @@ public class RawBlocksCoder implements IBlocksCoder {
             for (int y = 0 ; y < height ; y ++) {
                 for (int x = 0 ; x < width ; x ++) {
                     for (int z = 0 ; z < depth ; z ++) {
-                        save.writeInt(Registry.BLOCK.getRawId(blocks[y][x][z]));
+                        save.writeInt(Registry.BLOCK.getRawId(blocks[y][x][z].getBlock()));
                     }
                 }
             }

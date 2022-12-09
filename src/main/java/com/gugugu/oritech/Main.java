@@ -1,13 +1,11 @@
 package com.gugugu.oritech;
 
 import com.gugugu.oritech.client.OriTechClient;
-import com.gugugu.oritech.server.IntegratedServer;
+import com.gugugu.oritech.client.model.BlockStateModels;
+import com.gugugu.oritech.client.model.StateMapping;
+import com.gugugu.oritech.resource.ResLocation;
+import com.gugugu.oritech.resource.StateMappingLoader;
 import com.gugugu.oritech.ui.Window;
-import com.gugugu.oritech.world.ServerWorld;
-import com.gugugu.oritech.world.block.Block;
-import com.gugugu.oritech.world.block.Blocks;
-import com.gugugu.oritech.world.chunk.LogicChunk;
-import com.gugugu.oritech.world.save.BlocksCoders;
 import org.lwjgl.opengl.GL11C;
 
 import java.io.*;

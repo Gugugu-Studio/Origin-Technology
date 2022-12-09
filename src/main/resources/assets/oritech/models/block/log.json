@@ -1,0 +1,19 @@
+{
+    "textures": {
+        "up": "oritech:block/log_top.png",
+        "down": "oritech:block/log_top.png",
+        "east": "oritech:block/log.png",
+        "west": "oritech:block/log.png",
+        "north": "oritech:block/log.png",
+        "south": "oritech:block/log.png",
+        "granularity": 1
+    },
+    "cubes": [
+        {
+            "vertex": [[-1, -1, -1], [1, 1, 1]],
+            "uv": {
+                "all": [[0, 0], [1, 1]]
+            }
+        }
+    ]
+}

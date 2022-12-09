@@ -1,6 +1,10 @@
 package com.gugugu.oritech.client;
 
+import com.gugugu.oritech.world.block.BlockState;
 import com.gugugu.oritech.client.gl.GLStateMgr;
+import com.gugugu.oritech.client.model.BlockModelManager;
+import com.gugugu.oritech.client.model.BlockStateModels;
+import com.gugugu.oritech.client.model.ModelOperators;
 import com.gugugu.oritech.client.render.GameRenderer;
 import com.gugugu.oritech.client.render.WorldRenderer;
 import com.gugugu.oritech.resource.ResLocation;
@@ -14,11 +18,10 @@ import com.gugugu.oritech.ui.Keyboard;
 import com.gugugu.oritech.ui.Mouse;
 import com.gugugu.oritech.util.*;
 import com.gugugu.oritech.util.math.Direction;
-import com.gugugu.oritech.util.registry.Registry;
 import com.gugugu.oritech.world.ClientWorld;
 import com.gugugu.oritech.world.block.Block;
 import com.gugugu.oritech.world.block.Blocks;
-import com.gugugu.oritech.world.entity.PlayerEntity;
+import com.gugugu.oritech.entity.PlayerEntity;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -58,7 +61,7 @@ public class OriTechClient
     public boolean isPausing = false;
     private final Block[] hotBar = {
         Blocks.STONE, Blocks.GRASS_BLOCK, Blocks.DIRT, Blocks.LOG, Blocks.LEAVES,
-        Blocks.AIR, Blocks.AIR, Blocks.AIR, Blocks.AIR, Blocks.AIR
+        Blocks.DIRT_STAIR, Blocks.AIR, Blocks.AIR, Blocks.AIR, Blocks.AIR
     };
     private int handBlock = 0;
 
@@ -75,20 +78,15 @@ public class OriTechClient
         gameRenderer.init();
 
         Blocks.register();
+        BlockModelManager.initialize();
 
         blockAtlas = new TextureAtlas();
         List<SpriteInfo> list = new ArrayList<>();
-        for (Block block : Registry.BLOCK) {
-            if (block.isAir()) {
-                continue;
-            }
-
-            Identifier id = Registry.BLOCK.getId(block);
-
-            for (String path : block.getTextures()) {
-                list.add(new SpriteInfo(ResLocation.ofAssets(id.namespace(), "textures/block/" + path + ".png"),
-                    32,
-                    32));
+        for (BlockStateModels bsModel : BlockModelManager.modelMap.values()) {
+            for (ModelOperators model : bsModel.models) {
+                for (ResLocation path : model.model.textures.values()) {
+                    list.add(new SpriteInfo(path, 32, 32));
+                }
             }
         }
         blockAtlas.extraParam(target -> {
@@ -145,7 +143,7 @@ public class OriTechClient
     private void destroyBlock() {
         final HitResult hitResult = worldRenderer.hitResult;
         if (hitResult != null) {
-            world.setBlock(Blocks.AIR, hitResult.x(), hitResult.y(), hitResult.z());
+            world.setBlock(new BlockState(Blocks.AIR), hitResult.x(), hitResult.y(), hitResult.z());
         }
     }
 
@@ -159,7 +157,7 @@ public class OriTechClient
             final int hrx = hitResult.x();
             final int hry = hitResult.y();
             final int hrz = hitResult.z();
-            if (world.canBlockPlaceOn(hotBar[handBlock],
+            if (world.canBlockPlaceOn(new BlockState(hotBar[handBlock]),
                 hrx,
                 hry,
                 hrz,
@@ -167,7 +165,7 @@ public class OriTechClient
                 final int x = hrx + face.getOffsetX();
                 final int y = hry + face.getOffsetY();
                 final int z = hrz + face.getOffsetZ();
-                world.setBlock(hotBar[handBlock], x, y, z);
+                world.setBlock(new BlockState(hotBar[handBlock]), x, y, z);
             }
         }
     }
@@ -198,6 +196,7 @@ public class OriTechClient
                 case GLFW_KEY_3 -> handBlock = 2;
                 case GLFW_KEY_4 -> handBlock = 3;
                 case GLFW_KEY_5 -> handBlock = 4;
+                case GLFW_KEY_6 -> handBlock = 5;
             }
         }
     }
@@ -205,13 +204,13 @@ public class OriTechClient
     public void onScroll(double xo, double yo) {
         if (yo < 0.0) {
             ++handBlock;
-            if (handBlock > 4) {
+            if (handBlock > 5) {
                 handBlock = 0;
             }
         } else if (yo > 0.0) {
             --handBlock;
             if (handBlock < 0) {
-                handBlock = 4;
+                handBlock = 5;
             }
         }
     }

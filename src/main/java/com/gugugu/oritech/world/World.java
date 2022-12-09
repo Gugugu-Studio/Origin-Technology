@@ -1,16 +1,17 @@
 package com.gugugu.oritech.world;
 
+import com.gugugu.oritech.world.block.BlockState;
+import com.gugugu.oritech.world.block.Blocks;
 import com.gugugu.oritech.phys.AABBox;
 import com.gugugu.oritech.util.math.Direction;
-import com.gugugu.oritech.world.block.Block;
-import com.gugugu.oritech.world.block.Blocks;
 import com.gugugu.oritech.world.chunk.Chunk;
 import org.joml.Math;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.gugugu.oritech.world.chunk.Chunk.*;
+import static com.gugugu.oritech.world.chunk.Chunk.CHUNK_SIZE;
+import static com.gugugu.oritech.world.chunk.Chunk.getChunkPos;
 
 /**
  * @author squid233
@@ -21,15 +22,15 @@ public abstract class World {
     public static final int LIMIT = CHUNK_LIMIT * Chunk.CHUNK_SIZE;
     public static final int Y_LIMIT = CHUNK_LIMIT * 8;
 
-    public Block getBlock(int x, int y, int z) {
+    public BlockState getBlock(int x, int y, int z) {
         if (isInsideWorld(x, y, z)) {
             return getChunkByBlockPos(x, y, z)
                 .getBlockAbsolute(x, y, z);
         }
-        return Blocks.AIR;
+        return new BlockState(Blocks.AIR);
     }
 
-    public abstract boolean setBlock(Block block, int x, int y, int z);
+    public abstract boolean setBlock(BlockState block, int x, int y, int z);
 
     public abstract Chunk getChunk(int x, int y, int z);
 
@@ -59,9 +60,18 @@ public abstract class World {
                 for (int z = z0; z < z1; z++) {
                     var block = getBlock(x, y, z);
                     if (!block.isAir()) {
-                        AABBox aabb = block.getCollision(x, y, z);
-                        if (aabb != null) {
-                            list.add(aabb);
+                        List<AABBox> aabBoxes = block.getCollision();
+                        if (aabBoxes == null) {
+                            continue;
+                        }
+                        for (AABBox aabb : aabBoxes) {
+                            aabb.min.add(x, y, z);
+                            aabb.max.add(x, y, z);
+                        }
+                        for (AABBox aabb : aabBoxes) {
+                            if (aabb != null) {
+                                list.add(aabb);
+                            }
                         }
                     }
                 }
@@ -108,7 +118,7 @@ public abstract class World {
         }
     }
 
-    public boolean canBlockPlaceOn(Block block, int x, int y, int z, Direction face) {
+    public boolean canBlockPlaceOn(BlockState block, int x, int y, int z, Direction face) {
         return block.canPlaceOn(getBlock(x, y, z), this, x, y, z, face);
     }
 

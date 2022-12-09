@@ -1,9 +1,11 @@
 package com.gugugu.oritech.world.chunk;
 
+import com.gugugu.oritech.world.block.BlockState;
+import com.gugugu.oritech.util.math.BlockPos;
 import com.gugugu.oritech.world.ServerWorld;
-import com.gugugu.oritech.world.block.Block;
+import com.gugugu.oritech.world.World;
 import com.gugugu.oritech.world.chunk.gen.ChunkGens;
-import com.gugugu.oritech.world.entity.PlayerEntity;
+import com.gugugu.oritech.entity.PlayerEntity;
 
 /**
  * @author squid233
@@ -15,7 +17,7 @@ public class LogicChunk extends Chunk {
     public final int x1, y1, z1;
     private final float x, y, z;
     public final int chunkX, chunkY, chunkZ;
-    private final Block[][][] blocks;
+    private final BlockState[][][] blocks;
     public final int width, height, depth;
     private boolean isDirty = true;
     public long dirtiedTime = 0L;
@@ -39,21 +41,40 @@ public class LogicChunk extends Chunk {
         width = x1 - x0;
         height = y1 - y0;
         depth = z1 - z0;
-        blocks = new Block[height][width][depth];
+        blocks = new BlockState[height][width][depth];
 
         ChunkGens.PLAIN.generate(world, this, blocks,
             width, height, depth,
             chunkX, chunkY, chunkZ);
+
+        for (int y = 0 ; y < height ; y ++) {
+            for (int x = 0 ; x < height ; x ++) {
+                for (int z = 0 ; z < depth ; z ++) {
+                    blocks[y][x][z].setPos(new BlockPos(
+                        getAbsolutePos(chunkX, x),
+                        getAbsolutePos(chunkY, y),
+                        getAbsolutePos(chunkZ, z)
+                    ));
+                    blocks[y][x][z].setChunk(this);
+                }
+            }
+        }
     }
 
     @Override
-    public Block getBlock(int x, int y, int z) {
+    public BlockState getBlock(int x, int y, int z) {
         return blocks[y][x][z];
     }
 
     @Override
-    public void setBlock(Block block, int x, int y, int z) {
+    public void setBlock(BlockState block, int x, int y, int z) {
         blocks[y][x][z] = block;
+        block.setChunk(this);
+        block.setPos(new BlockPos(
+            getAbsolutePos(chunkX, x),
+            getAbsolutePos(chunkY, y),
+            getAbsolutePos(chunkZ, z)
+        ));
     }
 
     @Override
@@ -70,12 +91,17 @@ public class LogicChunk extends Chunk {
         world.dirtyChunks.add(this);
     }
 
-    public Block[][][] getBlocks() {
+    public BlockState[][][] getBlocks() {
         return blocks;
     }
 
     @Override
     public float distanceSqr(PlayerEntity player) {
         return player.position.distanceSquared(x, y, z);
+    }
+
+    @Override
+    public World getWorld() {
+        return world;
     }
 }

@@ -1,14 +1,19 @@
 package com.gugugu.oritech.world.chunk;
 
+import com.gugugu.oritech.world.block.BlockState;
 import com.gugugu.oritech.client.OriTechClient;
 import com.gugugu.oritech.client.render.Frustum;
+import com.gugugu.oritech.client.render.RenderSystem;
 import com.gugugu.oritech.client.render.Tesselator;
+import com.gugugu.oritech.client.renderer.AbstractBlockStateRenderer;
 import com.gugugu.oritech.util.Side;
 import com.gugugu.oritech.util.SideOnly;
 import com.gugugu.oritech.util.Timer;
+import com.gugugu.oritech.util.registry.ClientRegistry;
 import com.gugugu.oritech.world.ClientWorld;
-import com.gugugu.oritech.world.block.Block;
-import com.gugugu.oritech.world.entity.PlayerEntity;
+import com.gugugu.oritech.entity.PlayerEntity;
+import com.gugugu.oritech.world.World;
+import org.joml.Matrix4fStack;
 
 import static org.lwjgl.opengl.GL30C.*;
 
@@ -54,14 +59,14 @@ public class RenderChunk extends Chunk implements AutoCloseable {
     }
 
     @Override
-    public Block getBlock(int x, int y, int z) {
+    public BlockState getBlock(int x, int y, int z) {
         return OriTechClient.getServer().world
             .getChunk(chunkX, chunkY, chunkZ)
             .getBlock(x, y, z);
     }
 
     @Override
-    public void setBlock(Block block, int x, int y, int z) {
+    public void setBlock(BlockState block, int x, int y, int z) {
         OriTechClient.getServer().world
             .getChunk(chunkX, chunkY, chunkZ)
             .setBlock(block, x, y, z);
@@ -85,24 +90,33 @@ public class RenderChunk extends Chunk implements AutoCloseable {
         boolean rendered = false;
         Tesselator t = Tesselator.getInstance();
         t.begin();
+        Matrix4fStack matrix = RenderSystem.getMatrixStack();
+        matrix.pushMatrix()
+            .identity();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 for (int z = 0; z < depth; z++) {
-                    Block block = getBlock(x, y, z);
+                    BlockState block = getBlock(x, y, z);
                     if (!block.isAir()) {
-                        boolean b = block.render(t,
-                            world,
-                            getAbsolutePos(chunkX, x),
-                            getAbsolutePos(chunkY, y),
-                            getAbsolutePos(chunkZ, z));
+                        matrix.pushMatrix()
+                            .scale(0.5f)
+                            .translate(
+                                getAbsolutePos(chunkX, x) * 2 + 1,
+                                getAbsolutePos(chunkY, y) * 2 + 1,
+                                getAbsolutePos(chunkZ, z) * 2 + 1
+                            );
+                        AbstractBlockStateRenderer renderer = ClientRegistry.BLOCKSTATE_RENDERER.get(block.getRenderer());
+                        boolean b = renderer.render(t, world, block);
                         if (b) {
                             rendered = true;
                         }
+                        matrix.popMatrix();
                         //++blocks;
                     }
                 }
             }
         }
+        matrix.popMatrix();
         hasRendered = rendered;
         //if (blocks > 0) {
         //    hasBlock = true;
@@ -133,5 +147,10 @@ public class RenderChunk extends Chunk implements AutoCloseable {
         glDeleteVertexArrays(vao);
         glDeleteBuffers(vbo);
         glDeleteBuffers(ebo);
+    }
+
+    @Override
+    public World getWorld() {
+        return world;
     }
 }

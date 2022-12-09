@@ -1,0 +1,14 @@
+{
+    "textures": {
+        "all": "oritech:block/stone.png",
+        "granularity": 1
+    },
+    "cubes": [
+        {
+            "vertex": [[-1, -1, -1], [1, 1, 1]],
+            "uv": {
+                "all": [[0, 0], [1, 1]]
+            }
+        }
+    ]
+}

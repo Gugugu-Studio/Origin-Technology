@@ -1,9 +1,10 @@
 package com.gugugu.oritech.world.chunk.gen;
 
+import com.gugugu.oritech.world.block.BlockState;
 import com.gugugu.oritech.world.ServerWorld;
-import com.gugugu.oritech.world.block.Block;
 import com.gugugu.oritech.world.block.Blocks;
 import com.gugugu.oritech.world.chunk.Chunk;
+import com.gugugu.oritech.world.chunk.noise.SimplexNoise;
 
 /**
  * @author theflysong
@@ -11,30 +12,29 @@ import com.gugugu.oritech.world.chunk.Chunk;
  */
 public class PlainChunkGen implements IChunkGen {
     @Override
-    public void generate(ServerWorld world, Chunk chunk, Block[][][] blocks,
-                         int width, int height, int depth,
-                         int chunkX, int chunkY, int chunkZ) {
-//        SimplexNoise noise = new SimplexNoise(world.seed);
+    public void generate(ServerWorld world, Chunk chunk, BlockState[][][] blocks,
+                         int height, int width, int depth,
+                         int chunkX, int chunkY, int chunkZ)
+    {
+        SimplexNoise dirt_noise = new SimplexNoise(world.seed);
+        SimplexNoise stone_noise = new SimplexNoise(world.seed + 64);
         for (int y = 0; y < height; y++) {
-            int absY = Chunk.getAbsolutePos(chunkY, y);
+            int abs_y = Chunk.getAbsolutePos(chunkY, y);
             for (int x = 0; x < width; x++) {
-                int absX = Chunk.getAbsolutePos(chunkX, x);
+                int abs_x = Chunk.getAbsolutePos(chunkX, x);
                 for (int z = 0; z < depth; z++) {
-                    int absZ = Chunk.getAbsolutePos(chunkZ, z);
-                    long grassDepth = SimplexNoise.randWithin(world.seed, absX, absZ, 3) + 4;
-//                    int grassDepth = (int) TerrainNoise.sumOcatave(3,
-//                        absX, absZ,
-//                        .5f,
-//                        .007f,
-//                        0, 4);
-                    if (absY < 0) {
-                        blocks[y][x][z] = Blocks.STONE;
-                    } else if (absY < grassDepth) {
-                        blocks[y][x][z] = Blocks.DIRT;
-                    } else if (absY == grassDepth) {
-                        blocks[y][x][z] = Blocks.GRASS_BLOCK;
+                    int abs_z = Chunk.getAbsolutePos(chunkZ, z);
+                    long dirt_depth = dirt_noise.randWithin(abs_x, abs_z, 3);
+                    long stone_height = stone_noise.randWithin(abs_x, abs_z, 4);
+                    long grass_height = stone_height + dirt_depth + 1;
+                    if (abs_y < stone_height) {
+                        blocks[y][x][z] = new BlockState(Blocks.STONE);
+                    } else if (abs_y < grass_height) {
+                        blocks[y][x][z] = new BlockState(Blocks.DIRT);
+                    } else if (abs_y == grass_height) {
+                        blocks[y][x][z] = new BlockState(Blocks.GRASS_BLOCK);
                     } else {
-                        blocks[y][x][z] = Blocks.AIR;
+                        blocks[y][x][z] = new BlockState(Blocks.AIR);
                     }
                 }
             }

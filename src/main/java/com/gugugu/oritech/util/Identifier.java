@@ -10,7 +10,7 @@ import java.util.Objects;
  * @since 1.0
  */
 public class Identifier {
-    public static final String DEFAULT_NAMESPACE = "origin_technology";
+    public static final String DEFAULT_NAMESPACE = "oritech";
 
     private final String namespace, path;
 

@@ -1,4 +1,4 @@
-package com.gugugu.oritech.world.chunk.gen;
+package com.gugugu.oritech.world.chunk.noise;
 
 import org.joml.SimplexNoise;
 

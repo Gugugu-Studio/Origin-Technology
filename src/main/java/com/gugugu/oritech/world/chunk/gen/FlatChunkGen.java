@@ -1,7 +1,7 @@
 package com.gugugu.oritech.world.chunk.gen;
 
+import com.gugugu.oritech.world.block.BlockState;
 import com.gugugu.oritech.world.ServerWorld;
-import com.gugugu.oritech.world.block.Block;
 import com.gugugu.oritech.world.block.Blocks;
 import com.gugugu.oritech.world.chunk.Chunk;
 
@@ -11,7 +11,7 @@ import com.gugugu.oritech.world.chunk.Chunk;
  */
 public class FlatChunkGen implements IChunkGen {
     @Override
-    public void generate(ServerWorld world, Chunk chunk, Block[][][] blocks,
+    public void generate(ServerWorld world, Chunk chunk, BlockState[][][] blocks,
                          int width, int height, int depth,
                          int chunkX, int chunkY, int chunkZ) {
         for (int y = 0; y < height; y++) {
@@ -21,13 +21,13 @@ public class FlatChunkGen implements IChunkGen {
                 for (int z = 0; z < depth; z++) {
 //                    int absZ = Chunk.getAbsolutePos(chunkZ, z);
                     if (absY < 0) {
-                        blocks[y][x][z] = Blocks.STONE;
+                        blocks[y][x][z] = new BlockState(Blocks.STONE);
                     } else if (absY < 4) {
-                        blocks[y][x][z] = Blocks.DIRT;
+                        blocks[y][x][z] = new BlockState(Blocks.DIRT);
                     } else if (absY == 4) {
-                        blocks[y][x][z] = Blocks.GRASS_BLOCK;
+                        blocks[y][x][z] = new BlockState(Blocks.GRASS_BLOCK);
                     } else {
-                        blocks[y][x][z] = Blocks.AIR;
+                        blocks[y][x][z] = new BlockState(Blocks.AIR);
                     }
                 }
             }
