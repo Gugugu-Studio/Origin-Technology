@@ -1,5 +1,3 @@
-#version 330 core
-
 // COMMON LIB PART
 struct LightParamter {
     float kc, kl, kq;
@@ -21,15 +19,15 @@ DirecionalLight SunLight;
 float sunAngle = 0;
 
 float calcSunlightStrength() {
-    const float kq = 0.00003;
+    const float kq = 0.030;
     float d = (degrees(sunAngle) - 90);
-    float deno = kq * d * d * d * d + 1;
+    float deno = kq * d * d + 1;
     return 1 / deno;
 }
 
 void fixAngle() {
-    int mul = int(sunAngle / radians(180));
-    sunAngle -= mul * radians(180);
+    int mul = int(sunAngle / radians(360));
+    sunAngle -= mul * radians(360);
 }
 
 void updateSun(int time) {
@@ -78,32 +76,3 @@ vec3 calcDirecitonalLight(DirecionalLight light, vec3 normal) {
     return diffuse;
 }
 // END COMMON LIB PART
-
-// START UNIFORM LIB PART
-layout (std140) uniform InfoUniform {
-    int gameTime;
-    vec4 ColorModulator;
-};
-// END UNIFORM LIB PART
-
-out vec4 FragColor;
-
-uniform sampler2D Sampler0;
-
-in VS_OUT {
-    vec4 fragPos;
-    vec4 vertexColor;
-    vec3 vertexNormal;
-    vec2 texCoord0;
-} fr_in;
-
-void main() {
-    vec4 color = texture(Sampler0, fr_in.texCoord0) * fr_in.vertexColor;
-    if (color.a < 0.1) {
-        discard;
-    }
-    vec3 normal = normalize(fr_in.vertexNormal);
-    updateTime(gameTime);
-    vec3 light = calcAmbientLight() + calcDirecitonalLight(SunLight, normal);
-    FragColor = color * vec4(light, 1.0);
-}

@@ -80,7 +80,7 @@ public final class GLUniform implements AutoCloseable {
             return;
         }
         switch (type) {
-            case I1 -> glUniform1f(location, buffer.getInt(0));
+            case I1 -> glUniform1i(location, buffer.getInt(0));
             case F4 -> glUniform4f(location, buffer.getFloat(0),
                 buffer.getFloat(4),
                 buffer.getFloat(8),

@@ -2,6 +2,8 @@ package com.gugugu.oritech.client.render;
 
 import com.gugugu.oritech.client.OriTechClient;
 import com.gugugu.oritech.client.gl.Shader;
+import com.gugugu.oritech.client.gl.UniformBuffer;
+import com.gugugu.oritech.client.gl.UniformLayout;
 import com.gugugu.oritech.client.gui.DrawableHelper;
 import com.gugugu.oritech.client.gui.Screen;
 import com.gugugu.oritech.resource.ResLocation;
@@ -38,6 +40,7 @@ public class GameRenderer implements AutoCloseable {
     private Shader positionColorTexNormal;
     private Shader positionTexNormal;
     private Shader currentShader;
+    private UniformBuffer buffer;
 
     private static Shader loadShader(String name) {
         return ResourceLoader.loadShader(ResLocation.ofCore("shader/" + name + ".vert"),
@@ -46,6 +49,9 @@ public class GameRenderer implements AutoCloseable {
 
     public GameRenderer(OriTechClient client) {
         this.client = client;
+        UniformLayout layout = new UniformLayout();
+        layout.addIntUniform("gameTime").addVec4Uniform("ColorModulator");
+        this.buffer = new UniformBuffer(layout, "InfoUniform", 2);
     }
 
     public void init() {
@@ -58,6 +64,10 @@ public class GameRenderer implements AutoCloseable {
         positionColorTexNormal = loadShader("light/position_color_tex_normal");
         positionTexNormal = loadShader("light/position_tex_normal");
 
+        this.buffer.bind(positionNormal);
+        this.buffer.bind(positionColorNormal);
+        this.buffer.bind(positionColorTexNormal);
+        this.buffer.bind(positionTexNormal);
         Tesselator.getInstance().init();
     }
 
@@ -71,6 +81,9 @@ public class GameRenderer implements AutoCloseable {
     public void setupShaderMatrix(Shader shader) {
         shader.getUniform("Projection").ifPresent(uniform -> uniform.set(projection));
         shader.getUniform("View").ifPresent(uniform -> uniform.set(view));
+        this.buffer.lookup("gameTime").ifPresent(uniform -> {
+            uniform.set(client.world.getGameTime());
+        });
         shader.uploadUniforms();
     }
 
@@ -151,8 +164,7 @@ public class GameRenderer implements AutoCloseable {
     }
 
     public void setShaderColor(float r, float g, float b, float a) {
-        currentShader.getUniform("ColorModulator").ifPresent(uniform -> uniform.set(r, g, b, a));
-        currentShader.uploadUniforms();
+//        this.buffer.lookup("ColorModulator").ifPresent(uniform -> uniform.set(r, g, b, a));
     }
 
     public Shader nolightPosition() {
