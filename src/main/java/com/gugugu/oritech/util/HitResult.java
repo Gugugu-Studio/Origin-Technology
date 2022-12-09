@@ -1,12 +1,12 @@
 package com.gugugu.oritech.util;
 
 import com.gugugu.oritech.util.math.Direction;
-import com.gugugu.oritech.world.block.Block;
+import com.gugugu.oritech.world.block.BlockState;
 
 /**
  * The hit result.
  *
- * @param block The target block.
+ * @param state The target block state.
  * @param x     The pos x.
  * @param y     The pos y.
  * @param z     The pos z.
@@ -14,5 +14,5 @@ import com.gugugu.oritech.world.block.Block;
  * @author squid233
  * @since 1.0
  */
-public record HitResult(Block block, int x, int y, int z, Direction face) {
+public record HitResult(BlockState state, int x, int y, int z, Direction face) {
 }

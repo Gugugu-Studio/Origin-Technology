@@ -1,11 +1,10 @@
 package com.gugugu.oritech.world.chunk;
 
-import com.gugugu.oritech.world.block.BlockState;
-import com.gugugu.oritech.util.math.BlockPos;
+import com.gugugu.oritech.entity.PlayerEntity;
 import com.gugugu.oritech.world.ServerWorld;
 import com.gugugu.oritech.world.World;
+import com.gugugu.oritech.world.block.BlockState;
 import com.gugugu.oritech.world.chunk.gen.ChunkGens;
-import com.gugugu.oritech.entity.PlayerEntity;
 
 /**
  * @author squid233
@@ -50,11 +49,6 @@ public class LogicChunk extends Chunk {
         for (int y = 0 ; y < height ; y ++) {
             for (int x = 0 ; x < height ; x ++) {
                 for (int z = 0 ; z < depth ; z ++) {
-                    blocks[y][x][z].setPos(new BlockPos(
-                        getAbsolutePos(chunkX, x),
-                        getAbsolutePos(chunkY, y),
-                        getAbsolutePos(chunkZ, z)
-                    ));
                     blocks[y][x][z].setChunk(this);
                 }
             }
@@ -70,11 +64,6 @@ public class LogicChunk extends Chunk {
     public void setBlock(BlockState block, int x, int y, int z) {
         blocks[y][x][z] = block;
         block.setChunk(this);
-        block.setPos(new BlockPos(
-            getAbsolutePos(chunkX, x),
-            getAbsolutePos(chunkY, y),
-            getAbsolutePos(chunkZ, z)
-        ));
     }
 
     @Override

@@ -18,7 +18,7 @@ import static org.lwjgl.system.MemoryUtil.*;
  */
 @SideOnly(Side.CLIENT)
 public class Tesselator {
-    private static final int MEMORY_USE = 10 * 1024 * 1024;
+    private static final int MEMORY_USE = 16 * 1024 * 1024;
     private static Tesselator instance;
     private final ByteBuffer buffer = memAlloc(MEMORY_USE);
     private IntBuffer indexBuffer;

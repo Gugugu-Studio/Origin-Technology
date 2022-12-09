@@ -10,7 +10,8 @@ import java.util.function.Supplier;
 
 @SideOnly(Side.CLIENT)
 public abstract class ClientRegistry<T> extends Registry<T> {
-    public static DefaultedRegistry<AbstractBlockStateRenderer> BLOCKSTATE_RENDERER;
+    public static final DefaultedRegistry<AbstractBlockStateRenderer> BLOCKSTATE_RENDERER =
+        create(() -> BlockStateRenderers.COMMON);
 
     public static <T, R extends T> R register(ClientRegistry<T> registry,
                                               Identifier id,
@@ -25,10 +26,6 @@ public abstract class ClientRegistry<T> extends Registry<T> {
     }
 
     public abstract <R extends T> R add(Identifier id, R r);
-
-    static {
-        BLOCKSTATE_RENDERER = create(() -> BlockStateRenderers.COMMON);
-    }
 
     private static <T> DefaultedRegistry<T> create(Supplier<T> defaultEntry) {
         return new DefaultedRegistry<>(defaultEntry);

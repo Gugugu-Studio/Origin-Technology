@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.Objects;
 
 public class StateMapping {
-    protected String name;
-    public Map<String, StateMapping> nextLevel = new HashMap<>();
-    public Map<String, Integer> mapping = new HashMap<>();
+    protected final String name;
+    public final Map<String, StateMapping> nextLevel = new HashMap<>();
+    public final Map<String, Integer> mapping = new HashMap<>();
 
     public StateMapping(String name) {
         this.name = name;

@@ -65,12 +65,8 @@ public abstract class World {
                             continue;
                         }
                         for (AABBox aabb : aabBoxes) {
-                            aabb.min.add(x, y, z);
-                            aabb.max.add(x, y, z);
-                        }
-                        for (AABBox aabb : aabBoxes) {
                             if (aabb != null) {
-                                list.add(aabb);
+                                list.add(new AABBox(aabb).move(x, y, z));
                             }
                         }
                     }

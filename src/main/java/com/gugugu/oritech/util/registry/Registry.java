@@ -15,9 +15,9 @@ import java.util.function.Supplier;
  * @since 1.0
  */
 public abstract class Registry<T> implements Iterable<T> {
-    public static DefaultedRegistry<Block> BLOCK;
-    public static DefaultedRegistry<IBlocksCoder> CODER;
-    public static DefaultedRegistry<IChunkGen> CHUNK_GEN;
+    public static final DefaultedRegistry<Block> BLOCK = create(() -> Blocks.AIR);
+    public static final DefaultedRegistry<IBlocksCoder> CODER = create(() -> BlocksCoders.RAW);
+    public static final DefaultedRegistry<IChunkGen> CHUNK_GEN = create(() -> ChunkGens.FLAT);
 
     public static <T, R extends T> R register(Registry<T> registry,
                                               Identifier id,
@@ -32,12 +32,6 @@ public abstract class Registry<T> implements Iterable<T> {
     }
 
     public abstract <R extends T> R add(Identifier id, R r);
-
-    static {
-        BLOCK = create(() -> Blocks.AIR);
-        CODER = create(() -> BlocksCoders.RAW);
-        CHUNK_GEN = create(() -> ChunkGens.FLAT);
-    }
 
     private static <T> DefaultedRegistry<T> create(Supplier<T> defaultEntry) {
         return new DefaultedRegistry<>(defaultEntry);

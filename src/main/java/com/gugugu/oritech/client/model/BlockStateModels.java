@@ -5,8 +5,8 @@ import com.gugugu.oritech.world.block.BlockState;
 import java.util.List;
 
 public class BlockStateModels {
-    public List<ModelOperators> models;
-    public StateMapping mapping;
+    public final List<ModelOperators> models;
+    public final StateMapping mapping;
 
     public BlockStateModels(List<ModelOperators> models, StateMapping mapping) {
         this.models = models;

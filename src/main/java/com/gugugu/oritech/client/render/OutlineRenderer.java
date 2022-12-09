@@ -13,7 +13,7 @@ import java.util.List;
 import static org.lwjgl.opengl.GL11C.*;
 
 @SideOnly(Side.CLIENT)
-public class TryHitRenderer {
+public class OutlineRenderer {
     public static List<Edge> allEdges = new ArrayList<>();
     public static List<Edge> renderEdges = new ArrayList<>();
 
@@ -36,31 +36,29 @@ public class TryHitRenderer {
         allEdges.add(e);
     }
 
-    private static void collectEdges(List<AABBox> outlines) {
+    private static void collectEdges(List<AABBox> outlines, int x, int y, int z) {
         allEdges.clear();
         renderEdges.clear();
         if (outlines == null) {
             return;
         }
         for (AABBox outline : outlines) {
-            outline.forEachEdge((dir, minX, minY, minZ, maxX, maxY, maxZ) -> {
-                addEdge(new Edge(
-                    new Vector3f(minX, minY, minZ),
-                    new Vector3f(maxX, maxY, maxZ)
-                ));
-                return true;
-            });
+            new AABBox(outline)
+                .move(x, y, z)
+                .forEachEdge((dir, minX, minY, minZ, maxX, maxY, maxZ) -> {
+                    addEdge(new Edge(
+                        new Vector3f(minX, minY, minZ),
+                        new Vector3f(maxX, maxY, maxZ)
+                    ));
+                    return true;
+                });
         }
     }
 
     public static void render(HitResult hitResult) {
         if (hitResult != null) {
-            List<AABBox> outlines = hitResult.block().getOutline();
-            for (AABBox aabb : outlines) {
-                aabb.min.add(hitResult.x(), hitResult.y(), hitResult.z());
-                aabb.max.add(hitResult.x(), hitResult.y(), hitResult.z());
-            }
-            collectEdges(outlines);
+            List<AABBox> outlines = hitResult.state().getOutline();
+            collectEdges(outlines, hitResult.x(), hitResult.y(), hitResult.z());
 
             GameRenderer gameRenderer = OriTechClient.getClient().gameRenderer;
             gameRenderer.setShaderColor(0.0f, 0.0f, 0.0f, 0.4f);

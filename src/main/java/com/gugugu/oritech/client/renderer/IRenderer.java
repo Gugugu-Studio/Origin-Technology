@@ -7,5 +7,5 @@ import com.gugugu.oritech.world.World;
 
 @SideOnly(Side.CLIENT)
 public interface IRenderer<T> {
-    boolean render(Tesselator t, World world, T obj);
+    boolean render(Tesselator t, float x, float y, float z, World world, T obj);
 }

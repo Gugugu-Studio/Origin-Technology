@@ -1,41 +1,31 @@
 package com.gugugu.oritech.world.block;
 
-import com.gugugu.oritech.world.block.properties.DirectionProperty;
-import com.gugugu.oritech.world.block.properties.IProperty;
 import com.gugugu.oritech.phys.AABBox;
-import com.gugugu.oritech.util.math.Direction;
+import com.gugugu.oritech.util.shape.VoxelShapes;
+import com.gugugu.oritech.world.block.properties.IProperty;
+import com.gugugu.oritech.world.block.properties.Properties;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-public class DirtStairBlock extends Block{
+public class DirtStairBlock extends Block {
+    private static final List<AABBox> SHAPE = VoxelShapes.combine(
+        createCuboidShape(0, 0, 0, 16, 8, 16),
+        createCuboidShape(0, 8, 8, 16, 16, 16)
+    );
+
     @Override
     public boolean hasSideTransparency() {
         return true;
     }
 
     @Override
-    public List<AABBox> getOutline() {
-        AABBox box1 = new AABBox(
-            0.0f, 0.0f, 0.0f,
-            1.0f, 0.5f, 1.0f
-        );
-        AABBox box2 = new AABBox(
-            0.0f, 0.5f, 0.5f,
-            1.0f, 1.0f, 1.0f
-        );
-        return new ArrayList<>() {
-            {
-                add(box1);
-                add(box2);
-            }
-        };
+    public List<AABBox> getOutline(BlockState state) {
+        return SHAPE;
     }
 
     @Override
-    public List<IProperty> getProperties() {
-        List<IProperty> properties = super.getProperties();
-        properties.add(new DirectionProperty("dir", Direction.EAST));
-        return properties;
+    public Map<String, IProperty> getProperties() {
+        return Map.of("direction", Properties.DIRECTION);
     }
 }

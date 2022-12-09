@@ -1,7 +1,7 @@
 #version 330 core
 
 // COMMON LIB PART
-const vec3 ambientLight = vec3(0.1, 0.1, 0.1);
+const vec3 ambientLight = vec3(0.3);
 
 struct LightParamter {
     float kc, kl, kq;
@@ -19,8 +19,8 @@ struct DirecionalLight {
 };
 
 DirecionalLight SunLight = {
-normalize(vec3(0.8, -1.0, 0.8)),
-vec3(1.0, 1.0, 1.0)
+    normalize(vec3(0.8, -1.0, 0.8)),
+    vec3(1.0, 1.0, 1.0)
 };
 
 float calcAtt(LightParamter para, float d) {
@@ -39,7 +39,7 @@ vec3 calcPointLight(PointLight light, vec4 fragPos, vec3 normal) {
 }
 
 vec3 calcDirecitonalLight(DirecionalLight light, vec3 normal) {
-    float diff = max(dot(-light.direction, normal), 0);
+    float diff = max(dot(light.direction, normal), 0);
     vec3 diffuse = diff * light.color;
     return diffuse;
 }

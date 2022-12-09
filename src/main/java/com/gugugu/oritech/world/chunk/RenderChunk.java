@@ -29,7 +29,7 @@ public class RenderChunk extends Chunk implements AutoCloseable {
     private final float x, y, z;
     public final int chunkX, chunkY, chunkZ;
     private final int width, height, depth;
-    private int vao, vbo, ebo;
+    private final int vao, vbo, ebo;
     private final Tesselator.EndProperty property = new Tesselator.EndProperty();
     private boolean isDirty = true;
     private boolean hasRendered = false;
@@ -94,19 +94,26 @@ public class RenderChunk extends Chunk implements AutoCloseable {
         matrix.pushMatrix()
             .identity();
         for (int y = 0; y < height; y++) {
+            int absY = getAbsolutePos(chunkY, y);
             for (int x = 0; x < width; x++) {
+                int absX = getAbsolutePos(chunkX, x);
                 for (int z = 0; z < depth; z++) {
                     BlockState block = getBlock(x, y, z);
+                    int absZ = getAbsolutePos(chunkZ, z);
                     if (!block.isAir()) {
                         matrix.pushMatrix()
                             .scale(0.5f)
                             .translate(
-                                getAbsolutePos(chunkX, x) * 2 + 1,
-                                getAbsolutePos(chunkY, y) * 2 + 1,
-                                getAbsolutePos(chunkZ, z) * 2 + 1
+                                absX * 2 + 1,
+                                absY * 2 + 1,
+                                absZ * 2 + 1
                             );
                         AbstractBlockStateRenderer renderer = ClientRegistry.BLOCKSTATE_RENDERER.get(block.getRenderer());
-                        boolean b = renderer.render(t, world, block);
+                        boolean b = renderer.render(t,
+                            absX,
+                            absY,
+                            absZ,
+                            world, block);
                         if (b) {
                             rendered = true;
                         }
