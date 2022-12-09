@@ -4,6 +4,7 @@ import com.gugugu.oritech.client.render.Tesselator;
 import com.gugugu.oritech.util.Identifier;
 import com.gugugu.oritech.util.Side;
 import com.gugugu.oritech.util.SideOnly;
+import org.lwjgl.opengl.GL11C;
 
 import static com.gugugu.oritech.client.gl.GLStateMgr.*;
 
@@ -43,14 +44,15 @@ public class DrawableHelper {
         int lastUnit = getActiveTexture2d();
         int lastId = getTexture2dId();
         bindTexture(0, id);
-        Tesselator.getInstance().withBatch(batch ->
-            batch.begin()
-                .quadIndices()
-                .texCoords(u0, v0).vertex(x, y)
-                .texCoords(u0, v1).vertex(x, y1)
-                .texCoords(u1, v1).vertex(x1, y1)
-                .texCoords(u1, v0).vertex(x1, y)
-                .end().upload().render());
+        Tesselator t = Tesselator.getInstance();
+        t.begin();
+        t.index(0, 1, 2, 2, 3, 0);
+        t.texCoord(u0, v0).vertex(x, y).emit();
+        t.texCoord(u0, v1).vertex(x, y1).emit();
+        t.texCoord(u1, v1).vertex(x1, y1).emit();
+        t.texCoord(u1, v0).vertex(x1, y).emit();
+        t.end();
+        t.builtDraw(GL11C.GL_TRIANGLES);
         bindTexture(lastUnit, lastId);
     }
 }

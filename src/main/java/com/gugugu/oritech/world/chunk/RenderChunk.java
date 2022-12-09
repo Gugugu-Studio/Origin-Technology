@@ -1,14 +1,16 @@
 package com.gugugu.oritech.world.chunk;
 
 import com.gugugu.oritech.client.OriTechClient;
-import com.gugugu.oritech.client.render.Batch;
 import com.gugugu.oritech.client.render.Frustum;
+import com.gugugu.oritech.client.render.Tesselator;
 import com.gugugu.oritech.util.Side;
 import com.gugugu.oritech.util.SideOnly;
 import com.gugugu.oritech.util.Timer;
 import com.gugugu.oritech.world.ClientWorld;
 import com.gugugu.oritech.world.block.Block;
 import com.gugugu.oritech.world.entity.PlayerEntity;
+
+import static org.lwjgl.opengl.GL30C.*;
 
 /**
  * @author squid233
@@ -22,7 +24,8 @@ public class RenderChunk extends Chunk implements AutoCloseable {
     private final float x, y, z;
     public final int chunkX, chunkY, chunkZ;
     private final int width, height, depth;
-    public Batch batch = new Batch(CHUNK_SIZE * CHUNK_SIZE);
+    private int vao, vbo, ebo;
+    private final Tesselator.EndProperty property = new Tesselator.EndProperty();
     private boolean isDirty = true;
     private boolean hasRendered = false;
     public double dirtiedTime = 0.0;
@@ -45,6 +48,9 @@ public class RenderChunk extends Chunk implements AutoCloseable {
         width = logicChunk.width;
         height = logicChunk.height;
         depth = logicChunk.depth;
+        vao = glGenVertexArrays();
+        vbo = glGenBuffers();
+        ebo = glGenBuffers();
     }
 
     @Override
@@ -77,13 +83,14 @@ public class RenderChunk extends Chunk implements AutoCloseable {
     public void rebuild() {
         //int blocks = 0;
         boolean rendered = false;
-        batch.begin();
+        Tesselator t = Tesselator.getInstance();
+        t.begin();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 for (int z = 0; z < depth; z++) {
                     Block block = getBlock(x, y, z);
                     if (!block.isAir()) {
-                        boolean b = block.render(batch,
+                        boolean b = block.render(t,
                             world,
                             getAbsolutePos(chunkX, x),
                             getAbsolutePos(chunkY, y),
@@ -100,7 +107,7 @@ public class RenderChunk extends Chunk implements AutoCloseable {
         //if (blocks > 0) {
         //    hasBlock = true;
         //}
-        batch.end();
+        t.end(vao, vbo, ebo, property);
         isDirty = false;
     }
 
@@ -109,8 +116,10 @@ public class RenderChunk extends Chunk implements AutoCloseable {
     }
 
     public void render() {
-        if (hasRendered && batch != null && batch.uploaded() && testFrustum()) {
-            batch.render();
+        if (hasRendered && testFrustum()) {
+            glBindVertexArray(vao);
+            glDrawElements(GL_TRIANGLES, property.indicesSize, GL_UNSIGNED_INT, 0);
+            glBindVertexArray(0);
         }
     }
 
@@ -121,8 +130,8 @@ public class RenderChunk extends Chunk implements AutoCloseable {
 
     @Override
     public void close() {
-        if (batch != null) {
-            batch.free();
-        }
+        glDeleteVertexArrays(vao);
+        glDeleteBuffers(vbo);
+        glDeleteBuffers(ebo);
     }
 }

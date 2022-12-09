@@ -65,12 +65,6 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
             for (int i = 0; i < list.size() && i < MAX_REBUILD_PER_FRAME; i++) {
                 RenderChunk chunk = list.get(i);
                 chunk.rebuild();
-                if (chunk.batch != null) {
-                    chunk.batch.initGL();
-                    if (chunk.batch.hasBuilt() && !chunk.batch.uploaded()) {
-                        chunk.batch.upload();
-                    }
-                }
             }
         }
     }
@@ -91,23 +85,24 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
             glLineWidth(2.0f);
             AABBox outline = hitResult.block().getOutline(hitResult.x(), hitResult.y(), hitResult.z());
             final float epsilon = 0.001f;
-            Tesselator.getInstance().withBatch(batch -> {
-                batch.begin();
-                outline.forEachEdge((dir, minX, minY, minZ, maxX, maxY, maxZ) -> {
-                    boolean transparency =
-                        world.getBlock((int) floor(minX) + dir.getOffsetX(),
-                            (int) floor(minY) + dir.getOffsetY(),
-                            (int) floor(minZ) + dir.getOffsetZ()).hasSideTransparency();
-                    float offset = transparency ? epsilon : 0;
-                    float xo = dir.getOffsetX() * offset;
-                    float yo = dir.getOffsetY() * offset;
-                    float zo = dir.getOffsetZ() * offset;
-                    batch.vertex(minX + xo, minY+yo, minZ+zo)
-                        .vertex(maxX + xo, maxY + yo, maxZ + zo);
-                    return true;
-                });
-                batch.end().upload().render(GL_LINES);
+            Tesselator t = Tesselator.getInstance();
+            t.begin();
+            outline.forEachEdge((dir, minX, minY, minZ, maxX, maxY, maxZ) -> {
+                boolean transparency =
+                    world.getBlock((int) floor(minX) + dir.getOffsetX(),
+                        (int) floor(minY) + dir.getOffsetY(),
+                        (int) floor(minZ) + dir.getOffsetZ()).hasSideTransparency();
+                float offset = transparency ? epsilon : 0;
+                float xo = dir.getOffsetX() * offset;
+                float yo = dir.getOffsetY() * offset;
+                float zo = dir.getOffsetZ() * offset;
+                t.index(0, 1);
+                t.vertex(minX + xo, minY + yo, minZ + zo).emit();
+                t.vertex(maxX + xo, maxY + yo, maxZ + zo).emit();
+                return true;
             });
+            t.end();
+            t.builtDraw(GL_LINES);
             glLineWidth(1.0f);
             glDisable(GL_BLEND);
             gameRenderer.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);

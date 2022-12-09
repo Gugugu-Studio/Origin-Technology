@@ -48,8 +48,6 @@ public class GameRenderer implements AutoCloseable {
         positionColor = loadShader("position_color");
         positionColorTex = loadShader("position_color_tex");
         positionTex = loadShader("position_tex");
-
-        Tesselator.getInstance().init();
     }
 
     public void useShader(Shader shader,

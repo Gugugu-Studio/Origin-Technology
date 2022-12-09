@@ -1,7 +1,7 @@
 package com.gugugu.oritech.world.block;
 
 import com.gugugu.oritech.client.OriTechClient;
-import com.gugugu.oritech.client.render.Batch;
+import com.gugugu.oritech.client.render.Tesselator;
 import com.gugugu.oritech.phys.AABBox;
 import com.gugugu.oritech.resource.ResLocation;
 import com.gugugu.oritech.resource.tex.TextureAtlas;
@@ -65,7 +65,7 @@ public class Block {
         return list;
     }
 
-    public void renderFace(Batch batch, Direction face, int x, int y, int z) {
+    public void renderFace(Tesselator t, Direction face, int x, int y, int z) {
         float x0 = (float) x;
         float y0 = (float) y;
         float z0 = (float) z;
@@ -81,40 +81,52 @@ public class Block {
         float v1 = atlas.getV1n(texName);
 
         switch (face) {
-            case WEST -> batch.quadIndices()
-                .texCoords(u0, v0).vertex(x0, y1, z0)
-                .texCoords(u0, v1).vertex(x0, y0, z0)
-                .texCoords(u1, v1).vertex(x0, y0, z1)
-                .texCoords(u1, v0).vertex(x0, y1, z1);
-            case EAST -> batch.quadIndices()
-                .texCoords(u0, v0).vertex(x1, y1, z1)
-                .texCoords(u0, v1).vertex(x1, y0, z1)
-                .texCoords(u1, v1).vertex(x1, y0, z0)
-                .texCoords(u1, v0).vertex(x1, y1, z0);
-            case DOWN -> batch.quadIndices()
-                .texCoords(u0, v0).vertex(x0, y0, z1)
-                .texCoords(u0, v1).vertex(x0, y0, z0)
-                .texCoords(u1, v1).vertex(x1, y0, z0)
-                .texCoords(u1, v0).vertex(x1, y0, z1);
-            case UP -> batch.quadIndices()
-                .texCoords(u0, v0).vertex(x0, y1, z0)
-                .texCoords(u0, v1).vertex(x0, y1, z1)
-                .texCoords(u1, v1).vertex(x1, y1, z1)
-                .texCoords(u1, v0).vertex(x1, y1, z0);
-            case NORTH -> batch.quadIndices()
-                .texCoords(u0, v0).vertex(x1, y1, z0)
-                .texCoords(u0, v1).vertex(x1, y0, z0)
-                .texCoords(u1, v1).vertex(x0, y0, z0)
-                .texCoords(u1, v0).vertex(x0, y1, z0);
-            case SOUTH -> batch.quadIndices()
-                .texCoords(u0, v0).vertex(x0, y1, z1)
-                .texCoords(u0, v1).vertex(x0, y0, z1)
-                .texCoords(u1, v1).vertex(x1, y0, z1)
-                .texCoords(u1, v0).vertex(x1, y1, z1);
+            case WEST -> {
+                t.index(0, 1, 2, 2, 3, 0);
+                t.texCoord(u0, v0).vertex(x0, y1, z0).emit();
+                t.texCoord(u0, v1).vertex(x0, y0, z0).emit();
+                t.texCoord(u1, v1).vertex(x0, y0, z1).emit();
+                t.texCoord(u1, v0).vertex(x0, y1, z1).emit();
+            }
+            case EAST -> {
+                t.index(0, 1, 2, 2, 3, 0);
+                t.texCoord(u0, v0).vertex(x1, y1, z1).emit();
+                t.texCoord(u0, v1).vertex(x1, y0, z1).emit();
+                t.texCoord(u1, v1).vertex(x1, y0, z0).emit();
+                t.texCoord(u1, v0).vertex(x1, y1, z0).emit();
+            }
+            case DOWN -> {
+                t.index(0, 1, 2, 2, 3, 0);
+                t.texCoord(u0, v0).vertex(x0, y0, z1).emit();
+                t.texCoord(u0, v1).vertex(x0, y0, z0).emit();
+                t.texCoord(u1, v1).vertex(x1, y0, z0).emit();
+                t.texCoord(u1, v0).vertex(x1, y0, z1).emit();
+            }
+            case UP -> {
+                t.index(0, 1, 2, 2, 3, 0);
+                t.texCoord(u0, v0).vertex(x0, y1, z0).emit();
+                t.texCoord(u0, v1).vertex(x0, y1, z1).emit();
+                t.texCoord(u1, v1).vertex(x1, y1, z1).emit();
+                t.texCoord(u1, v0).vertex(x1, y1, z0).emit();
+            }
+            case NORTH -> {
+                t.index(0, 1, 2, 2, 3, 0);
+                t.texCoord(u0, v0).vertex(x1, y1, z0).emit();
+                t.texCoord(u0, v1).vertex(x1, y0, z0).emit();
+                t.texCoord(u1, v1).vertex(x0, y0, z0).emit();
+                t.texCoord(u1, v0).vertex(x0, y1, z0).emit();
+            }
+            case SOUTH -> {
+                t.index(0, 1, 2, 2, 3, 0);
+                t.texCoord(u0, v0).vertex(x0, y1, z1).emit();
+                t.texCoord(u0, v1).vertex(x0, y0, z1).emit();
+                t.texCoord(u1, v1).vertex(x1, y0, z1).emit();
+                t.texCoord(u1, v0).vertex(x1, y1, z1).emit();
+            }
         }
     }
 
-    public boolean render(Batch batch, World world, int x, int y, int z) {
+    public boolean render(Tesselator t, World world, int x, int y, int z) {
         boolean rendered = false;
         for (Direction face : Direction.values()) {
             if (shouldRenderFace(world,
@@ -125,13 +137,13 @@ public class Block {
                 final float c2 = 0.8f;
                 final float c3 = 0.6f;
                 if (face.isOnAxisX()) {
-                    batch.color(c1, c1, c1);
+                    t.color(c1, c1, c1);
                 } else if (face.isOnAxisY()) {
-                    batch.color(c2, c2, c2);
+                    t.color(c2, c2, c2);
                 } else if (face.isOnAxisZ()) {
-                    batch.color(c3, c3, c3);
+                    t.color(c3, c3, c3);
                 }
-                renderFace(batch, face, x, y, z);
+                renderFace(t, face, x, y, z);
                 rendered = true;
             }
         }
