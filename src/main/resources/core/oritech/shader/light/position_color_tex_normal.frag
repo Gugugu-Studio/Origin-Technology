@@ -82,13 +82,13 @@ vec3 calcDirecitonalLight(DirecionalLight light, vec3 normal) {
 // START UNIFORM LIB PART
 layout (std140) uniform InfoUniform {
     int gameTime;
-    vec4 ColorModulator;
 };
 // END UNIFORM LIB PART
 
 out vec4 FragColor;
 
 uniform sampler2D Sampler0;
+uniform vec4 ColorModulator;
 
 in VS_OUT {
     vec4 fragPos;

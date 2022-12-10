@@ -1,6 +1,5 @@
 package com.gugugu.oritech.client.render;
 
-import com.gugugu.oritech.client.OriTechClient;
 import com.gugugu.oritech.phys.AABBox;
 import com.gugugu.oritech.util.HitResult;
 import com.gugugu.oritech.util.Side;
@@ -44,14 +43,14 @@ public class OutlineRenderer {
         }
         for (AABBox outline : outlines) {
             new AABBox(outline)
-                .move(x, y, z)
-                .forEachEdge((dir, minX, minY, minZ, maxX, maxY, maxZ) -> {
-                    addEdge(new Edge(
-                        new Vector3f(minX, minY, minZ),
-                        new Vector3f(maxX, maxY, maxZ)
-                    ));
-                    return true;
-                });
+                    .move(x, y, z)
+                    .forEachEdge((dir, minX, minY, minZ, maxX, maxY, maxZ) -> {
+                        addEdge(new Edge(
+                                new Vector3f(minX, minY, minZ),
+                                new Vector3f(maxX, maxY, maxZ)
+                        ));
+                        return true;
+                    });
         }
     }
 
@@ -60,13 +59,12 @@ public class OutlineRenderer {
             List<AABBox> outlines = hitResult.state().getOutline();
             collectEdges(outlines, hitResult.x(), hitResult.y(), hitResult.z());
 
-            GameRenderer gameRenderer = OriTechClient.getClient().gameRenderer;
-            gameRenderer.setShaderColor(0.0f, 0.0f, 0.0f, 0.4f);
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             glLineWidth(2.0f);
             Tesselator t = Tesselator.getInstance();
             t.begin();
+            t.color(0.0f, 0.0f, 0.0f);
             for (Edge re : renderEdges) {
                 Edge.Line l = re.toLine();
                 t.index(0, 1);
@@ -77,7 +75,6 @@ public class OutlineRenderer {
             t.builtDraw(GL_LINES);
             glLineWidth(1.0f);
             glDisable(GL_BLEND);
-            gameRenderer.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         }
     }
 }
