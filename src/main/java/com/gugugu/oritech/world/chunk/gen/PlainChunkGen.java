@@ -1,10 +1,8 @@
 package com.gugugu.oritech.world.chunk.gen;
 
-import com.gugugu.oritech.block.BlockState;
-import com.gugugu.oritech.util.math.BlockPos;
+import com.gugugu.oritech.world.block.BlockState;
 import com.gugugu.oritech.world.ServerWorld;
-import com.gugugu.oritech.block.Block;
-import com.gugugu.oritech.block.Blocks;
+import com.gugugu.oritech.world.block.Blocks;
 import com.gugugu.oritech.world.chunk.Chunk;
 import com.gugugu.oritech.world.chunk.noise.SimplexNoise;
 

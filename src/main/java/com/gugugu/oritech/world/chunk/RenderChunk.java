@@ -1,20 +1,21 @@
 package com.gugugu.oritech.world.chunk;
 
-import com.gugugu.oritech.block.BlockState;
+import com.gugugu.oritech.world.block.BlockState;
 import com.gugugu.oritech.client.OriTechClient;
-import com.gugugu.oritech.client.render.Batch;
 import com.gugugu.oritech.client.render.Frustum;
+import com.gugugu.oritech.client.render.RenderSystem;
+import com.gugugu.oritech.client.render.Tesselator;
 import com.gugugu.oritech.client.renderer.AbstractBlockStateRenderer;
-import com.gugugu.oritech.client.renderer.BlockStateRenderer;
 import com.gugugu.oritech.util.Side;
 import com.gugugu.oritech.util.SideOnly;
 import com.gugugu.oritech.util.Timer;
 import com.gugugu.oritech.util.registry.ClientRegistry;
-import com.gugugu.oritech.util.registry.Registry;
 import com.gugugu.oritech.world.ClientWorld;
-import com.gugugu.oritech.block.Block;
 import com.gugugu.oritech.entity.PlayerEntity;
 import com.gugugu.oritech.world.World;
+import org.joml.Matrix4fStack;
+
+import static org.lwjgl.opengl.GL30C.*;
 
 /**
  * @author squid233
@@ -28,7 +29,8 @@ public class RenderChunk extends Chunk implements AutoCloseable {
     private final float x, y, z;
     public final int chunkX, chunkY, chunkZ;
     private final int width, height, depth;
-    public Batch batch = new Batch(CHUNK_SIZE * CHUNK_SIZE);
+    private final int vao, vbo, ebo;
+    private final Tesselator.EndProperty property = new Tesselator.EndProperty();
     private boolean isDirty = true;
     private boolean hasRendered = false;
     public double dirtiedTime = 0.0;
@@ -51,6 +53,9 @@ public class RenderChunk extends Chunk implements AutoCloseable {
         width = logicChunk.width;
         height = logicChunk.height;
         depth = logicChunk.depth;
+        vao = glGenVertexArrays();
+        vbo = glGenBuffers();
+        ebo = glGenBuffers();
     }
 
     @Override
@@ -83,37 +88,47 @@ public class RenderChunk extends Chunk implements AutoCloseable {
     public void rebuild() {
         //int blocks = 0;
         boolean rendered = false;
-        batch.begin();
-        batch.matrix.clear();
-        batch.matrix.identity();
+        Tesselator t = Tesselator.getInstance();
+        t.begin();
+        Matrix4fStack matrix = RenderSystem.getMatrixStack();
+        matrix.pushMatrix()
+            .identity();
         for (int y = 0; y < height; y++) {
+            int absY = getAbsolutePos(chunkY, y);
             for (int x = 0; x < width; x++) {
+                int absX = getAbsolutePos(chunkX, x);
                 for (int z = 0; z < depth; z++) {
                     BlockState block = getBlock(x, y, z);
+                    int absZ = getAbsolutePos(chunkZ, z);
                     if (!block.isAir()) {
-                        batch.matrix.pushMatrix();
-                        batch.matrix.scale(0.5f);
-                        batch.matrix.translate(
-                            getAbsolutePos(chunkX, x) * 2 + 1,
-                            getAbsolutePos(chunkY, y) * 2 + 1,
-                            getAbsolutePos(chunkZ, z) * 2 + 1
-                        );
+                        matrix.pushMatrix()
+                            .scale(0.5f)
+                            .translate(
+                                absX * 2 + 1,
+                                absY * 2 + 1,
+                                absZ * 2 + 1
+                            );
                         AbstractBlockStateRenderer renderer = ClientRegistry.BLOCKSTATE_RENDERER.get(block.getRenderer());
-                        boolean b = renderer.render(batch, world, block);
+                        boolean b = renderer.render(t,
+                            absX,
+                            absY,
+                            absZ,
+                            world, block);
                         if (b) {
                             rendered = true;
                         }
-                        batch.matrix.popMatrix();
+                        matrix.popMatrix();
                         //++blocks;
                     }
                 }
             }
         }
+        matrix.popMatrix();
         hasRendered = rendered;
         //if (blocks > 0) {
         //    hasBlock = true;
         //}
-        batch.end();
+        t.end(vao, vbo, ebo, property);
         isDirty = false;
     }
 
@@ -122,8 +137,10 @@ public class RenderChunk extends Chunk implements AutoCloseable {
     }
 
     public void render() {
-        if (hasRendered && batch != null && batch.uploaded() && testFrustum()) {
-            batch.render();
+        if (hasRendered && testFrustum()) {
+            glBindVertexArray(vao);
+            glDrawElements(GL_TRIANGLES, property.indicesSize, GL_UNSIGNED_INT, 0);
+            glBindVertexArray(0);
         }
     }
 
@@ -134,9 +151,9 @@ public class RenderChunk extends Chunk implements AutoCloseable {
 
     @Override
     public void close() {
-        if (batch != null) {
-            batch.free();
-        }
+        glDeleteVertexArrays(vao);
+        glDeleteBuffers(vbo);
+        glDeleteBuffers(ebo);
     }
 
     @Override

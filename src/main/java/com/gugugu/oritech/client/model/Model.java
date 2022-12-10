@@ -1,13 +1,12 @@
 package com.gugugu.oritech.client.model;
 
 import com.gugugu.oritech.client.OriTechClient;
-import com.gugugu.oritech.client.render.Batch;
+import com.gugugu.oritech.client.render.Tesselator;
 import com.gugugu.oritech.resource.ResLocation;
 import com.gugugu.oritech.resource.tex.TextureAtlas;
 import com.gugugu.oritech.util.Side;
 import com.gugugu.oritech.util.SideOnly;
 import com.gugugu.oritech.util.math.Direction;
-import org.joml.Vector2d;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +22,7 @@ public class Model {
     public List<ResLocation> getAllTextures() {
         List<ResLocation> text = new ArrayList<>();
         for (ResLocation p : textures.values()) {
-            if (! text.contains(p)) {
+            if (!text.contains(p)) {
                 text.add(p);
             }
         }
@@ -36,15 +35,16 @@ public class Model {
         this.granularity = granularity;
     }
 
-    public void renderFace(Batch batch, Direction face) {
+    public void renderFace(Tesselator t, Direction face) {
         String texName = textures.get(face).toString();
 
         TextureAtlas atlas = OriTechClient.getClient().blockAtlas;
-        Vector2d uv0 = new Vector2d(atlas.getU0(texName), atlas.getV0(texName));
-        Vector2d uv1 = new Vector2d(atlas.getU1(texName), atlas.getV1(texName));
 
         for (RenderBox renderBox : boxes) {
-            renderBox.renderFace(batch, face, uv0, uv1, atlas, granularity);
+            renderBox.renderFace(t, face,
+                atlas.getU0(texName), atlas.getV0(texName),
+                atlas.getU1(texName), atlas.getV1(texName),
+                atlas, granularity);
         }
     }
 

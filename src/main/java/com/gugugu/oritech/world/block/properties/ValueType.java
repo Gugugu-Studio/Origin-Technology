@@ -1,4 +1,4 @@
-package com.gugugu.oritech.block.properties;
+package com.gugugu.oritech.world.block.properties;
 
 public enum ValueType {
     INTEGER,

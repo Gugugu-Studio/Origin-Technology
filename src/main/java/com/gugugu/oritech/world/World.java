@@ -1,18 +1,17 @@
 package com.gugugu.oritech.world;
 
-import com.gugugu.oritech.block.BlockState;
+import com.gugugu.oritech.world.block.BlockState;
+import com.gugugu.oritech.world.block.Blocks;
 import com.gugugu.oritech.phys.AABBox;
-import com.gugugu.oritech.util.math.BlockPos;
 import com.gugugu.oritech.util.math.Direction;
-import com.gugugu.oritech.block.Block;
-import com.gugugu.oritech.block.Blocks;
 import com.gugugu.oritech.world.chunk.Chunk;
 import org.joml.Math;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.gugugu.oritech.world.chunk.Chunk.*;
+import static com.gugugu.oritech.world.chunk.Chunk.CHUNK_SIZE;
+import static com.gugugu.oritech.world.chunk.Chunk.getChunkPos;
 
 /**
  * @author squid233
@@ -68,12 +67,8 @@ public abstract class World {
                             continue;
                         }
                         for (AABBox aabb : aabBoxes) {
-                            aabb.min.add(x, y, z);
-                            aabb.max.add(x, y, z);
-                        }
-                        for (AABBox aabb : aabBoxes) {
                             if (aabb != null) {
-                                list.add(aabb);
+                                list.add(new AABBox(aabb).move(x, y, z));
                             }
                         }
                     }

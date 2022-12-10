@@ -1,16 +1,12 @@
 package com.gugugu.oritech;
 
 import com.gugugu.oritech.client.OriTechClient;
-import com.gugugu.oritech.client.model.BlockStateModels;
-import com.gugugu.oritech.client.model.StateMapping;
-import com.gugugu.oritech.resource.ResLocation;
-import com.gugugu.oritech.resource.StateMappingLoader;
 import com.gugugu.oritech.ui.Window;
 import org.lwjgl.opengl.GL11C;
 
-import java.io.*;
+import java.io.File;
 
-import static org.lwjgl.opengl.GL11C.*;
+import static org.lwjgl.opengl.GL11C.glClearColor;
 
 /**
  * @author theflysong
@@ -52,8 +48,8 @@ public class Main extends Window {
     @Override
     public void close() {
         File directory = new File("./save/");
-        if (! directory.exists()) {
-            if (! directory.mkdir()) {
+        if (!directory.exists()) {
+            if (!directory.mkdir()) {
                 System.err.println("Couldn't create save directory!");
             }
         }

@@ -1,4 +1,4 @@
-package com.gugugu.oritech.block.properties;
+package com.gugugu.oritech.world.block.properties;
 
 import com.gugugu.oritech.util.math.Direction;
 

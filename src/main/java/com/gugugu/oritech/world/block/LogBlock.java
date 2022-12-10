@@ -1,15 +1,14 @@
-package com.gugugu.oritech.block;
+package com.gugugu.oritech.world.block;
 
-import com.gugugu.oritech.block.properties.DirectionProperty;
-import com.gugugu.oritech.block.properties.IProperty;
+import com.gugugu.oritech.util.math.BlockPos;
 import com.gugugu.oritech.util.math.Direction;
-import com.gugugu.oritech.world.World;
+import com.gugugu.oritech.world.block.properties.DirectionProperty;
+import com.gugugu.oritech.world.block.properties.IProperty;
+import com.gugugu.oritech.world.block.properties.Properties;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public class LogBlock extends Block{
+public class LogBlock extends Block {
     private static Direction getNowFace(Direction dir, Direction face) {
         return switch (dir) {
             case UP, DOWN -> face;
@@ -45,19 +44,17 @@ public class LogBlock extends Block{
     }
 
     @Override
-    public boolean shouldRenderFace(BlockState state, Direction face) {
-        IProperty property = state.getProperty("dir");
+    public boolean shouldRenderFace(BlockState state, BlockPos pos, Direction face) {
+        IProperty property = state.getProperty("direction");
         Direction dir = Direction.UP;
         if (property instanceof DirectionProperty) {
             dir = ((DirectionProperty) property).getValue();
         }
-        return super.shouldRenderFace(state, getNowFace(dir, face));
+        return super.shouldRenderFace(state, pos, getNowFace(dir, face));
     }
 
     @Override
-    public List<IProperty> getProperties() {
-        List<IProperty> properties = super.getProperties();
-        properties.add(new DirectionProperty("dir", Direction.EAST));
-        return properties;
+    public Map<String, IProperty> getProperties() {
+        return Map.of("direction", Properties.DIRECTION);
     }
 }

@@ -1,7 +1,6 @@
 package com.gugugu.oritech.world.chunk;
 
-import com.gugugu.oritech.block.Block;
-import com.gugugu.oritech.block.BlockState;
+import com.gugugu.oritech.world.block.BlockState;
 import com.gugugu.oritech.entity.PlayerEntity;
 import com.gugugu.oritech.world.World;
 

@@ -1,8 +1,7 @@
 package com.gugugu.oritech.world.chunk.gen;
 
-import com.gugugu.oritech.block.BlockState;
+import com.gugugu.oritech.world.block.BlockState;
 import com.gugugu.oritech.world.ServerWorld;
-import com.gugugu.oritech.block.Block;
 import com.gugugu.oritech.world.chunk.Chunk;
 
 /**

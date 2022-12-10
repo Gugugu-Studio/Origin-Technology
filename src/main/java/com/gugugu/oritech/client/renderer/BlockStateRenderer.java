@@ -1,55 +1,56 @@
 package com.gugugu.oritech.client.renderer;
 
-import com.gugugu.oritech.block.BlockState;
-import com.gugugu.oritech.block.Blocks;
-import com.gugugu.oritech.client.model.Model;
 import com.gugugu.oritech.client.model.ModelOperators;
-import com.gugugu.oritech.client.render.Batch;
-import com.gugugu.oritech.util.Identifier;
+import com.gugugu.oritech.client.render.RenderSystem;
+import com.gugugu.oritech.client.render.Tesselator;
 import com.gugugu.oritech.util.Side;
 import com.gugugu.oritech.util.SideOnly;
+import com.gugugu.oritech.util.math.BlockPos;
 import com.gugugu.oritech.util.math.Direction;
-import com.gugugu.oritech.util.registry.Registry;
 import com.gugugu.oritech.world.World;
-import org.joml.Vector3f;
+import com.gugugu.oritech.world.block.BlockState;
+import org.joml.Math;
+import org.joml.Matrix4fStack;
 
 @SideOnly(Side.CLIENT)
 public class BlockStateRenderer extends AbstractBlockStateRenderer {
-
-    public void renderFace(Batch batch, Direction face, BlockState obj) {
-        batch.matrix.pushMatrix();
-        ModelOperators model = getBlockModel(obj);
+    @Override
+    public void renderFace(Tesselator t, BlockPos pos, Direction face, BlockState state) {
+        Matrix4fStack matrixStack = RenderSystem.getMatrixStack();
+        matrixStack.pushMatrix();
+        ModelOperators model = getBlockModel(state);
         if (model.translate != null) {
-            batch.matrix.translate(model.translate);
+            matrixStack.translate(model.translate);
         }
         if (model.rotate != null) {
-            Vector3f _rotate = new Vector3f(model.rotate);
-            _rotate.mul((float)Math.PI);
-            _rotate.div(180);
-            batch.matrix.rotateXYZ(_rotate);
+            matrixStack.rotateXYZ(Math.toRadians(model.rotate.x()),
+                Math.toRadians(model.rotate.y()),
+                Math.toRadians(model.rotate.z()));
         }
         if (model.scale != null) {
-            batch.matrix.scale(model.scale);
+            matrixStack.scale(model.scale);
         }
-        model.model.renderFace(batch, face);
-        batch.matrix.popMatrix();
+        model.model.renderFace(t, face);
+        matrixStack.popMatrix();
     }
 
-    public boolean render(Batch batch, World world, BlockState obj) {
+    @Override
+    public boolean render(Tesselator t, float x, float y, float z, World world, BlockState state) {
         boolean rendered = false;
+        BlockPos pos = new BlockPos((int) Math.floor(x), (int) Math.floor(y), (int) Math.floor(z));
         for (Direction face : Direction.values()) {
-            if (obj.shouldRenderFace(obj, face)) {
+            if (state.shouldRenderFace(pos, face)) {
                 final float c1 = 1.0f;
                 final float c2 = 0.8f;
                 final float c3 = 0.6f;
                 if (face.isOnAxisX()) {
-                    batch.color(c1, c1, c1);
+                    t.color(c1, c1, c1);
                 } else if (face.isOnAxisY()) {
-                    batch.color(c2, c2, c2);
+                    t.color(c2, c2, c2);
                 } else if (face.isOnAxisZ()) {
-                    batch.color(c3, c3, c3);
+                    t.color(c3, c3, c3);
                 }
-                renderFace(batch, face, obj);
+                renderFace(t, pos, face, state);
                 rendered = true;
             }
         }

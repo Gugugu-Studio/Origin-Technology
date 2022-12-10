@@ -1,4 +1,4 @@
-package com.gugugu.oritech.block.properties;
+package com.gugugu.oritech.world.block.properties;
 
 public class EnumProperty<T extends Enum<T>> extends ObjectProperty<T> {
     public EnumProperty(String name, T defVal) {

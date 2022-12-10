@@ -1,16 +1,16 @@
 package com.gugugu.oritech.client.model;
 
-import com.gugugu.oritech.block.BlockState;
-import com.gugugu.oritech.block.properties.IProperty;
+import com.gugugu.oritech.world.block.BlockState;
+import com.gugugu.oritech.world.block.properties.IProperty;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 public class StateMapping {
-    protected String name;
-    public Map<String, StateMapping> nextLevel = new HashMap<>();
-    public Map<String, Integer> mapping = new HashMap<>();
+    protected final String name;
+    public final Map<String, StateMapping> nextLevel = new HashMap<>();
+    public final Map<String, Integer> mapping = new HashMap<>();
 
     public StateMapping(String name) {
         this.name = name;

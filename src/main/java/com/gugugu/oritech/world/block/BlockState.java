@@ -1,6 +1,6 @@
-package com.gugugu.oritech.block;
+package com.gugugu.oritech.world.block;
 
-import com.gugugu.oritech.block.properties.IProperty;
+import com.gugugu.oritech.world.block.properties.IProperty;
 import com.gugugu.oritech.phys.AABBox;
 import com.gugugu.oritech.util.Identifier;
 import com.gugugu.oritech.util.math.BlockPos;
@@ -9,24 +9,22 @@ import com.gugugu.oritech.world.World;
 import com.gugugu.oritech.world.chunk.Chunk;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class BlockState {
     protected Block block;
-    protected @Nullable BlockPos pos;
     protected @Nullable Chunk chunk;
     protected @Nullable World world;
-    protected List<IProperty> properties;
+    protected final Map<String, IProperty> properties;
 
     public BlockState(Block block) {
-        this(block, null, null);
+        this(block, null);
     }
 
-    public BlockState(Block block, @Nullable BlockPos pos, @Nullable Chunk chunk) {
+    public BlockState(Block block, @Nullable Chunk chunk) {
         this.block = block;
         this.properties = block.getProperties();
-        this.pos = pos;
         this.chunk = chunk;
         this.world = chunk != null ? chunk.getWorld() : null;
     }
@@ -37,14 +35,6 @@ public class BlockState {
 
     public void setBlock(Block block) {
         this.block = block;
-    }
-
-    public @Nullable BlockPos getPos() {
-        return pos;
-    }
-
-    public void setPos(@Nullable BlockPos pos) {
-        this.pos = pos;
     }
 
     public @Nullable Chunk getChunk() {
@@ -68,36 +58,35 @@ public class BlockState {
         return block.isAir();
     }
 
+    public List<AABBox> getOutline() {
+        return block.getOutline(this);
+    }
+
     public List<AABBox> getCollision() {
-        return block.getCollision();
+        return block.getCollision(this);
+    }
+
+    public List<AABBox> getRayCast() {
+        return block.getRayCast(this);
     }
 
     public boolean canPlaceOn(BlockState block, World world, int x, int y, int z, Direction face) {
         return this.block.canPlaceOn(block, world, x, y, z, face);
     }
 
-    public List<AABBox> getRayCast() {
-        return block.getRayCast();
-    }
-
-    public boolean shouldRenderFace(BlockState state, Direction face) {
-        return block.shouldRenderFace(state, face);
+    public boolean shouldRenderFace(BlockPos pos, Direction face) {
+        return block.shouldRenderFace(this, pos, face);
     }
 
     public Identifier getRenderer() {
         return block.getRenderer();
     }
 
-    public List<IProperty> getProperties() {
+    public Map<String, IProperty> getProperties() {
         return properties;
     }
 
     public IProperty getProperty(String name) {
-        for (IProperty property : properties) {
-            if (property.getName().equals(name)) {
-                return property;
-            }
-        }
-        return null;
+        return properties.get(name);
     }
 }

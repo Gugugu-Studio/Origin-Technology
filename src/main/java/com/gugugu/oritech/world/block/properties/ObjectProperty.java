@@ -1,4 +1,4 @@
-package com.gugugu.oritech.block.properties;
+package com.gugugu.oritech.world.block.properties;
 
 public abstract class ObjectProperty<T> extends AbstractProperty {
     public ObjectProperty(String name, T defVal) {

@@ -1,7 +1,6 @@
 package com.gugugu.oritech.client.model;
 
-import com.gugugu.oritech.block.Block;
-import com.gugugu.oritech.resource.ModelLoader;
+import com.gugugu.oritech.world.block.Block;
 import com.gugugu.oritech.resource.ResLocation;
 import com.gugugu.oritech.resource.ResType;
 import com.gugugu.oritech.resource.StateMappingLoader;

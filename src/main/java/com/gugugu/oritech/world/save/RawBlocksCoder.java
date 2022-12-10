@@ -1,9 +1,7 @@
 package com.gugugu.oritech.world.save;
 
-import com.gugugu.oritech.block.BlockState;
-import com.gugugu.oritech.util.math.BlockPos;
+import com.gugugu.oritech.world.block.BlockState;
 import com.gugugu.oritech.util.registry.Registry;
-import com.gugugu.oritech.block.Block;
 
 import java.io.*;
 

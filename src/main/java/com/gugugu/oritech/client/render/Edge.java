@@ -2,7 +2,6 @@ package com.gugugu.oritech.client.render;
 
 import com.gugugu.oritech.util.Side;
 import com.gugugu.oritech.util.SideOnly;
-import com.gugugu.oritech.util.math.Direction;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -71,10 +70,10 @@ public class Edge {
 
     @Override
     public boolean equals(Object obj) {
-        if (! (obj instanceof  Edge)) {
+        if (!(obj instanceof Edge)) {
             return false;
         }
-        if (! xy.equals(((Edge) obj).xy)) {
+        if (!xy.equals(((Edge) obj).xy)) {
             return false;
         }
         if (min_z != ((Edge) obj).min_z) {
@@ -133,21 +132,18 @@ public class Edge {
 
     public Line toLine() {
         return switch (dir) {
-            case X ->
-                new Line(
-                    new Vector3f(min_z, xy.x, xy.y),
-                    new Vector3f(max_z, xy.x, xy.y)
-                );
-            case Y ->
-                new Line(
-                    new Vector3f(xy.x, min_z, xy.y),
-                    new Vector3f(xy.x, max_z, xy.y)
-                );
-            case Z ->
-                new Line(
-                    new Vector3f(xy.x, xy.y, min_z),
-                    new Vector3f(xy.x, xy.y, max_z)
-                );
+            case X -> new Line(
+                new Vector3f(min_z, xy.x, xy.y),
+                new Vector3f(max_z, xy.x, xy.y)
+            );
+            case Y -> new Line(
+                new Vector3f(xy.x, min_z, xy.y),
+                new Vector3f(xy.x, max_z, xy.y)
+            );
+            case Z -> new Line(
+                new Vector3f(xy.x, xy.y, min_z),
+                new Vector3f(xy.x, xy.y, max_z)
+            );
         };
     }
 }

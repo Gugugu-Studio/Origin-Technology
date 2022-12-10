@@ -1,6 +1,6 @@
 package com.gugugu.oritech.client.model;
 
-import com.gugugu.oritech.client.render.Batch;
+import com.gugugu.oritech.client.render.Tesselator;
 import com.gugugu.oritech.resource.tex.TextureAtlas;
 import com.gugugu.oritech.util.Side;
 import com.gugugu.oritech.util.SideOnly;
@@ -15,10 +15,12 @@ import java.util.Map;
 public class RenderBox {
     public Vector3f min;
     public Vector3f max;
+
     public static class UVGroup {
         public Vector2d uv_min;
         public Vector2d uv_max;
     }
+
     public Map<Direction, UVGroup> uvGroups;
 
     public RenderBox(Vector3f min, Vector3f max, Map<Direction, UVGroup> uvGroups) {
@@ -27,7 +29,10 @@ public class RenderBox {
         this.uvGroups = uvGroups;
     }
 
-    public void renderFace(Batch batch, Direction face, Vector2d uv0, Vector2d uv1, TextureAtlas atlas, int granularity) {
+    public void renderFace(Tesselator t, Direction face,
+                           double u0, double v0,
+                           double u1, double v1,
+                           TextureAtlas atlas, int granularity) {
         float x0 = min.x;
         float y0 = min.y;
         float z0 = min.z;
@@ -35,54 +40,66 @@ public class RenderBox {
         float y1 = max.y;
         float z1 = max.z;
 
-        float u_len = (float) (uv1.x - uv0.x);
-        float v_len = (float) (uv1.y - uv0.y);
+        float u_len = (float) (u1 - u0);
+        float v_len = (float) (v1 - v0);
         float scale_u = u_len / granularity;
         float scale_v = v_len / granularity;
         UVGroup group = uvGroups.get(face);
-        float u0 = (float) ((uv0.x + group.uv_min.x * scale_u) / atlas.width());
-        float v0 = (float) ((uv0.y + group.uv_min.y * scale_v) / atlas.height());
-        float u1 = (float) ((uv0.x + group.uv_max.x * scale_u) / atlas.width());
-        float v1 = (float) ((uv0.y + group.uv_max.y * scale_v) / atlas.height());
+        float fu0 = (float) ((u0 + group.uv_min.x * scale_u) / atlas.width());
+        float fv0 = (float) ((v0 + group.uv_min.y * scale_v) / atlas.height());
+        float fu1 = (float) ((u0 + group.uv_max.x * scale_u) / atlas.width());
+        float fv1 = (float) ((v0 + group.uv_max.y * scale_v) / atlas.height());
 
         switch (face) {
-            case WEST -> batch.quadIndices()
-                .texCoords(u0, v0).normal(-1, 0, 0).vertex(x0, y1, z0)
-                .texCoords(u0, v1).normal(-1, 0, 0).vertex(x0, y0, z0)
-                .texCoords(u1, v1).normal(-1, 0, 0).vertex(x0, y0, z1)
-                .texCoords(u1, v0).normal(-1, 0, 0).vertex(x0, y1, z1);
-            case EAST -> batch.quadIndices()
-                .texCoords(u0, v0).normal(1, 0, 0).vertex(x1, y1, z1)
-                .texCoords(u0, v1).normal(1, 0, 0).vertex(x1, y0, z1)
-                .texCoords(u1, v1).normal(1, 0, 0).vertex(x1, y0, z0)
-                .texCoords(u1, v0).normal(1, 0, 0).vertex(x1, y1, z0);
-            case DOWN -> batch.quadIndices()
-                .texCoords(u0, v0).normal(0, -1, 0).vertex(x0, y0, z1)
-                .texCoords(u0, v1).normal(0, -1, 0).vertex(x0, y0, z0)
-                .texCoords(u1, v1).normal(0, -1, 0).vertex(x1, y0, z0)
-                .texCoords(u1, v0).normal(0, -1, 0).vertex(x1, y0, z1);
-            case UP -> batch.quadIndices()
-                .texCoords(u0, v0).normal(0, 1, 0).vertex(x0, y1, z0)
-                .texCoords(u0, v1).normal(0, 1, 0).vertex(x0, y1, z1)
-                .texCoords(u1, v1).normal(0, 1, 0).vertex(x1, y1, z1)
-                .texCoords(u1, v0).normal(0, 1, 0).vertex(x1, y1, z0);
-            case NORTH -> batch.quadIndices()
-                .texCoords(u0, v0).normal(0, 0, 1).vertex(x1, y1, z0)
-                .texCoords(u0, v1).normal(0, 0, 1).vertex(x1, y0, z0)
-                .texCoords(u1, v1).normal(0, 0, 1).vertex(x0, y0, z0)
-                .texCoords(u1, v0).normal(0, 0, 1).vertex(x0, y1, z0);
-            case SOUTH -> batch.quadIndices()
-                .texCoords(u0, v0).normal(0, 0, -1).vertex(x0, y1, z1)
-                .texCoords(u0, v1).normal(0, 0, -1).vertex(x0, y0, z1)
-                .texCoords(u1, v1).normal(0, 0, -1).vertex(x1, y0, z1)
-                .texCoords(u1, v0).normal(0, 0, -1).vertex(x1, y1, z1);
+            case WEST -> {
+                t.index(0, 1, 2, 2, 3, 0);
+                t.texCoord(fu0, fv0).normal(-1, 0, 0).vertex(x0, y1, z0).emit();
+                t.texCoord(fu0, fv1).normal(-1, 0, 0).vertex(x0, y0, z0).emit();
+                t.texCoord(fu1, fv1).normal(-1, 0, 0).vertex(x0, y0, z1).emit();
+                t.texCoord(fu1, fv0).normal(-1, 0, 0).vertex(x0, y1, z1).emit();
+            }
+            case EAST -> {
+                t.index(0, 1, 2, 2, 3, 0);
+                t.texCoord(fu0, fv0).normal(1, 0, 0).vertex(x1, y1, z1).emit();
+                t.texCoord(fu0, fv1).normal(1, 0, 0).vertex(x1, y0, z1).emit();
+                t.texCoord(fu1, fv1).normal(1, 0, 0).vertex(x1, y0, z0).emit();
+                t.texCoord(fu1, fv0).normal(1, 0, 0).vertex(x1, y1, z0).emit();
+            }
+            case DOWN -> {
+                t.index(0, 1, 2, 2, 3, 0);
+                t.texCoord(fu0, fv0).normal(0, -1, 0).vertex(x0, y0, z1).emit();
+                t.texCoord(fu0, fv1).normal(0, -1, 0).vertex(x0, y0, z0).emit();
+                t.texCoord(fu1, fv1).normal(0, -1, 0).vertex(x1, y0, z0).emit();
+                t.texCoord(fu1, fv0).normal(0, -1, 0).vertex(x1, y0, z1).emit();
+            }
+            case UP -> {
+                t.index(0, 1, 2, 2, 3, 0);
+                t.texCoord(fu0, fv0).normal(0, 1, 0).vertex(x0, y1, z0).emit();
+                t.texCoord(fu0, fv1).normal(0, 1, 0).vertex(x0, y1, z1).emit();
+                t.texCoord(fu1, fv1).normal(0, 1, 0).vertex(x1, y1, z1).emit();
+                t.texCoord(fu1, fv0).normal(0, 1, 0).vertex(x1, y1, z0).emit();
+            }
+            case NORTH -> {
+                t.index(0, 1, 2, 2, 3, 0);
+                t.texCoord(fu0, fv0).normal(0, 0, 1).vertex(x1, y1, z0).emit();
+                t.texCoord(fu0, fv1).normal(0, 0, 1).vertex(x1, y0, z0).emit();
+                t.texCoord(fu1, fv1).normal(0, 0, 1).vertex(x0, y0, z0).emit();
+                t.texCoord(fu1, fv0).normal(0, 0, 1).vertex(x0, y1, z0).emit();
+            }
+            case SOUTH -> {
+                t.index(0, 1, 2, 2, 3, 0);
+                t.texCoord(fu0, fv0).normal(0, 0, -1).vertex(x0, y1, z1).emit();
+                t.texCoord(fu0, fv1).normal(0, 0, -1).vertex(x0, y0, z1).emit();
+                t.texCoord(fu1, fv1).normal(0, 0, -1).vertex(x1, y0, z1).emit();
+                t.texCoord(fu1, fv0).normal(0, 0, -1).vertex(x1, y1, z1).emit();
+            }
         }
     }
 
     public static class Builder {
         public Vector3f min;
         public Vector3f max;
-        public Map<Direction, RenderBox.UVGroup> uvGroups = new HashMap<>();
+        public final Map<Direction, RenderBox.UVGroup> uvGroups = new HashMap<>();
 
         public Builder() {
         }

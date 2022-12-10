@@ -1,6 +1,7 @@
-package com.gugugu.oritech.block;
+package com.gugugu.oritech.world.block;
 
 import com.gugugu.oritech.phys.AABBox;
+import com.gugugu.oritech.util.shape.VoxelShapes;
 
 import java.util.List;
 
@@ -25,8 +26,8 @@ public class AirBlock extends Block {
     }
 
     @Override
-    public List<AABBox> getOutline() {
-        return null;
+    public List<AABBox> getOutline(BlockState state) {
+        return VoxelShapes.empty();
     }
 
     @Override

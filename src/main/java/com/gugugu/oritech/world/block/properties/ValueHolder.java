@@ -1,4 +1,4 @@
-package com.gugugu.oritech.block.properties;
+package com.gugugu.oritech.world.block.properties;
 
 public class ValueHolder {
     protected ValueType type;
@@ -46,6 +46,7 @@ public class ValueHolder {
         return floatVal;
     }
 
+    @SuppressWarnings("unchecked")
     public <T> T getValueAs() {
         return (T) getValueAsObject();
     }

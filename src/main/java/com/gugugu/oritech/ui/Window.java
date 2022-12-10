@@ -3,6 +3,9 @@ package com.gugugu.oritech.ui;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.system.MemoryStack;
+
+import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -60,17 +63,20 @@ public abstract class Window
         mouse = new Mouse(this);
         mouse.registerToWindow(handle);
 
-        int[] pWidth = {0}, pHeight = {0};
-        glfwGetWindowSize(handle, pWidth, pHeight);
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            IntBuffer pWidth = stack.mallocInt(1);
+            IntBuffer pHeight = stack.mallocInt(1);
+            glfwGetWindowSize(handle, pWidth, pHeight);
 
-        GLFWVidMode videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+            GLFWVidMode videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
-        if (videoMode != null) {
-            glfwSetWindowPos(
-                handle,
-                (videoMode.width() - pWidth[0]) / 2,
-                (videoMode.height() - pHeight[0]) / 2
-            );
+            if (videoMode != null) {
+                glfwSetWindowPos(
+                    handle,
+                    (videoMode.width() - pWidth.get(0)) / 2,
+                    (videoMode.height() - pHeight.get(0)) / 2
+                );
+            }
         }
 
         glfwMakeContextCurrent(handle);
@@ -94,10 +100,13 @@ public abstract class Window
     }
 
     public void mainLoop() {
-        int[] pWidth = {0}, pHeight = {0};
-        glfwGetFramebufferSize(handle, pWidth, pHeight);
-        init(pWidth[0], pHeight[0]);
-        onResize(handle, pWidth[0], pHeight[0]);
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            IntBuffer pWidth = stack.mallocInt(1);
+            IntBuffer pHeight = stack.mallocInt(1);
+            glfwGetFramebufferSize(handle, pWidth, pHeight);
+            init(pWidth.get(0), pHeight.get(0));
+            onResize(handle, pWidth.get(0), pHeight.get(0));
+        }
 
         while (!glfwWindowShouldClose(handle)) {
             update();

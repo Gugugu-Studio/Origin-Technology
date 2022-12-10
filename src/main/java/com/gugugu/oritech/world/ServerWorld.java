@@ -1,10 +1,9 @@
 package com.gugugu.oritech.world;
 
-import com.gugugu.oritech.block.BlockState;
+import com.gugugu.oritech.world.block.BlockState;
 import com.gugugu.oritech.server.IntegratedServer;
 import com.gugugu.oritech.server.Server;
 import com.gugugu.oritech.util.math.ChunkPos;
-import com.gugugu.oritech.block.Block;
 import com.gugugu.oritech.world.chunk.Chunk;
 import com.gugugu.oritech.world.chunk.LogicChunk;
 import com.gugugu.oritech.world.save.BlocksCoders;

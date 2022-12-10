@@ -1,7 +1,7 @@
 package com.gugugu.oritech.client.render;
 
-import com.gugugu.oritech.block.BlockState;
 import com.gugugu.oritech.client.OriTechClient;
+import com.gugugu.oritech.entity.PlayerEntity;
 import com.gugugu.oritech.phys.AABBox;
 import com.gugugu.oritech.phys.RayCastResult;
 import com.gugugu.oritech.util.HitResult;
@@ -10,9 +10,8 @@ import com.gugugu.oritech.util.SideOnly;
 import com.gugugu.oritech.util.math.Direction;
 import com.gugugu.oritech.world.ClientWorld;
 import com.gugugu.oritech.world.IWorldListener;
-import com.gugugu.oritech.block.Block;
+import com.gugugu.oritech.world.block.BlockState;
 import com.gugugu.oritech.world.chunk.RenderChunk;
-import com.gugugu.oritech.entity.PlayerEntity;
 import org.joml.Intersectionf;
 import org.joml.Matrix4fc;
 import org.joml.Vector3f;
@@ -31,7 +30,6 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
     public static final int MAX_REBUILD_PER_FRAME = 4;
     private final OriTechClient client;
     private final ClientWorld world;
-    private final List<RenderChunk> dirtyChunks = new ArrayList<>();
     private static final Vector3f pickVec = new Vector3f();
     public HitResult hitResult;
 
@@ -44,7 +42,7 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
     }
 
     public List<RenderChunk> getDirtyChunks(PlayerEntity player) {
-        dirtyChunks.clear();
+        List<RenderChunk> dirtyChunks = new ArrayList<>();
         final int distance = client.gameRenderer.renderDistance;
         final Vector3f pos = player.position;
         world.forEachChunksDistance(distance, pos.x(), pos.y(), pos.z(), (chunk, x, y, z) -> {
@@ -65,12 +63,6 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
             for (int i = 0; i < list.size() && i < MAX_REBUILD_PER_FRAME; i++) {
                 RenderChunk chunk = list.get(i);
                 chunk.rebuild();
-                if (chunk.batch != null) {
-                    chunk.batch.initGL();
-                    if (chunk.batch.hasBuilt() && !chunk.batch.uploaded()) {
-                        chunk.batch.upload();
-                    }
-                }
             }
         }
     }
@@ -83,7 +75,7 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
     }
 
     public void tryRenderHit() {
-        TryHitRenderer.render(hitResult);
+        OutlineRenderer.render(hitResult);
     }
 
     public void pick(PlayerEntity player, Matrix4fc viewMatrix, Camera camera) {
@@ -98,7 +90,7 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
         float closestDistance = Float.POSITIVE_INFINITY;
         hitResult = null;
         Vector3f dir = viewMatrix.positiveZ(pickVec).negate();
-        Block hBlock = null;
+        BlockState hBlock = null;
         int hX = 0, hY = 0, hZ = 0;
         Direction hFace = null;
 
@@ -111,26 +103,23 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
                         if (rayCasts == null) {
                             continue;
                         }
-                        for (AABBox aabb : rayCasts) {
-                            aabb.min.add(x, y, z);
-                            aabb.max.add(x, y, z);
-                        }
                         for (AABBox rayCast : rayCasts) {
-                            if (!Frustum.test(rayCast)) {
+                            AABBox bb = new AABBox(rayCast).move(x, y, z);
+                            if (!Frustum.test(bb)) {
                                 continue;
                             }
                             if (Intersectionf.intersectRayAab(camera.position,
                                 dir,
-                                rayCast.min,
-                                rayCast.max,
+                                bb.min,
+                                bb.max,
                                 RayCastResult.nearFar)
                                 && RayCastResult.nearFar.x < closestDistance) {
                                 closestDistance = RayCastResult.nearFar.x;
-                                hBlock = block.getBlock();
+                                hBlock = block;
                                 hX = x;
                                 hY = y;
                                 hZ = z;
-                                hFace = rayCast.rayCastFacing(camera.position, dir);
+                                hFace = bb.rayCastFacing(camera.position, dir);
                             }
                         }
                     }

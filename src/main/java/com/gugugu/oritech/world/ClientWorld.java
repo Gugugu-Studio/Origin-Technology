@@ -1,11 +1,10 @@
 package com.gugugu.oritech.world;
 
-import com.gugugu.oritech.block.BlockState;
+import com.gugugu.oritech.world.block.BlockState;
 import com.gugugu.oritech.client.OriTechClient;
 import com.gugugu.oritech.util.Side;
 import com.gugugu.oritech.util.SideOnly;
 import com.gugugu.oritech.util.math.ChunkPos;
-import com.gugugu.oritech.block.Block;
 import com.gugugu.oritech.world.chunk.RenderChunk;
 import org.joml.Random;
 

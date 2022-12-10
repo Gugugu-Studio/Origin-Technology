@@ -73,7 +73,7 @@ vec3 calcPointLight(PointLight light, vec4 fragPos, vec3 normal) {
 }
 
 vec3 calcDirecitonalLight(DirecionalLight light, vec3 normal) {
-    float diff = max(dot(-light.direction, normal), 0);
+    float diff = max(dot(light.direction, normal), 0);
     vec3 diffuse = diff * light.color;
     return diffuse;
 }

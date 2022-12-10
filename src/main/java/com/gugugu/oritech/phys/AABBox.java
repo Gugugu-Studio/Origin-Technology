@@ -62,6 +62,12 @@ public class AABBox {
         fix();
     }
 
+    public AABBox(AABBox box) {
+        min.set(box.min);
+        max.set(box.max);
+        fix();
+    }
+
     /**
      * The box consumer.
      *
@@ -268,9 +274,10 @@ public class AABBox {
         return dt;
     }
 
-    public void move(float x, float y, float z) {
+    public AABBox move(float x, float y, float z) {
         min.add(x, y, z);
         max.add(x, y, z);
         fix();
+        return this;
     }
 }

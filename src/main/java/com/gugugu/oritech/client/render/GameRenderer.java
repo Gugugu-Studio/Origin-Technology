@@ -51,7 +51,7 @@ public class GameRenderer implements AutoCloseable {
         this.client = client;
         UniformLayout layout = new UniformLayout();
         layout.addIntUniform("gameTime").addVec4Uniform("ColorModulator");
-        this.buffer = new UniformBuffer(layout, "InfoUniform", 2);
+        buffer = new UniformBuffer(layout, "InfoUniform", 2);
     }
 
     public void init() {
@@ -64,11 +64,10 @@ public class GameRenderer implements AutoCloseable {
         positionColorTexNormal = loadShader("light/position_color_tex_normal");
         positionTexNormal = loadShader("light/position_tex_normal");
 
-        this.buffer.bind(positionNormal);
-        this.buffer.bind(positionColorNormal);
-        this.buffer.bind(positionColorTexNormal);
-        this.buffer.bind(positionTexNormal);
-        Tesselator.getInstance().init();
+        buffer.bind(positionNormal);
+        buffer.bind(positionColorNormal);
+        buffer.bind(positionColorTexNormal);
+        buffer.bind(positionTexNormal);
     }
 
     public void useShader(Shader shader,
@@ -103,7 +102,8 @@ public class GameRenderer implements AutoCloseable {
 
     public void render() {
         setupCamera((float) client.timer.partialTick, client.width, client.height);
-        Frustum.update(projection.pushMatrix().mul(view));
+        projection.pushMatrix();
+        Frustum.update(projection.mul(view));
         projection.popMatrix();
 
         client.worldRenderer.pick(client.player, view, camera);

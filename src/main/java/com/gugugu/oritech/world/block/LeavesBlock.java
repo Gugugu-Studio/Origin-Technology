@@ -1,4 +1,4 @@
-package com.gugugu.oritech.block;
+package com.gugugu.oritech.world.block;
 
 public class LeavesBlock extends Block{
     @Override

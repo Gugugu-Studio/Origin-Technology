@@ -1,7 +1,6 @@
 package com.gugugu.oritech.world.save;
 
-import com.gugugu.oritech.block.Block;
-import com.gugugu.oritech.block.BlockState;
+import com.gugugu.oritech.world.block.BlockState;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
