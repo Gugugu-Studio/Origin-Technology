@@ -10,10 +10,14 @@ out VS_OUT {
     vec2 texCoord0;
 } vs_out;
 
-uniform mat4 Projection, View;
+layout (std140) uniform MVPMatrix {
+    mat4 Projection;
+    mat4 View;
+    mat4 Model;
+};
 
 void main() {
-    gl_Position = Projection * View * vec4(Position, 1.0);
+    gl_Position = Projection * View * Model * vec4(Position, 1.0);
     vs_out.fragPos = vec4(Position, 1.0);
     vs_out.texCoord0 = UV0;
     // TODO: calc the normal matrix on cpu

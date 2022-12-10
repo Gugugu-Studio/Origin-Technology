@@ -23,7 +23,7 @@ public final class GLUniform implements AutoCloseable {
 
     public GLUniform(int loc, UniformType type) {
         this.location = loc;
-        buffer = MemoryUtil.memAlloc(type.length);
+        buffer = MemoryUtil.memCalloc(type.length);
         this.type = type;
         if (type == UniformType.MAT_F4) {
             buffer.putFloat(1).putFloat(0).putFloat(0).putFloat(0)
@@ -85,9 +85,7 @@ public final class GLUniform implements AutoCloseable {
                 buffer.getFloat(4),
                 buffer.getFloat(8),
                 buffer.getFloat(12));
-            case MAT_F4 -> glUniformMatrix4fv(location,
-                false,
-                buffer.asFloatBuffer());
+            case MAT_F4 -> nglUniformMatrix4fv(location, 1, false, MemoryUtil.memAddress(buffer));
         }
         isDirty = false;
     }

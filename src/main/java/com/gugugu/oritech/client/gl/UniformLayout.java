@@ -3,6 +3,9 @@ package com.gugugu.oritech.client.gl;
 import java.util.*;
 
 public class UniformLayout {
+    /**
+     * {@code name -> (offset, size)}
+     */
     protected Map<String, Map.Entry<Integer, Integer>> layout = new HashMap<>();
     protected int offset = 0;
 
@@ -28,7 +31,7 @@ public class UniformLayout {
     }
 
     public UniformLayout addMatrixUniform(String name, int size) {
-        return addArrayUniform(name, 16, size);
+        return addArrayUniform(name, 4, size * size);
     }
 
     public UniformLayout addMatrix3fUniform(String name) {

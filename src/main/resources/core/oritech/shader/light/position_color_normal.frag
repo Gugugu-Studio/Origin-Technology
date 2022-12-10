@@ -51,7 +51,6 @@ vec3 calcDirecitonalLight(DirecionalLight light, vec3 normal) {
 // START UNIFORM LIB PART
 layout (std140) uniform InfoUniform {
     int gameTime;
-    vec4 ColorModulator;
 };
 // END UNIFORM LIB PART
 
@@ -62,6 +61,8 @@ in VS_OUT {
     vec4 vertexColor;
     vec3 vertexNormal;
 } fr_in;
+
+uniform vec4 ColorModulator;
 
 void main() {
     vec4 color = fr_in.vertexColor;

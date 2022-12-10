@@ -38,8 +38,7 @@ public class Shader implements AutoCloseable {
         glDeleteShader(fsh);
 
         // Initialize uniforms
-        createUniform("Projection", UniformType.MAT_F4);
-        createUniform("View", UniformType.MAT_F4);
+        createUniform("ColorModulator", UniformType.F4).ifPresent(uniform -> uniform.set(1.0f, 1.0f, 1.0f, 1.0f));
     }
 
     private static int compileShader(int type, String typeStr, CharSequence src) {
