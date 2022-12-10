@@ -49,6 +49,11 @@ public class ClientWorld extends World implements AutoCloseable {
     }
 
     @Override
+    public int getGameTime() {
+        return OriTechClient.getServer().world.getGameTime();
+    }
+
+    @Override
     public boolean setBlock(BlockState block, int x, int y, int z) {
         return OriTechClient.getServer().world.setBlock(block, x, y, z);
     }

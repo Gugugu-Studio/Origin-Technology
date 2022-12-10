@@ -1,8 +1,6 @@
 #version 330 core
 
 // COMMON LIB PART
-const vec3 ambientLight = vec3(0.3);
-
 struct LightParamter {
     float kc, kl, kq;
 };
@@ -28,6 +26,11 @@ float calcAtt(LightParamter para, float d) {
     return 1 / deno;
 }
 
+vec3 calcAmbientLight(int time) {
+    float ka = (sin(time / 100.0f) + 1) / 2;
+    return vec3(ka, ka, ka);
+}
+
 vec3 calcPointLight(PointLight light, vec4 fragPos, vec3 normal) {
     vec3 lightVec = vec3(light.position - fragPos);
     vec3 lightDir = normalize(lightVec);
@@ -45,9 +48,14 @@ vec3 calcDirecitonalLight(DirecionalLight light, vec3 normal) {
 }
 // END COMMON LIB PART
 
-out vec4 FragColor;
+// START UNIFORM LIB PART
+layout (std140) uniform InfoUniform {
+    int gameTime;
+    vec4 ColorModulator;
+};
+// END UNIFORM LIB PART
 
-uniform vec4 ColorModulator;
+out vec4 FragColor;
 
 in VS_OUT {
     vec4 fragPos;
@@ -56,6 +64,6 @@ in VS_OUT {
 
 void main() {
     vec3 normal = normalize(fr_in.vertexNormal);
-    vec3 light = ambientLight + calcDirecitonalLight(SunLight, normal);
+    vec3 light = calcAmbientLight(gameTime) + calcDirecitonalLight(SunLight, normal);
     FragColor = ColorModulator * vec4(light, 1.0);
 }

@@ -40,9 +40,6 @@ public class Shader implements AutoCloseable {
         // Initialize uniforms
         createUniform("Projection", UniformType.MAT_F4);
         createUniform("View", UniformType.MAT_F4);
-        createUniform("Model", UniformType.MAT_F4);
-        createUniform("ColorModulator", UniformType.F4).ifPresent(uniform -> uniform.set(1.0f, 1.0f, 1.0f, 1.0f));
-        createUniform("Sampler0", UniformType.I1).ifPresent(uniform -> uniform.set(0));
     }
 
     private static int compileShader(int type, String typeStr, CharSequence src) {
@@ -100,5 +97,9 @@ public class Shader implements AutoCloseable {
             uniform.close();
         }
         delete();
+    }
+
+    public int getProgramId() {
+        return programId;
     }
 }

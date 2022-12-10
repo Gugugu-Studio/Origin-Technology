@@ -1,6 +1,8 @@
 package com.gugugu.oritech.world;
 
 import com.gugugu.oritech.world.block.BlockState;
+import com.gugugu.oritech.server.IntegratedServer;
+import com.gugugu.oritech.server.Server;
 import com.gugugu.oritech.util.math.ChunkPos;
 import com.gugugu.oritech.world.chunk.Chunk;
 import com.gugugu.oritech.world.chunk.LogicChunk;
@@ -23,10 +25,12 @@ public class ServerWorld extends World {
     public final Random random;
     public final long seed;
     public List<LogicChunk> dirtyChunks = new ArrayList<>();
+    protected Server server;
 
-    public ServerWorld(long seed,
+    public ServerWorld(Server server, long seed,
                        int distance,
                        int spawnX, int spawnY, int spawnZ) {
+        this.server = server;
         this.seed = seed;
         random = new Random(seed);
         forEachChunksDistance(distance, spawnX, spawnY, spawnZ, (chunk, x, y, z) -> {
@@ -73,6 +77,11 @@ public class ServerWorld extends World {
             this,
             x0, y0, z0,
             x1, y1, z1);
+    }
+
+    @Override
+    public int getGameTime() {
+        return server.getTicks();
     }
 
     @Override

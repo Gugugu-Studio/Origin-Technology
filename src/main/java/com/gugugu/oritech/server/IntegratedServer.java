@@ -11,7 +11,7 @@ import org.joml.Random;
  */
 public class IntegratedServer extends Server implements AutoCloseable {
     private final OriTechClient client;
-    public final Timer timer = new Timer();
+    protected final Timer timer = new Timer();
     public int passedTick = 0;
 
     public IntegratedServer(OriTechClient client) {
@@ -19,7 +19,7 @@ public class IntegratedServer extends Server implements AutoCloseable {
     }
 
     public void start() {
-        world = new ServerWorld(Random.newSeed() ^ System.nanoTime(),
+        world = new ServerWorld(this, Random.newSeed() ^ System.nanoTime(),
             client.gameRenderer.renderDistance,
             0, 5, 0);
     }
@@ -48,6 +48,11 @@ public class IntegratedServer extends Server implements AutoCloseable {
     @Override
     public boolean isIntegrated() {
         return true;
+    }
+
+    @Override
+    public int getTicks() {
+        return passedTick;
     }
 
     @Override

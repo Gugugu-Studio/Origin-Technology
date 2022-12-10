@@ -22,6 +22,8 @@ public abstract class World {
     public static final int LIMIT = CHUNK_LIMIT * Chunk.CHUNK_SIZE;
     public static final int Y_LIMIT = CHUNK_LIMIT * 8;
 
+    public abstract int getGameTime();
+
     public BlockState getBlock(int x, int y, int z) {
         if (isInsideWorld(x, y, z)) {
             return getChunkByBlockPos(x, y, z)
@@ -126,5 +128,8 @@ public abstract class World {
 
     public boolean isOutsideWorld(int x, int y, int z) {
         return !isInsideWorld(x, y, z);
+    }
+
+    public void update() {
     }
 }
